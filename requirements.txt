@@ -1,0 +1,3 @@
+ase
+pint >= 0.17
+-r tests/requirements.test.txt
