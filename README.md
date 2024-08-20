@@ -5,12 +5,12 @@
 | Name                                              |    Stmts |     Miss |   Cover |   Missing |
 |-------------------------------------------------- | -------: | -------: | ------: | --------: |
 | python/lammpsinputbuilder/\_\_init\_\_.py         |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/typedMolecule.py        |       89 |       40 |     55% |19, 22, 25, 28, 31-35, 39-40, 43, 46, 49, 52, 72, 74, 79, 84, 91-92, 99-107, 111-120 |
-| python/lammpsinputbuilder/types.py                |       30 |        3 |     90% |30, 35, 38 |
+| python/lammpsinputbuilder/typedMolecule.py        |      122 |       14 |     89% |43, 46, 49, 52, 74, 76, 84, 95-98, 109, 116, 146, 164 |
+| python/lammpsinputbuilder/types.py                |       62 |       27 |     56% |14-21, 24-33, 46-49, 52-57, 70, 75, 78 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/modelToData.py  |      130 |       19 |     85% |35, 39, 94, 114, 133, 155-158, 172, 176-186 |
-| python/lammpsinputbuilder/workflowBuilder.py      |       27 |        2 |     93% |    20, 25 |
-|                                         **TOTAL** |  **276** |   **64** | **77%** |           |
+| python/lammpsinputbuilder/workflowBuilder.py      |       29 |        3 |     90% |18, 22, 27 |
+|                                         **TOTAL** |  **343** |   **63** | **82%** |           |
 
 
 ## Setup coverage badge
