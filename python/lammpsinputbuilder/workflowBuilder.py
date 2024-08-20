@@ -11,9 +11,11 @@ class WorkflowBuilder:
 
     def __init__(self):
         self.molecule = None
-        self.sections =[]
+        self.sections = []
 
     def setTypedMolecule(self, molecule: TypedMolecule):
+        if not molecule.isModelLoaded():
+            raise ValueError("The molecule must be loaded before it can be set.")
         self.molecule = molecule
 
     def getTypedMolecule(self) -> TypedMolecule:
