@@ -34,7 +34,7 @@ class TypedMolecule:
         result["bboxStyle"] = self.getBoundingBoxStyle().value
         return result
     
-    def fromDict(self, d: dict):
+    def fromDict(self, d: dict, version: int):
         # We're not checking the class name here, it's up to the inheriting class
         self.setForcefieldType(Forcefield(d["forcefield"]))
         self.setBoundingBoxStyle(BoundingBoxStyle(d["bboxStyle"]))
@@ -157,7 +157,7 @@ class ReaxTypedMolecule(TypedMolecule):
         result["moleculeContent"] = self.moleculeContent
         return result
     
-    def fromDict(self, d: dict):
+    def fromDict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         moleculeType = d["class"]
         if moleculeType != self.__class__.__name__:

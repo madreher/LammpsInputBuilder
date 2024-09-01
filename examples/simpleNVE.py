@@ -9,6 +9,8 @@ import logging
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
 from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+from lammpsinputbuilder.section import IntegratorSection
+from lammpsinputbuilder.integrator import NVEIntegrator
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -29,6 +31,11 @@ def main():
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
     workflow.setTypedMolecule(typedMolecule)
+
+    # Create a NVE Section
+    section = IntegratorSection(integrator=NVEIntegrator())
+    workflow.addSection(section)
+
 
     # Generate the inputs
     jobFolder = workflow.generateInputs()

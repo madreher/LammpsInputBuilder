@@ -1,7 +1,9 @@
 from lammpsinputbuilder.typedMolecule import TypedMolecule
+from lammpsinputbuilder.section import Section
 
 from pathlib import Path
 from uuid import uuid4
+import shutil
 import logging
 import tempfile
 
@@ -20,6 +22,9 @@ class WorkflowBuilder:
 
     def getTypedMolecule(self) -> TypedMolecule:
         return self.molecule
+    
+    def addSection(self, section: Section):
+        self.sections.append(section)
     
     def generateInputs(self, jobFolderPrefix: Path = None) -> Path:
 
@@ -41,5 +46,19 @@ class WorkflowBuilder:
         inputPath = self.molecule.generateLammpsInputFile(jobFolder, molecule)
 
         # System is now declared, we can add sections to the input file
+
+        # First, we are going to copy the initial input file to a new file
+        # This is to preserve the input file with the system declaration only 
+        # to help with debugging or additional manual analysis from the user
+        workflowInputPath = jobFolder / "workflow.input"
+        shutil.copy(inputPath, workflowInputPath)
+
+        # Now we can add the sections
+        sectionContent = ""
+        for section in self.sections:
+            sectionContent += section.addAllCommands()
+
+        with open(workflowInputPath, "a") as f:
+            f.write(sectionContent)
 
         return jobFolder
