@@ -11,7 +11,7 @@ from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection
 from lammpsinputbuilder.integrator import NVEIntegrator
-from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO
+from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO
 from lammpsinputbuilder.group import AllGroup
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -38,6 +38,8 @@ def main():
     section = IntegratorSection(integrator=NVEIntegrator())
     io = DumpTrajectoryFileIO(fileIOName="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
     section.addFileIO(io)
+    bonds = ReaxBondFileIO(fileIOName="bonds", interval=10, group=AllGroup())
+    section.addFileIO(bonds)
 
     workflow.addSection(section)
 

@@ -102,21 +102,34 @@ class DumpTrajectoryFileIO(FileIO):
 
 class ReaxBondFileIO(FileIO):
 
-    def __init__(self):
+    def __init__(self, fileIOName: str = "defaultReaxBondFileIO", group: Group = AllGroup(), interval: int = 100) -> None:
         super().__init__()
+        self.fileIOName = fileIOName
+        self.groupName = group.getGroupName()
+        self.interval = interval
 
     def toDict(self) -> dict:
-        pass    
+        result  = super().toDict()
+        result["class"] = self.__class__.__name__ 
+        result["fileIOName"] = self.fileIOName
+        result["group"] = self.groupName
+        result["interval"] = self.interval
+        return result
 
     def fromDict(self, d: dict, version: int):
-        pass    
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version=version)
+        self.fileIOName = d.get("fileIOName", "defaultReaxBondFileIO")
+        self.groupName = d.get("group", AllGroup().getGroupName())
+        self.interval = d.get("interval", 100)   
 
     def addDoCommands(self) -> str:
-        return ""
+        return f"fix {self.fileIOName} {self.groupName} reaxff/bonds {self.interval} bonds.{self.fileIOName}.txt\n"
 
     def addUndoCommands(self) -> str:
-        return ""
+        return f"unfix {self.fileIOName}\n"
 
     def getAssociatedFilePath(self) -> Path:
-        return Path()
+        return Path(f"bonds.{self.fileIOName}.txt")
 
