@@ -128,7 +128,7 @@ def test_moleculeToDictToMolecule():
     dict1 = typedMolecule.toDict()
 
     typedMolecule2 = ReaxTypedMolecule()
-    typedMolecule2.fromDict(dict1)
+    typedMolecule2.fromDict(dict1, 0)
 
     assert typedMolecule.toDict() == typedMolecule2.toDict()
 

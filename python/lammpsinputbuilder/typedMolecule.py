@@ -162,7 +162,7 @@ class ReaxTypedMolecule(TypedMolecule):
         moleculeType = d["class"]
         if moleculeType != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {moleculeType}.")
-        super().fromDict(d)
+        super().fromDict(d, version=version)
         self.electrostaticMethod = ElectrostaticMethod(d["electrostaticMethod"])
         self.modelLoaded = d["isModelLoaded"]
         self.forcefieldPath = Path(d["forcefieldPath"])

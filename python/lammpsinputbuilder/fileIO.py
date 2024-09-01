@@ -60,4 +60,25 @@ class DumpTrajectoryFileIO(FileIO):
 
     def getAssociatedFilePath(self) -> Path:
         return Path()
+    
+
+class ReaxBondFileIO(FileIO):
+
+    def __init__(self):
+        super().__init__()
+
+    def toDict(self) -> dict:
+        pass    
+
+    def fromDict(self, d: dict, version: int):
+        pass    
+
+    def addDoCommands(self) -> str:
+        return ""
+
+    def addUndoCommands(self) -> str:
+        return ""
+
+    def getAssociatedFilePath(self) -> Path:
+        return Path()
 

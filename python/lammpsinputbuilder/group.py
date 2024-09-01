@@ -40,7 +40,7 @@ class IndicesGroup(Group):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d)
+        super().fromDict(d, version=version)
         self.indices = d["indices"]
 
     def addDoCommands(self) -> str:
@@ -82,7 +82,7 @@ class OperationGroup(Group):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d)
+        super().fromDict(d, version=version)
         self.otherGroups = d["otherGroups"]
 
         if len(self.otherGroups) == 0 and self.op == OperationGroupEnum.UNION:
@@ -113,7 +113,7 @@ class AllGroup(Group):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d)
+        super().fromDict(d, version=version)
 
     def addDoCommands(self) -> str:
         return ""

@@ -45,7 +45,7 @@ class RecusiveSection(Section):
         return result
     
     def fromDict(self, d: dict, version: int):
-        super().fromDict(d)
+        super().fromDict(d, version=version)
         self.sections = [Section.fromDict(s) for s in d["sections"]]
 
     def addDoCommands(self) -> str:
@@ -66,7 +66,7 @@ class IntegratorSection(Section):
         return result
     
     def fromDict(self, d: dict, version: int):
-        super().fromDict(d)
+        super().fromDict(d, version=version)
         if d["class"] != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
         if "integrator" not in d.keys():
@@ -104,5 +104,5 @@ class CommandsSection(Section):
         return result
     
     def fromDict(self, d: dict, version: int):
-        super().fromDict(d)
+        super().fromDict(d, version=version)
         self.commands = d["commands"]
