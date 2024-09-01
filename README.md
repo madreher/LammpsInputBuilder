@@ -5,11 +5,11 @@
 | Name                                                    |    Stmts |     Miss |   Cover |   Missing |
 |-------------------------------------------------------- | -------: | -------: | ------: | --------: |
 | python/lammpsinputbuilder/\_\_init\_\_.py               |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/fileIO.py                     |       88 |       57 |     35% |8, 11-14, 17, 20, 23, 26, 31, 34, 37, 40, 43, 46, 52-57, 60-66, 69-76, 79-94, 97, 100, 106, 109, 112, 115, 118, 121 |
+| python/lammpsinputbuilder/fileIO.py                     |      144 |      103 |     28% |8, 11-14, 17, 20, 23, 26, 31, 34, 37, 40, 43, 46, 52-57, 60-66, 69-76, 79-94, 97, 100, 106-109, 112-117, 120-125, 128, 131, 134, 139-143, 146, 149, 152, 155-160, 163-168, 171-181, 184, 187 |
 | python/lammpsinputbuilder/group.py                      |       89 |       56 |     37% |9, 12-15, 19, 22, 25, 30-31, 34-37, 41-44, 47-54, 57, 67-69, 75-79, 83-91, 94-98, 101, 108-110, 114-116, 119, 122 |
 | python/lammpsinputbuilder/integrator.py                 |       95 |       59 |     38% |10, 13-15, 18, 21, 24, 27, 34-36, 39-41, 44, 48-50, 53-57, 60-64, 68, 71, 74, 85-90, 93-100, 103-110, 114, 117, 120-122, 125 |
 | python/lammpsinputbuilder/loader/\_\_init\_\_.py        |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/loader/fileIOLoader.py        |       18 |       18 |      0% |      1-24 |
+| python/lammpsinputbuilder/loader/fileIOLoader.py        |       19 |       19 |      0% |      1-25 |
 | python/lammpsinputbuilder/loader/integratorLoader.py    |       17 |       17 |      0% |      1-23 |
 | python/lammpsinputbuilder/loader/sectionLoader.py       |       18 |       18 |      0% |      1-24 |
 | python/lammpsinputbuilder/loader/typedMoleculeLoader.py |       16 |       16 |      0% |      1-22 |
@@ -19,7 +19,7 @@
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py       |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/modelToData.py        |      130 |       19 |     85% |35, 39, 94, 114, 133, 155-158, 172, 176-186 |
 | python/lammpsinputbuilder/workflowBuilder.py            |       40 |        5 |     88% |20, 24, 27, 32, 59 |
-|                                               **TOTAL** |  **793** |  **371** | **53%** |           |
+|                                               **TOTAL** |  **850** |  **418** | **51%** |           |
 
 
 ## Setup coverage badge
