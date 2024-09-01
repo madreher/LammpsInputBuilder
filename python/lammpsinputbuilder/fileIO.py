@@ -132,4 +132,57 @@ class ReaxBondFileIO(FileIO):
 
     def getAssociatedFilePath(self) -> Path:
         return Path(f"bonds.{self.fileIOName}.txt")
+    
+class ThermoFileIO(FileIO):
+
+    def __init__(self, fileIOName: str = "defaultThermoFileIO", interval: int = 10, addDefaultFields: bool = True, userFields: List[str] = []) -> None: # ) -> None:
+        super().__init__(fileIOName=fileIOName)
+        self.interval = interval
+        self.userFields = userFields
+        self.addDefaultFields = addDefaultFields
+        self.defaultFields = ["step", "temp", "pe", "ke", "etotal", "press"]
+
+    def setUserFields(self, userFields: List[str]):
+        self.userFields = userFields
+
+    def getUserFields(self) -> List[str]:
+        return self.userFields
+    
+    def setAddDefaultFields(self, addDefaultFields: bool):
+        self.addDefaultFields = addDefaultFields
+
+    def toDict(self) -> dict:
+        result  = super().toDict()
+        result["class"] = self.__class__.__name__ 
+        result["userFields"] = self.userFields
+        result["addDefaultFields"] = self.addDefaultFields
+        result["interval"] = self.interval
+        return result
+
+    def fromDict(self, d: dict, version: int):
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version=version)
+        self.userFields = d.get("userFields", [])
+        self.addDefaultFields = d.get("addDefaultFields", True)
+        self.interval = d.get("interval", 10)
+
+    def addDoCommands(self) -> str:
+        result = ""
+        result += f"thermo {self.interval}\n"
+        fields = []
+        if self.addDefaultFields:
+            fields.extend(self.defaultFields)
+        fields.extend(self.userFields)
+        result += f"thermo_style custom"
+        for field in fields:
+            result += f" {field}"
+        result += "\n"
+        return result
+
+    def addUndoCommands(self) -> str:
+        return ""
+
+    def getAssociatedFilePath(self) -> Path:
+        return Path("lammps.log")
 
