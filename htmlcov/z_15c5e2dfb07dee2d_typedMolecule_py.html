@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="index.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="z_15c5e2dfb07dee2d_section_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_15c5e2dfb07dee2d_types_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
-            created at 2024-08-20 06:35 +0000
+            created at 2024-09-01 03:02 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -116,7 +116,7 @@
     <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">        <span class="nam">result</span><span class="op">[</span><span class="str">"bboxStyle"</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">getBoundingBoxStyle</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">        <span class="key">return</span> <span class="nam">result</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">    <span class="key">def</span> <span class="nam">fromDict</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">d</span><span class="op">:</span> <span class="nam">dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">    <span class="key">def</span> <span class="nam">fromDict</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">d</span><span class="op">:</span> <span class="nam">dict</span><span class="op">,</span> <span class="nam">version</span><span class="op">:</span> <span class="nam">int</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">        <span class="com"># We're not checking the class name here, it's up to the inheriting class</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">setForcefieldType</span><span class="op">(</span><span class="nam">Forcefield</span><span class="op">(</span><span class="nam">d</span><span class="op">[</span><span class="str">"forcefield"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">setBoundingBoxStyle</span><span class="op">(</span><span class="nam">BoundingBoxStyle</span><span class="op">(</span><span class="nam">d</span><span class="op">[</span><span class="str">"bboxStyle"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -239,12 +239,12 @@
     <p class="run"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">        <span class="nam">result</span><span class="op">[</span><span class="str">"moleculeContent"</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">moleculeContent</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">        <span class="key">return</span> <span class="nam">result</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">    <span class="key">def</span> <span class="nam">fromDict</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">d</span><span class="op">:</span> <span class="nam">dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">    <span class="key">def</span> <span class="nam">fromDict</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">d</span><span class="op">:</span> <span class="nam">dict</span><span class="op">,</span> <span class="nam">version</span><span class="op">:</span> <span class="nam">int</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">        <span class="com"># Make sure that we are reading the right class</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">        <span class="nam">moleculeType</span> <span class="op">=</span> <span class="nam">d</span><span class="op">[</span><span class="str">"class"</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">        <span class="key">if</span> <span class="nam">moleculeType</span> <span class="op">!=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">__class__</span><span class="op">.</span><span class="nam">__name__</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">            <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">Expected class </span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">__class__</span><span class="op">.</span><span class="nam">__name__</span><span class="op">}</span><span class="fst">, got </span><span class="op">{</span><span class="nam">moleculeType</span><span class="op">}</span><span class="fst">.</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">        <span class="nam">super</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">fromDict</span><span class="op">(</span><span class="nam">d</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">        <span class="nam">super</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">fromDict</span><span class="op">(</span><span class="nam">d</span><span class="op">,</span> <span class="nam">version</span><span class="op">=</span><span class="nam">version</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">electrostaticMethod</span> <span class="op">=</span> <span class="nam">ElectrostaticMethod</span><span class="op">(</span><span class="nam">d</span><span class="op">[</span><span class="str">"electrostaticMethod"</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">modelLoaded</span> <span class="op">=</span> <span class="nam">d</span><span class="op">[</span><span class="str">"isModelLoaded"</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t168" href="#t168">168</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">forcefieldPath</span> <span class="op">=</span> <span class="nam">Path</span><span class="op">(</span><span class="nam">d</span><span class="op">[</span><span class="str">"forcefieldPath"</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -270,12 +270,12 @@
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a class="nav" href="z_15c5e2dfb07dee2d_section_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_15c5e2dfb07dee2d_types_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
-            created at 2024-08-20 06:35 +0000
+            created at 2024-09-01 03:02 +0000
         </p>
     </div>
 </footer>
