@@ -75,9 +75,9 @@ class NVEIntegrator(Integrator):
     
 
 class MinimizeStyle(Enum):
-    CG = 0,
-    SD = 1,
-    SPIN_LBFGS = 2
+    CG = "cg",
+    SD = "sd",
+    SPIN_LBFGS = "spin/lbfgs"
 
 
 class MinimizeIntegrator(Integrator):
@@ -117,6 +117,9 @@ class MinimizeIntegrator(Integrator):
         return ""
 
     def addRunCommands(self) -> str:
-        result = f"minstyle"
+        result = f"min_style {self.style.value}\n"
         result +=f"minimize {self.etol} {self.ftol} {self.maxiter} {self.maxeval}\n"
         return result
+    
+    def getMinimizeStyle(self) -> MinimizeStyle:
+        return self.style

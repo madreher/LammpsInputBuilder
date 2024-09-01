@@ -176,6 +176,11 @@ class ReaxTypedMolecule(TypedMolecule):
         # TODO: Adjust code to handle the different bbox styles
         molecule = moleculeToLammpsDataPBC(self.moleculeContent, self.moleculeFormat, jobFolder, self.getLammpsDataFileName())
 
+        # Copy the forcefield to the job folder
+        forcefieldPath = jobFolder / self.forcefieldPath.name
+        with open(forcefieldPath, 'w') as f:
+            f.write(self.forcefieldContent)
+
         return molecule
     
     def generateLammpsInputFile(self, jobFolder:Path, molecule: MoleculeHolder) -> Path:

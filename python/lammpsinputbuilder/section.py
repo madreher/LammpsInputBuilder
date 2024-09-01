@@ -1,6 +1,7 @@
 from typing import List
 
 from lammpsinputbuilder.integrator import Integrator, RunZeroIntegrator
+from lammpsinputbuilder.fileIO import FileIO
 
 class Section:
     def __init__(self, sectionName: str = "defaultSection") -> None:
@@ -58,6 +59,10 @@ class IntegratorSection(Section):
     def __init__(self, integrator: Integrator = RunZeroIntegrator()) -> None:
         super().__init__()
         self.integrator = integrator
+        self.fileIOs = []
+
+    def addFileIO(self, fileIO: FileIO):
+        self.fileIOs.append(fileIO)
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -77,17 +82,27 @@ class IntegratorSection(Section):
         self.integrator = integratorLoader.dictToIntegrator(d["integrator"], version)
         
     def addAllCommands(self) -> str:
-        result = ""
+        result =  "################# START SECTION " + self.sectionName + " #################\n\n"
         result += self.addDoCommands()
         result += self.integrator.addRunCommands()
         result += self.addUndoCommands()
+        result += "################# END SECTION " + self.sectionName + " #################\n\n"
         return result
 
     def addDoCommands(self) -> str:
-        return self.integrator.addDoCommands()
+        result = ""
+        for io in self.fileIOs:
+            result += io.addDoCommands()
+        result += self.integrator.addDoCommands()
+        return result
     
     def addUndoCommands(self) -> str:
-        return self.integrator.addUndoCommands()
+        # Undo if the reverse order is needed
+        result = ""
+        result += self.integrator.addUndoCommands()
+        for io in reversed(self.fileIOs):
+            result += io.addUndoCommands()
+        return result
 
 class CommandsSection(Section):
     def __init__(self) -> None:
