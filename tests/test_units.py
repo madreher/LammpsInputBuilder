@@ -2,26 +2,48 @@ import pytest
 
 from lammpsinputbuilder.quantities import *
 
-def test_DistanceQuantityDeclarations():
-    distanceQuantity = DistanceQuantity(1.0, "angstrom")
-    assert distanceQuantity.getMagnitude() == 1.0
-    assert distanceQuantity.getUnits() == "angstrom"
+def test_LengthQuantityDeclarations():
+    lengthQuantity = LengthQuantity(1.0, "angstrom")
+    assert lengthQuantity.getMagnitude() == 1.0
+    assert lengthQuantity.getUnits() == "angstrom"
 
-    distanceRealUnit = DistanceQuantity(1.0, "lmp_real_length")
-    assert distanceRealUnit.getMagnitude() == 1.0
-    assert distanceRealUnit.getUnits() == "lmp_real_length"
+    dictResult = lengthQuantity.toDict()
+    assert dictResult["magnitude"] == 1.0
+    assert dictResult["units"] == "angstrom"
+    assert dictResult["class"] == "LengthQuantity"
 
-    distanceMetalUnit = DistanceQuantity(1.0, "lmp_metal_length")
-    assert distanceMetalUnit.getMagnitude() == 1.0
-    assert distanceMetalUnit.getUnits() == "lmp_metal_length"
+    loadBackQuantity = LengthQuantity()
+    loadBackQuantity.fromDict(dictResult, version=0)
+
+    assert loadBackQuantity.getMagnitude() == 1.0
+    assert loadBackQuantity.getUnits() == "angstrom"
+
+    lengthRealUnit = LengthQuantity(1.0, "lmp_real_length")
+    assert lengthRealUnit.getMagnitude() == 1.0
+    assert lengthRealUnit.getUnits() == "lmp_real_length"
+
+    lengthMetalUnit = LengthQuantity(1.0, "lmp_metal_length")
+    assert lengthMetalUnit.getMagnitude() == 1.0
+    assert lengthMetalUnit.getUnits() == "lmp_metal_length"
 
     with pytest.raises(ValueError):
-        failedDistance = DistanceQuantity(1.0, "A") # Wrong unit
+        failedLength = LengthQuantity(1.0, "A") # Wrong unit
 
 def test_TimeQuantityDeclarations():
     timeQuantity = TimeQuantity(1.0, "ps")
     assert timeQuantity.getMagnitude() == 1.0
     assert timeQuantity.getUnits() == "ps"
+
+    dictResult = timeQuantity.toDict()
+    assert dictResult["magnitude"] == 1.0
+    assert dictResult["units"] == "ps"
+    assert dictResult["class"] == "TimeQuantity"
+
+    loadBackQuantity = TimeQuantity()
+    loadBackQuantity.fromDict(dictResult, version=0)
+
+    assert loadBackQuantity.getMagnitude() == 1.0
+    assert loadBackQuantity.getUnits() == "ps"
 
     timeRealUnit = TimeQuantity(1.0, "lmp_real_time")
     assert timeRealUnit.getMagnitude() == 1.0
@@ -39,6 +61,17 @@ def test_VelocityQuantityDeclarations():
     assert velocityQuantity.getMagnitude() == 1.0
     assert velocityQuantity.getUnits() == "m/s"
 
+    dictResult = velocityQuantity.toDict()
+    assert dictResult["magnitude"] == 1.0
+    assert dictResult["units"] == "m/s"
+    assert dictResult["class"] == "VelocityQuantity"
+
+    loadBackQuantity = VelocityQuantity()
+    loadBackQuantity.fromDict(dictResult, version=0)
+
+    assert loadBackQuantity.getMagnitude() == 1.0
+    assert loadBackQuantity.getUnits() == "m/s"
+
     velocityRealUnit = VelocityQuantity(1.0, "lmp_real_velocity")
     assert velocityRealUnit.getMagnitude() == 1.0
     assert velocityRealUnit.getUnits() == "lmp_real_velocity"
@@ -54,6 +87,17 @@ def test_EnergyQuantityDeclarations():
     energyQuantity = EnergyQuantity(1.0, "kcal/mol")
     assert energyQuantity.getMagnitude() == 1.0
     assert energyQuantity.getUnits() == "kcal/mol"
+
+    dictResult = energyQuantity.toDict()
+    assert dictResult["magnitude"] == 1.0
+    assert dictResult["units"] == "kcal/mol"
+    assert dictResult["class"] == "EnergyQuantity"
+
+    loadBackQuantity = EnergyQuantity()
+    loadBackQuantity.fromDict(dictResult, version=0)
+
+    assert loadBackQuantity.getMagnitude() == 1.0
+    assert loadBackQuantity.getUnits() == "kcal/mol"
 
     energyRealUnit = EnergyQuantity(1.0, "lmp_real_energy")
     assert energyRealUnit.getMagnitude() == 1.0
@@ -71,6 +115,17 @@ def test_TemperatureQuantityDeclarations():
     assert temperatureQuantity.getMagnitude() == 1.0
     assert temperatureQuantity.getUnits() == "K"
 
+    dictResult = temperatureQuantity.toDict()
+    assert dictResult["magnitude"] == 1.0
+    assert dictResult["units"] == "K"
+    assert dictResult["class"] == "TemperatureQuantity"
+
+    loadBackQuantity = TemperatureQuantity()
+    loadBackQuantity.fromDict(dictResult, version=0)
+
+    assert loadBackQuantity.getMagnitude() == 1.0
+    assert loadBackQuantity.getUnits() == "K"
+
     temperatureRealUnit = TemperatureQuantity(1.0, "lmp_real_temperature")
     assert temperatureRealUnit.getMagnitude() == 1.0
     assert temperatureRealUnit.getUnits() == "lmp_real_temperature"
@@ -86,6 +141,17 @@ def test_ForceQuantityDeclarations():
     forceQuantity = ForceQuantity(1.0, "kcal/mol/angstrom")
     assert forceQuantity.getMagnitude() == 1.0
     assert forceQuantity.getUnits() == "kcal/mol/angstrom"
+
+    dictResult = forceQuantity.toDict()
+    assert dictResult["magnitude"] == 1.0
+    assert dictResult["units"] == "kcal/mol/angstrom"
+    assert dictResult["class"] == "ForceQuantity"
+
+    loadBackQuantity = ForceQuantity()
+    loadBackQuantity.fromDict(dictResult, version=0)
+
+    assert loadBackQuantity.getMagnitude() == 1.0
+    assert loadBackQuantity.getUnits() == "kcal/mol/angstrom"
 
     forceRealUnit = ForceQuantity(1.0, "lmp_real_force")
     assert forceRealUnit.getMagnitude() == 1.0
@@ -103,6 +169,17 @@ def test_TorqueQuantityDeclarations():
     assert torqueQuantity.getMagnitude() == 1.0
     assert torqueQuantity.getUnits() == "kcal/mol"
 
+    dictResult = torqueQuantity.toDict()
+    assert dictResult["magnitude"] == 1.0
+    assert dictResult["units"] == "kcal/mol"
+    assert dictResult["class"] == "TorqueQuantity"
+
+    loadBackQuantity = TorqueQuantity()
+    loadBackQuantity.fromDict(dictResult, version=0)
+
+    assert loadBackQuantity.getMagnitude() == 1.0
+    assert loadBackQuantity.getUnits() == "kcal/mol"
+
     torqueRealUnit = TorqueQuantity(1.0, "lmp_real_torque")
     assert torqueRealUnit.getMagnitude() == 1.0
     assert torqueRealUnit.getUnits() == "lmp_real_torque"
@@ -114,6 +191,8 @@ def test_TorqueQuantityDeclarations():
     with pytest.raises(ValueError):
         failedTorque = TorqueQuantity(1.0, "m")
 
+    
+
 if __name__ == "__main__":
-    test_DistanceQuantityDeclarations()
+    test_LengthQuantityDeclarations()
 

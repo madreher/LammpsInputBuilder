@@ -93,14 +93,14 @@ class LIBQuantity():
     def toDict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
-        result["value"] = self.magnitude
+        result["magnitude"] = self.magnitude
         result["units"] = self.units
         return result
     
     def fromDict(self, d: dict, version: int) -> None:
-        self.value = d["value"]
+        self.magnitude = d["magnitude"]
         self.units = d["units"]
-        self.quantity = self.value * ureg(self.units)
+        self.quantity = self.magnitude * ureg(self.units)
 
     def getValue(self) -> float:
         return self.magnitude
@@ -110,18 +110,13 @@ class LIBQuantity():
     
 class ForceQuantity(LIBQuantity):
 
-    def __init__(self, value: float, units: str = "") -> None:
+    def __init__(self, value: float = 0.0, units: str = "lmp_real_force") -> None:
         super().__init__(value, units)
         self.expectedDimensionality = [
             "[mass] * [length] / [time] ** 2 / [substance]",
             "[mass] * [length] / [time] ** 2"
             ]
         self.validateDimensionality()
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
     
     def fromDict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
@@ -140,15 +135,10 @@ class ForceQuantity(LIBQuantity):
     
 class TemperatureQuantity(LIBQuantity):
 
-    def __init__(self, value: float, units: str = "") -> None:
+    def __init__(self, value: float = 0.0, units: str = "lmp_real_temperature") -> None:
         super().__init__(value, units)
         self.expectedDimensionality = ["[temperature]"]
         self.validateDimensionality()
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
     
     def fromDict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
@@ -167,18 +157,13 @@ class TemperatureQuantity(LIBQuantity):
     
 class TorqueQuantity(LIBQuantity):
 
-    def __init__(self, value: float, units: str = "") -> None:
+    def __init__(self, value: float = 0.0, units: str = "lmp_real_torque") -> None:
         super().__init__(value, units)
         self.expectedDimensionality = [
             "[mass] * [length] ** 2 / [time] ** 2 / [substance]",
             "[mass] * [length] ** 2 / [time] ** 2"
             ]
         self.validateDimensionality()
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
     
     def fromDict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
@@ -192,16 +177,11 @@ class TorqueQuantity(LIBQuantity):
     
 class TimeQuantity(LIBQuantity):
 
-    def __init__(self, value: float, units: str = "") -> None:
+    def __init__(self, value: float = 0.0, units: str = "lmp_real_time") -> None:
         super().__init__(value, units)
         self.expectedDimensionality = ["[time]"]
         self.validateDimensionality()
            
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
     
     def fromDict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
@@ -215,18 +195,13 @@ class TimeQuantity(LIBQuantity):
     
 class EnergyQuantity(LIBQuantity):
 
-    def __init__(self, value: float, units: str = "") -> None:
+    def __init__(self, value: float = 0.0, units: str = "lmp_real_energy") -> None:
         super().__init__(value, units)
         self.expectedDimensionality = [
             "[mass] * [length] ** 2 / [time] ** 2 / [substance]",
             "[mass] * [length] ** 2 / [time] ** 2"
             ]
         self.validateDimensionality()
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
     
     def fromDict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
@@ -238,16 +213,11 @@ class EnergyQuantity(LIBQuantity):
     def convertTo(self, unit: str) -> EnergyQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
 
-class DistanceQuantity(LIBQuantity):
-    def __init__(self, value: float, units: str = "") -> None:
+class LengthQuantity(LIBQuantity):
+    def __init__(self, value: float = 0.0, units: str = "lmp_real_length") -> None:
         super().__init__(value, units)
         self.expectedDimensionality = ["[length]"]
         self.validateDimensionality()
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
     
     def fromDict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
@@ -255,20 +225,15 @@ class DistanceQuantity(LIBQuantity):
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
         self.validateDimensionality()
-    def convertTo(self, unit: str) -> DistanceQuantity:
+    def convertTo(self, unit: str) -> float:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
 
 class VelocityQuantity(LIBQuantity):
 
-    def __init__(self, value: float, units: str = "") -> None:
+    def __init__(self, value: float = 0.0, units: str = "lmp_real_velocity") -> None:
         super().__init__(value, units)
         self.expectedDimensionality = ["[length] / [time]"]
         self.validateDimensionality()
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
     
     def fromDict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
