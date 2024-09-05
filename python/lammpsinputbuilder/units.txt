@@ -1,0 +1,8 @@
+@context lammpsinputbuilder
+    [energy] -> [energy] / [substance]: value * N_A
+    [energy] / [substance] -> [energy]: value / N_A
+    [energy] -> [mass]: value / c ** 2
+    [mass] -> [energy]: value * c ** 2
+    [energy] / [length] -> [energy] / [substance] / [length]: value * N_A
+    [energy] / [substance] / [length] -> [energy] / [length]: value / N_A
+@end
