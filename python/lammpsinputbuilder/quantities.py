@@ -67,12 +67,14 @@ mapLammpsMetalUnits = {
     UnitType.TEMPERATURE: ureg.lmp_metal_temperature
 }
 
+# TODO: move the expectedDimensionality to a static member of the class
 
 class LIBQuantity():
     def __init__(self, magnitude: float, units: str = "") -> None:
         self.magnitude = magnitude
         self.units = units
         self.quantity = magnitude * ureg(units)
+        self.expectedDimensionality = [""]
 
     def getMagnitude(self) -> float:
         return self.magnitude
@@ -80,9 +82,10 @@ class LIBQuantity():
     def getUnits(self) -> str:
         return self.units
     
-    def checkDimensionality(self) -> bool:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
-    
+    def validateDimensionality(self) -> bool:
+        if self.quantity.dimensionality not in self.expectedDimensionality:
+            raise ValueError(f"Expected dimensionality of {self.expectedDimensionality }, got {self.quantity.dimensionality}.")
+        return True
     def toDict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
@@ -101,29 +104,15 @@ class LIBQuantity():
     def convertTo(self, unit: str) -> LIBQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
     
-class TimeQuantity(LIBQuantity):
-
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(value, unitStr)
-
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["class"] = self.__class__.__name__
-        return result
-    
-    def fromDict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
-
-    def convertTo(self, unit: str) -> TimeQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
-    
 class ForceQuantity(LIBQuantity):
 
     def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(value, unitStr)
+        LIBQuantity.__init__(self, value, unitStr)
+        self.expectedDimensionality = [
+            "[mass] * [length] / [time] ** 2 / [substance]",
+            "[mass] * [length] / [time] ** 2"
+            ]
+        self.validateDimensionality()
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -135,6 +124,7 @@ class ForceQuantity(LIBQuantity):
         if className != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
+        self.validateDimensionality()
 
     def convertTo(self, unit: str) -> ForceQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
@@ -142,7 +132,9 @@ class ForceQuantity(LIBQuantity):
 class TemperatureQuantity(LIBQuantity):
 
     def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(value, unitStr)
+        LIBQuantity.__init__(self, value, unitStr)
+        self.expectedDimensionality = ["[temperature]"]
+        self.validateDimensionality()
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -154,6 +146,7 @@ class TemperatureQuantity(LIBQuantity):
         if className != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
+        self.validateDimensionality()
 
     def convertTo(self, unit: str) -> TimeQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
@@ -161,7 +154,12 @@ class TemperatureQuantity(LIBQuantity):
 class TorqueQuantity(LIBQuantity):
 
     def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(value, unitStr)
+        LIBQuantity.__init__(self, value, unitStr)
+        self.expectedDimensionality = [
+            "[mass] * [length] ** 2 / [time] ** 2 / [substance]",
+            "[mass] * [length] ** 2 / [time] ** 2"
+            ]
+        self.validateDimensionality()
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -173,6 +171,7 @@ class TorqueQuantity(LIBQuantity):
         if className != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
+        self.validateDimensionality()
 
     def convertTo(self, unit: str) -> TorqueQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
@@ -180,7 +179,10 @@ class TorqueQuantity(LIBQuantity):
 class TimeQuantity(LIBQuantity):
 
     def __init__(self, value: float, unitStr: str = "") -> None:
-       LIBQuantity.__init__(value, unitStr)
+        LIBQuantity.__init__(self, value, unitStr)
+        self.expectedDimensionality = ["[time]"]
+        self.validateDimensionality()
+           
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -192,6 +194,7 @@ class TimeQuantity(LIBQuantity):
         if className != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
+        self.validateDimensionality()
 
     def convertTo(self, unit: str) -> TimeQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
@@ -199,7 +202,12 @@ class TimeQuantity(LIBQuantity):
 class EnergyQuantity(LIBQuantity):
 
     def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(value, unitStr)
+        LIBQuantity.__init__(self, value, unitStr)
+        self.expectedDimensionality = [
+            "[mass] * [length] ** 2 / [time] ** 2 / [substance]",
+            "[mass] * [length] ** 2 / [time] ** 2"
+            ]
+        self.validateDimensionality()
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -211,6 +219,7 @@ class EnergyQuantity(LIBQuantity):
         if className != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
+        self.validateDimensionality()
 
     def convertTo(self, unit: str) -> EnergyQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
@@ -218,11 +227,8 @@ class EnergyQuantity(LIBQuantity):
 class DistanceQuantity(LIBQuantity):
     def __init__(self, value: float, unitStr: str = "") -> None:
         LIBQuantity.__init__(self, value, unitStr)
-        if  not self.checkDimensionality():
-            raise ValueError(f"Expected dimensionality of length, got {self.quantity.dimensionality}.")
-
-    def checkDimensionality(self) -> bool:
-        return self.quantity.dimensionality == "[length]"
+        self.expectedDimensionality = ["[length]"]
+        self.validateDimensionality()
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -234,16 +240,16 @@ class DistanceQuantity(LIBQuantity):
         if className != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
-        if  not self.checkDimensionality():
-            raise ValueError(f"Expected dimensionality of length, got {self.quantity.dimensionality}.")
-
+        self.validateDimensionality()
     def convertTo(self, unit: str) -> DistanceQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
 
 class VelocityQuantity(LIBQuantity):
 
-    def __init__(self, value: float, unitStr: str = "", units: pint.Unit = None) -> None:
-        super().__init__(value, unitStr, units)
+    def __init__(self, value: float, unitStr: str = "") -> None:
+        super().__init__(value, unitStr)
+        self.expectedDimensionality = ["[length] / [time]"]
+        self.validateDimensionality()
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -255,6 +261,7 @@ class VelocityQuantity(LIBQuantity):
         if className != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
+        self.validateDimensionality()
 
     def convertTo(self, unit: str) -> VelocityQuantity:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
