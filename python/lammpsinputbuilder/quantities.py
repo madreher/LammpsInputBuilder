@@ -44,6 +44,10 @@ class UnitType(Enum):
     TORQUE = 6,
     TEMPERATURE = 7
 
+class LammpsUnitSystem(Enum):
+    REAL = 0,
+    METAL = 1
+
 # Define default conversion tables
 mapLammpsRealUnits = {
     UnitType.MASS: ureg.lmp_real_mass,
@@ -94,9 +98,9 @@ class LIBQuantity():
         return result
     
     def fromDict(self, d: dict, version: int) -> None:
-        value = d["value"]
-        unit = d["units"]
-        self.quantity = value * ureg(unit)
+        self.value = d["value"]
+        self.units = d["units"]
+        self.quantity = self.value * ureg(self.units)
 
     def getValue(self) -> float:
         return self.magnitude
@@ -106,8 +110,8 @@ class LIBQuantity():
     
 class ForceQuantity(LIBQuantity):
 
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(self, value, unitStr)
+    def __init__(self, value: float, units: str = "") -> None:
+        super().__init__(value, units)
         self.expectedDimensionality = [
             "[mass] * [length] / [time] ** 2 / [substance]",
             "[mass] * [length] / [time] ** 2"
@@ -126,13 +130,18 @@ class ForceQuantity(LIBQuantity):
         super().fromDict(d, version=version)
         self.validateDimensionality()
 
-    def convertTo(self, unit: str) -> ForceQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+        if lmpUnit == LammpsUnitSystem.REAL:
+            return self.quantity.to(ureg.lmp_real_force).magnitude
+        elif lmpUnit == LammpsUnitSystem.METAL:
+            return self.quantity.to(ureg.lmp_metal_force).magnitude
+        else:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
     
 class TemperatureQuantity(LIBQuantity):
 
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(self, value, unitStr)
+    def __init__(self, value: float, units: str = "") -> None:
+        super().__init__(value, units)
         self.expectedDimensionality = ["[temperature]"]
         self.validateDimensionality()
 
@@ -148,13 +157,18 @@ class TemperatureQuantity(LIBQuantity):
         super().fromDict(d, version=version)
         self.validateDimensionality()
 
-    def convertTo(self, unit: str) -> TimeQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+        if lmpUnit == LammpsUnitSystem.REAL:
+            return self.quantity.to(ureg.lmp_real_time).magnitude
+        elif lmpUnit == LammpsUnitSystem.METAL:
+            return self.quantity.to(ureg.lmp_metal_time).magnitude
+        else:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
     
 class TorqueQuantity(LIBQuantity):
 
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(self, value, unitStr)
+    def __init__(self, value: float, units: str = "") -> None:
+        super().__init__(value, units)
         self.expectedDimensionality = [
             "[mass] * [length] ** 2 / [time] ** 2 / [substance]",
             "[mass] * [length] ** 2 / [time] ** 2"
@@ -178,8 +192,8 @@ class TorqueQuantity(LIBQuantity):
     
 class TimeQuantity(LIBQuantity):
 
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(self, value, unitStr)
+    def __init__(self, value: float, units: str = "") -> None:
+        super().__init__(value, units)
         self.expectedDimensionality = ["[time]"]
         self.validateDimensionality()
            
@@ -201,8 +215,8 @@ class TimeQuantity(LIBQuantity):
     
 class EnergyQuantity(LIBQuantity):
 
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(self, value, unitStr)
+    def __init__(self, value: float, units: str = "") -> None:
+        super().__init__(value, units)
         self.expectedDimensionality = [
             "[mass] * [length] ** 2 / [time] ** 2 / [substance]",
             "[mass] * [length] ** 2 / [time] ** 2"
@@ -225,8 +239,8 @@ class EnergyQuantity(LIBQuantity):
         raise NotImplementedError(f"Method not implemented by class {__class__}")
 
 class DistanceQuantity(LIBQuantity):
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        LIBQuantity.__init__(self, value, unitStr)
+    def __init__(self, value: float, units: str = "") -> None:
+        super().__init__(value, units)
         self.expectedDimensionality = ["[length]"]
         self.validateDimensionality()
 
@@ -246,8 +260,8 @@ class DistanceQuantity(LIBQuantity):
 
 class VelocityQuantity(LIBQuantity):
 
-    def __init__(self, value: float, unitStr: str = "") -> None:
-        super().__init__(value, unitStr)
+    def __init__(self, value: float, units: str = "") -> None:
+        super().__init__(value, units)
         self.expectedDimensionality = ["[length] / [time]"]
         self.validateDimensionality()
 
