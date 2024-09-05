@@ -15,14 +15,14 @@
 | python/lammpsinputbuilder/loader/integratorLoader.py    |       17 |       17 |      0% |      1-23 |
 | python/lammpsinputbuilder/loader/sectionLoader.py       |       18 |       18 |      0% |      1-24 |
 | python/lammpsinputbuilder/loader/typedMoleculeLoader.py |       16 |       16 |      0% |      1-22 |
-| python/lammpsinputbuilder/quantities.py                 |      179 |       85 |     53% |84, 87-91, 94-96, 99, 102, 107, 110-112, 115-118, 121, 126, 129-131, 134-137, 140, 145, 148-150, 153-156, 159, 164, 167-169, 172-175, 178, 183, 186-188, 191-194, 197, 202, 205-207, 210-213, 216, 222, 228-230, 233-238, 241, 246, 249-251, 254-257, 260 |
+| python/lammpsinputbuilder/quantities.py                 |      166 |       24 |     86% |106, 109, 124, 129-134, 146, 151-156, 171, 176, 189, 194, 209, 214, 225, 229, 241, 246 |
 | python/lammpsinputbuilder/section.py                    |       95 |       65 |     32% |8, 11-14, 17-18, 21-24, 27, 30, 36-37, 40, 43-46, 49-50, 53, 56, 60-62, 65, 68-71, 74-82, 85-90, 93-97, 101-105, 109-110, 113, 116-119, 122-123 |
 | python/lammpsinputbuilder/typedMolecule.py              |      125 |       14 |     89% |43, 46, 49, 52, 74, 76, 84, 95-98, 109, 116, 146, 164 |
 | python/lammpsinputbuilder/types.py                      |       62 |       27 |     56% |14-21, 24-33, 46-49, 52-57, 70, 75, 78 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py       |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/modelToData.py        |      130 |       19 |     85% |35, 39, 94, 114, 133, 155-158, 172, 176-186 |
 | python/lammpsinputbuilder/workflowBuilder.py            |       40 |        5 |     88% |20, 24, 27, 32, 59 |
-|                                               **TOTAL** | **1121** |  **595** | **47%** |           |
+|                                               **TOTAL** | **1108** |  **534** | **52%** |           |
 
 
 ## Setup coverage badge
