@@ -1,4 +1,5 @@
 from lammpsinputbuilder.group import Group, AllGroup
+from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 from enum import Enum
 
@@ -17,7 +18,7 @@ class Integrator:
     def fromDict(self, d: dict, version: int):
         self.integratorName = d.get("integratorName", "defaultIntegrator")
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         return ""
 
     def addUndoCommands(self) -> str:
@@ -64,7 +65,7 @@ class NVEIntegrator(Integrator):
         self.nbSteps = d["nbSteps"]
 
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         return f"fix {self.integratorName} {self.group} nve\n"
 
     def addUndoCommands(self) -> str:
@@ -109,8 +110,7 @@ class MinimizeIntegrator(Integrator):
         self.maxiter = d["maxiter"]
         self.maxeval = d["maxeval"]
 
-
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         return ""
 
     def addUndoCommands(self) -> str:
@@ -123,3 +123,60 @@ class MinimizeIntegrator(Integrator):
     
     def getMinimizeStyle(self) -> MinimizeStyle:
         return self.style
+    
+class MultiMinimizeIntegrator(Integrator):
+
+    def __init__(self, integratorName: str = "MultiMinimize") -> None:
+        super().__init__(integratorName=integratorName)
+
+    def toDict(self) -> dict:
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
+        return result
+    
+    def fromDict(self, d: dict, version: int):
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d)
+
+    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+        return ""
+
+    def addUndoCommands(self) -> str:
+        return ""
+
+    def addRunCommands(self) -> str:
+        commands = ""
+        commands += f"min_style      cg\n"
+        commands += f"minimize       1.0e-10 1.0e-10 10000 100000\n"
+
+        commands += f"min_style      hftn\n"
+        commands += f"minimize       1.0e-10 1.0e-10 10000 100000\n"
+
+        commands += f'min_style      sd\n'
+        commands += f'minimize       1.0e-10 1.0e-10 10000 100000\n'
+
+        commands += f'variable       i loop 100\n'
+        commands += f'label          loop1\n'
+        commands += f'variable       ene_min equal pe\n'
+        commands += 'variable       ene_min_i equal ${ene_min}\n'
+
+        commands += f'min_style      cg\n'
+        commands += f'minimize       1.0e-10 1.0e-10 10000 100000\n'
+
+        commands += f'min_style      hftn\n'
+        commands += f'minimize       1.0e-10 1.0e-10 10000 100000\n'
+
+        commands += f'min_style      sd\n'
+        commands += f'minimize       1.0e-10 1.0e-10 10000 100000\n'
+
+        commands += f'variable       ene_min_f equal pe\n'
+        commands += 'variable       ene_diff equal ${ene_min_i}-${ene_min_f}\n'
+        commands += 'print          "Delta_E = ${ene_diff}"\n'
+        commands += 'if             "${ene_diff}<1e-6" then "jump SELF break1"\n'
+        commands += f'print          "Loop_id = $i"\n'
+        commands += f'next           i\n'
+        commands += f'jump           SELF loop1\n'
+        commands += f'label          break1\n'
+        commands += f'variable       i delete\n'
+        return commands

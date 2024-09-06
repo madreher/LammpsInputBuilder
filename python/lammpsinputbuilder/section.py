@@ -2,6 +2,7 @@ from typing import List
 
 from lammpsinputbuilder.integrator import Integrator, RunZeroIntegrator
 from lammpsinputbuilder.fileIO import FileIO
+from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 class Section:
     def __init__(self, sectionName: str = "defaultSection") -> None:
@@ -23,7 +24,7 @@ class Section:
         result += self.addUndoCommands()
         return result
     
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         return ""
     
     def addUndoCommands(self) -> str:
@@ -49,7 +50,7 @@ class RecusiveSection(Section):
         super().fromDict(d, version=version)
         self.sections = [Section.fromDict(s) for s in d["sections"]]
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         return ""
     
     def addUndoCommands(self) -> str:
@@ -81,7 +82,7 @@ class IntegratorSection(Section):
         integratorLoader = loader.IntegratorLoader()
         self.integrator = integratorLoader.dictToIntegrator(d["integrator"], version)
         
-    def addAllCommands(self) -> str:
+    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result =  "################# START SECTION " + self.sectionName + " #################\n\n"
         result += self.addDoCommands()
         result += self.integrator.addRunCommands()
@@ -89,11 +90,11 @@ class IntegratorSection(Section):
         result += "################# END SECTION " + self.sectionName + " #################\n\n"
         return result
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result = ""
         for io in self.fileIOs:
-            result += io.addDoCommands()
-        result += self.integrator.addDoCommands()
+            result += io.addDoCommands(unitsystem)
+        result += self.integrator.addDoCommands(unitsystem)
         return result
     
     def addUndoCommands(self) -> str:
