@@ -33,43 +33,9 @@ ureg.define("lmp_metal_force = eV / angstrom")
 ureg.define("lmp_metal_torque = eV")
 ureg.define("lmp_metal_temperature = kelvin")
 
-# Define types of units 
-class UnitType(Enum):
-    MASS = 0,
-    LENGTH = 1,
-    TIME = 2,
-    ENERGY = 3,
-    VELOCITY = 4,
-    FORCE = 5,
-    TORQUE = 6,
-    TEMPERATURE = 7
-
 class LammpsUnitSystem(Enum):
     REAL = 0,
     METAL = 1
-
-# Define default conversion tables
-mapLammpsRealUnits = {
-    UnitType.MASS: ureg.lmp_real_mass,
-    UnitType.LENGTH: ureg.lmp_real_length,
-    UnitType.TIME: ureg.lmp_real_time,
-    UnitType.ENERGY: ureg.lmp_real_energy,
-    UnitType.VELOCITY: ureg.lmp_real_velocity,
-    UnitType.FORCE: ureg.lmp_real_force,
-    UnitType.TORQUE: ureg.lmp_real_torque,
-    UnitType.TEMPERATURE: ureg.lmp_real_temperature
-}
-
-mapLammpsMetalUnits = {
-    UnitType.MASS: ureg.lmp_metal_mass,
-    UnitType.LENGTH: ureg.lmp_metal_length,
-    UnitType.TIME: ureg.lmp_metal_time,
-    UnitType.ENERGY: ureg.lmp_metal_energy,
-    UnitType.VELOCITY: ureg.lmp_metal_velocity,
-    UnitType.FORCE: ureg.lmp_metal_force,
-    UnitType.TORQUE: ureg.lmp_metal_torque,
-    UnitType.TEMPERATURE: ureg.lmp_metal_temperature
-}
 
 # TODO: move the expectedDimensionality to a static member of the class
 
@@ -90,6 +56,7 @@ class LIBQuantity():
         if self.quantity.dimensionality not in self.expectedDimensionality:
             raise ValueError(f"Expected dimensionality of {self.expectedDimensionality }, got {self.quantity.dimensionality}.")
         return True
+    
     def toDict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
@@ -105,8 +72,8 @@ class LIBQuantity():
     def getValue(self) -> float:
         return self.magnitude
 
-    def convertTo(self, unit: str) -> LIBQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
     
 class ForceQuantity(LIBQuantity):
 
@@ -149,9 +116,9 @@ class TemperatureQuantity(LIBQuantity):
 
     def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
         if lmpUnit == LammpsUnitSystem.REAL:
-            return self.quantity.to(ureg.lmp_real_time).magnitude
+            return self.quantity.to(ureg.lmp_real_temperature).magnitude
         elif lmpUnit == LammpsUnitSystem.METAL:
-            return self.quantity.to(ureg.lmp_metal_time).magnitude
+            return self.quantity.to(ureg.lmp_metal_temperature).magnitude
         else:
             raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
     
@@ -172,8 +139,13 @@ class TorqueQuantity(LIBQuantity):
         super().fromDict(d, version=version)
         self.validateDimensionality()
 
-    def convertTo(self, unit: str) -> TorqueQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+        if lmpUnit == LammpsUnitSystem.REAL:
+            return self.quantity.to(ureg.lmp_real_torque).magnitude
+        elif lmpUnit == LammpsUnitSystem.METAL:
+            return self.quantity.to(ureg.lmp_metal_torque).magnitude
+        else:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
     
 class TimeQuantity(LIBQuantity):
 
@@ -190,8 +162,13 @@ class TimeQuantity(LIBQuantity):
         super().fromDict(d, version=version)
         self.validateDimensionality()
 
-    def convertTo(self, unit: str) -> TimeQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+        if lmpUnit == LammpsUnitSystem.REAL:
+            return self.quantity.to(ureg.lmp_real_time).magnitude
+        elif lmpUnit == LammpsUnitSystem.METAL:
+            return self.quantity.to(ureg.lmp_metal_time).magnitude
+        else:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
     
 class EnergyQuantity(LIBQuantity):
 
@@ -210,9 +187,14 @@ class EnergyQuantity(LIBQuantity):
         super().fromDict(d, version=version)
         self.validateDimensionality()
 
-    def convertTo(self, unit: str) -> EnergyQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
-
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+        if lmpUnit == LammpsUnitSystem.REAL:
+            return self.quantity.to(ureg.lmp_real_energy).magnitude
+        elif lmpUnit == LammpsUnitSystem.METAL:
+            return self.quantity.to(ureg.lmp_metal_energy).magnitude
+        else:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
+    
 class LengthQuantity(LIBQuantity):
     def __init__(self, value: float = 0.0, units: str = "lmp_real_length") -> None:
         super().__init__(value, units)
@@ -225,9 +207,14 @@ class LengthQuantity(LIBQuantity):
             raise ValueError(f"Expected class {self.__class__.__name__}, got {className}.")
         super().fromDict(d, version=version)
         self.validateDimensionality()
-    def convertTo(self, unit: str) -> float:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
-
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+        if lmpUnit == LammpsUnitSystem.REAL:
+            return self.quantity.to(ureg.lmp_real_length).magnitude
+        elif lmpUnit == LammpsUnitSystem.METAL:
+            return self.quantity.to(ureg.lmp_metal_length).magnitude
+        else:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
+    
 class VelocityQuantity(LIBQuantity):
 
     def __init__(self, value: float = 0.0, units: str = "lmp_real_velocity") -> None:
@@ -242,5 +229,11 @@ class VelocityQuantity(LIBQuantity):
         super().fromDict(d, version=version)
         self.validateDimensionality()
 
-    def convertTo(self, unit: str) -> VelocityQuantity:
-        raise NotImplementedError(f"Method not implemented by class {__class__}")
+    def convertTo(self, lmpUnit:LammpsUnitSystem) -> float:
+        if lmpUnit == LammpsUnitSystem.REAL:
+            return self.quantity.to(ureg.lmp_real_velocity).magnitude
+        elif lmpUnit == LammpsUnitSystem.METAL:
+            return self.quantity.to(ureg.lmp_metal_velocity).magnitude
+        else:
+            raise NotImplementedError(f"Lammps unit system {lmpUnit} not supported by class {__class__}")
+    

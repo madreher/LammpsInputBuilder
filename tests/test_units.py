@@ -21,13 +21,21 @@ def test_LengthQuantityDeclarations():
     lengthRealUnit = LengthQuantity(1.0, "lmp_real_length")
     assert lengthRealUnit.getMagnitude() == 1.0
     assert lengthRealUnit.getUnits() == "lmp_real_length"
+    
+    assert lengthRealUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+    assert lengthRealUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
 
     lengthMetalUnit = LengthQuantity(1.0, "lmp_metal_length")
     assert lengthMetalUnit.getMagnitude() == 1.0
     assert lengthMetalUnit.getUnits() == "lmp_metal_length"
 
+    assert lengthMetalUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
+    assert lengthMetalUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+
     with pytest.raises(ValueError):
         failedLength = LengthQuantity(1.0, "A") # Wrong unit
+
+    
 
 def test_TimeQuantityDeclarations():
     timeQuantity = TimeQuantity(1.0, "ps")
@@ -49,9 +57,15 @@ def test_TimeQuantityDeclarations():
     assert timeRealUnit.getMagnitude() == 1.0
     assert timeRealUnit.getUnits() == "lmp_real_time"
 
+    assert timeRealUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+    assert timeRealUnit.convertTo(LammpsUnitSystem.METAL) == pytest.approx(0.001)
+
     timeMetalUnit = TimeQuantity(1.0, "lmp_metal_time")
     assert timeMetalUnit.getMagnitude() == 1.0
     assert timeMetalUnit.getUnits() == "lmp_metal_time"
+
+    assert timeMetalUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
+    assert timeMetalUnit.convertTo(LammpsUnitSystem.REAL) == pytest.approx(1000.0) 
 
     with pytest.raises(ValueError):
         failedTime = TimeQuantity(1.0, "m")
@@ -76,9 +90,15 @@ def test_VelocityQuantityDeclarations():
     assert velocityRealUnit.getMagnitude() == 1.0
     assert velocityRealUnit.getUnits() == "lmp_real_velocity"
 
+    assert velocityRealUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+    assert velocityRealUnit.convertTo(LammpsUnitSystem.METAL) == pytest.approx(1000.0)
+
     velocityMetalUnit = VelocityQuantity(1.0, "lmp_metal_velocity")
     assert velocityMetalUnit.getMagnitude() == 1.0
     assert velocityMetalUnit.getUnits() == "lmp_metal_velocity"
+
+    assert velocityMetalUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
+    assert velocityMetalUnit.convertTo(LammpsUnitSystem.REAL) == pytest.approx(0.001, 1e-3)
 
     with pytest.raises(ValueError):
         failedVelocity = VelocityQuantity(1.0, "m")
@@ -103,9 +123,16 @@ def test_EnergyQuantityDeclarations():
     assert energyRealUnit.getMagnitude() == 1.0
     assert energyRealUnit.getUnits() == "lmp_real_energy"
 
+    # Conversion table: http://wild.life.nctu.edu.tw/class/common/energy-unit-conv-table-detail.html
+    assert energyRealUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+    assert energyRealUnit.convertTo(LammpsUnitSystem.METAL) == pytest.approx(0.0433634, 1e-3)
+
     energyMetalUnit = EnergyQuantity(1.0, "lmp_metal_energy")
     assert energyMetalUnit.getMagnitude() == 1.0
     assert energyMetalUnit.getUnits() == "lmp_metal_energy"
+
+    assert energyMetalUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
+    assert energyMetalUnit.convertTo(LammpsUnitSystem.REAL) == pytest.approx(23.0609, 1e-3)
 
     with pytest.raises(ValueError):
         failedEnergy = EnergyQuantity(1.0, "m")
@@ -130,9 +157,15 @@ def test_TemperatureQuantityDeclarations():
     assert temperatureRealUnit.getMagnitude() == 1.0
     assert temperatureRealUnit.getUnits() == "lmp_real_temperature"
 
+    assert temperatureRealUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+    assert temperatureRealUnit.convertTo(LammpsUnitSystem.METAL) == pytest.approx(1.0, 1e-3)
+
     temperatureMetalUnit = TemperatureQuantity(1.0, "lmp_metal_temperature")
     assert temperatureMetalUnit.getMagnitude() == 1.0
     assert temperatureMetalUnit.getUnits() == "lmp_metal_temperature"
+
+    assert temperatureMetalUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
+    assert temperatureMetalUnit.convertTo(LammpsUnitSystem.REAL) == pytest.approx(1.0, 1e-3)
 
     with pytest.raises(ValueError):
         failedTemperature = TemperatureQuantity(1.0, "m")
@@ -157,9 +190,15 @@ def test_ForceQuantityDeclarations():
     assert forceRealUnit.getMagnitude() == 1.0
     assert forceRealUnit.getUnits() == "lmp_real_force"
 
+    assert forceRealUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+    assert forceRealUnit.convertTo(LammpsUnitSystem.METAL) == pytest.approx(0.0433634, 1e-3)
+
     forceMetalUnit = ForceQuantity(1.0, "lmp_metal_force")
     assert forceMetalUnit.getMagnitude() == 1.0
     assert forceMetalUnit.getUnits() == "lmp_metal_force"
+
+    assert forceMetalUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
+    assert forceMetalUnit.convertTo(LammpsUnitSystem.REAL) == pytest.approx(23.0609, 1e-3)
 
     with pytest.raises(ValueError):
         failedForce = ForceQuantity(1.0, "m")
@@ -184,9 +223,15 @@ def test_TorqueQuantityDeclarations():
     assert torqueRealUnit.getMagnitude() == 1.0
     assert torqueRealUnit.getUnits() == "lmp_real_torque"
 
+    assert torqueRealUnit.convertTo(LammpsUnitSystem.REAL) == 1.0
+    assert torqueRealUnit.convertTo(LammpsUnitSystem.METAL) == pytest.approx(0.0433634, 1e-3)
+
     torqueMetalUnit = TorqueQuantity(1.0, "lmp_metal_torque")
     assert torqueMetalUnit.getMagnitude() == 1.0
     assert torqueMetalUnit.getUnits() == "lmp_metal_torque"
+
+    assert torqueMetalUnit.convertTo(LammpsUnitSystem.METAL) == 1.0
+    assert torqueMetalUnit.convertTo(LammpsUnitSystem.REAL) == pytest.approx(23.0609, 1e-3)
 
     with pytest.raises(ValueError):
         failedTorque = TorqueQuantity(1.0, "m")
