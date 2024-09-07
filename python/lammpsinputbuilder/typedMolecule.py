@@ -4,6 +4,7 @@ from ase import Atoms
 
 from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileFormat, MoleculeHolder, ElectrostaticMethod, getMoleculeFileFormatFromExtension, getExtensionFromMoleculeFileFormat, getForcefieldFromExtension
 from lammpsinputbuilder.utility.modelToData import moleculeToLammpsDataPBC, moleculeToLammpsInput
+from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 class TypedMolecule:
     """
@@ -23,6 +24,14 @@ class TypedMolecule:
     
     def setForcefieldType(self, ffType: Forcefield):
         self.ffType = ffType
+
+    def getUnitsystem(self) -> LammpsUnitSystem:
+        if self.getForcefieldType() == Forcefield.REAX:
+            return LammpsUnitSystem.REAL
+        elif self.getForcefieldType() in [Forcefield.AIREBO, Forcefield.AIREBOM, Forcefield.REBO]:
+            return LammpsUnitSystem.METAL
+        else:
+            raise ValueError(f"Unit system unknown for the forcefield type {self.getForcefieldType()}.")
 
     def setBoundingBoxStyle(self, bboxStyle: BoundingBoxStyle):
         self.bboxStyle = bboxStyle
