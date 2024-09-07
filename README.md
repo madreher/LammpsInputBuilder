@@ -11,7 +11,7 @@
 | python/lammpsinputbuilder/instructions.py               |      145 |        8 |     94% |23, 33, 45, 64, 73, 101, 112, 192 |
 | python/lammpsinputbuilder/integrator.py                 |      139 |       95 |     32% |11, 14-16, 19, 22, 25, 28, 35-37, 40-42, 45, 49-51, 54-58, 61-65, 69, 72, 75, 86-91, 94-101, 104-111, 114, 117, 120-122, 125, 130, 133-135, 138-140, 143, 146, 149-182 |
 | python/lammpsinputbuilder/loader/\_\_init\_\_.py        |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/loader/computationLoader.py   |       17 |       17 |      0% |      1-23 |
+| python/lammpsinputbuilder/loader/extensionLoader.py     |       18 |       18 |      0% |      1-24 |
 | python/lammpsinputbuilder/loader/fileIOLoader.py        |       19 |       19 |      0% |      1-25 |
 | python/lammpsinputbuilder/loader/instructionLoader.py   |       18 |       18 |      0% |      1-24 |
 | python/lammpsinputbuilder/loader/integratorLoader.py    |       17 |       17 |      0% |      1-23 |
@@ -24,7 +24,7 @@
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py       |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/modelToData.py        |      130 |       19 |     85% |35, 39, 94, 114, 133, 155-158, 172, 176-186 |
 | python/lammpsinputbuilder/workflowBuilder.py            |       40 |        5 |     88% |20, 24, 27, 32, 59 |
-|                                               **TOTAL** | **1418** |  **486** | **66%** |           |
+|                                               **TOTAL** | **1419** |  **487** | **66%** |           |
 
 
 ## Setup coverage badge
