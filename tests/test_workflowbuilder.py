@@ -6,6 +6,10 @@ import shutil
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod, Forcefield, MoleculeFileFormat
 from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+from lammpsinputbuilder.section import IntegratorSection 
+from lammpsinputbuilder.integrator import NVEIntegrator
+from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO
+from lammpsinputbuilder.group import AllGroup
 
 def test_workflowBuilder():
     # Create a molecule
@@ -22,6 +26,17 @@ def test_workflowBuilder():
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
     workflow.setTypedMolecule(typedMolecule)
+
+    # Create a NVE Section
+    section = IntegratorSection(integrator=NVEIntegrator())
+    pos = DumpTrajectoryFileIO(fileIOName="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
+    section.addFileIO(pos)
+    bonds = ReaxBondFileIO(fileIOName="bonds", interval=10, group=AllGroup())
+    section.addFileIO(bonds)
+    thermo = ThermoFileIO(fileIOName="thermo", addDefaultFields=True, interval=10)
+    section.addFileIO(thermo)
+
+    workflow.addSection(section)
 
     # Generate the inputs
     jobFolder = workflow.generateInputs()

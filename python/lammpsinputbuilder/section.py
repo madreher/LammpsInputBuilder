@@ -94,7 +94,7 @@ class IntegratorSection(Section):
     def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result = ""
         for io in self.fileIOs:
-            result += io.addDoCommands(unitsystem)
+            result += io.addDoCommands()
         result += self.integrator.addDoCommands(unitsystem)
         return result
     
