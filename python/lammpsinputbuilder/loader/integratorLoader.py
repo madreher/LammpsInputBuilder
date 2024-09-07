@@ -10,6 +10,8 @@ class IntegratorLoader():
         integratorTable = {}
         integratorTable[RunZeroIntegrator.__name__] = RunZeroIntegrator()
         integratorTable[NVEIntegrator.__name__] = NVEIntegrator()
+        integratorTable[MinimizeIntegrator.__name__] = MinimizeIntegrator()
+        integratorTable[MultipassMinimizeIntegrator.__name__] = MultipassMinimizeIntegrator()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")
