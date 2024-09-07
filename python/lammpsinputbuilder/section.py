@@ -85,25 +85,37 @@ class IntegratorSection(Section):
         
     def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result =  "################# START SECTION " + self.sectionName + " #################\n\n"
-        result += self.addDoCommands()
+        result += self.addDoCommands(unitsystem)
+        result +=  "################# START RUN INTEGRATOR FOR SECTION " + self.sectionName + " #################\n"
         result += self.integrator.addRunCommands()
+        result +=  "################# END RUN INTEGRATOR FOR SECTION " + self.sectionName + " #################\n"
         result += self.addUndoCommands()
         result += "################# END SECTION " + self.sectionName + " #################\n\n"
         return result
 
     def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result = ""
+        result +=  "################# START IOs DECLARATION #################\n"
         for io in self.fileIOs:
             result += io.addDoCommands()
+        result +=  "################# END IOs DECLARATION #################\n"
+        
+        result +=  "################# START INTEGRATOR DECLARATION #################\n"
         result += self.integrator.addDoCommands(unitsystem)
+        result +=  "################# END INTEGRATOR DECLARATION #################\n"
         return result
     
     def addUndoCommands(self) -> str:
         # Undo if the reverse order is needed
         result = ""
+        result +=  "################# START INTEGRATOR REMOVAL #################\n"
         result += self.integrator.addUndoCommands()
+        result +=  "################# END INTEGRATOR REMOVAL #################\n"
+        result +=  "################# START IO REMOVAL #################\n"
         for io in reversed(self.fileIOs):
             result += io.addUndoCommands()
+        result +=  "################# END IOs DECLARATION #################\n"
+        
         return result
 
 class InstructionsSection(Section):

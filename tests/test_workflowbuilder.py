@@ -47,4 +47,9 @@ def test_workflowBuilder():
     assert (jobFolder / "model.data").is_file()
     assert (jobFolder / "model.data.temp").is_file()
 
-    shutil.rmtree(jobFolder, ignore_errors=True)
+    print("Job folder: ", jobFolder)
+
+    #shutil.rmtree(jobFolder, ignore_errors=True)
+
+if __name__ == "__main__":
+    test_workflowBuilder()

@@ -51,6 +51,9 @@ class TypedMolecule:
     def getDefaultThermoVariables(self) -> List[str]:
         return []
     
+    def getUnitsystem(self) -> LammpsUnitSystem:
+        raise NotImplementedError(f"Method not implemented by class {__class__}")
+    
     def generateLammpsDataFile(self, jobFolder:Path) -> MoleculeHolder:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
     
@@ -76,6 +79,9 @@ class ReaxTypedMolecule(TypedMolecule):
         self.forcefieldPath = None
         self.moleculePath = None
         self.moleculeFormat = None
+
+    def getUnitsystem(self) -> LammpsUnitSystem:
+        return LammpsUnitSystem.REAL
 
     def loadFromFile(self, moleculePath: Path, forcefieldPath: Path):
         # Check for file exist

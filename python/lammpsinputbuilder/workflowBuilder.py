@@ -56,7 +56,7 @@ class WorkflowBuilder:
         # Now we can add the sections
         sectionContent = ""
         for section in self.sections:
-            sectionContent += section.addAllCommands()
+            sectionContent += section.addAllCommands(self.getTypedMolecule().getUnitsystem())
 
         with open(workflowInputPath, "a") as f:
             f.write(sectionContent)
