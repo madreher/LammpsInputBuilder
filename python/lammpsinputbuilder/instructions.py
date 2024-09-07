@@ -7,6 +7,9 @@ class Instruction:
     def __init__(self, instructionName: str = "defaultInstruction") -> None:
         self.instructionName = instructionName
 
+    def getInstructionName(self) -> str:
+        return self.instructionName
+
     def toDict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
@@ -29,6 +32,8 @@ class ResetTimestepInstruction(Instruction):
         if self.timestep < 0:
             raise ValueError(f"Invalid timestep {self.timestep} in Intruction {self.instructionName}.")
         
+    def getTimestep(self) -> int:
+        return self.timestep
 
     def toDict(self) -> dict:
         result = super().toDict()
@@ -51,6 +56,9 @@ class SetTimestepInstruction(Instruction):
         self.timestep = timestep
         self.validate()
 
+    def getTimestep(self) -> TimeQuantity:
+        return self.timestep
+
     def validate(self):
         if self.timestep.getMagnitude() < 0:
             raise ValueError(f"Invalid timestep {self.timestep.getMagnitude()} in Intruction {self.instructionName}.")
@@ -69,7 +77,7 @@ class SetTimestepInstruction(Instruction):
         self.validate()
 
     def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"timestep {self.timestep.convertTo(unitsystem).getMagnitude()}\n"
+        return f"timestep {self.timestep.convertTo(unitsystem)}\n"
     
 class VelocityCreateInstruction(Instruction):
     def __init__(self, instructionName: str = "defaultVelocityCreate", group: Group = AllGroup(), temp: TemperatureQuantity = TemperatureQuantity(300, "kelvin"), seed: int =12335) -> None:
@@ -79,13 +87,22 @@ class VelocityCreateInstruction(Instruction):
         self.seed = seed
         self.validate()
 
+    def getGroupName(self) -> str:
+        return self.group
+    
+    def getTemp(self) -> TemperatureQuantity:
+        return self.temp
+    
+    def getSeed(self) -> int:
+        return self.seed
+
     def validate(self):
         if self.temp.getMagnitude() < 0:
             raise ValueError(f"Invalid temperature {self.temp.getMagnitude()} in Intruction {self.instructionName}.")
 
     def toDict(self) -> dict:
         result = super().toDict()
-        result["group"] = self.group
+        result["groupName"] = self.group
         result["temp"] = self.temp.toDict()
         result["seed"] = self.seed
         return result
@@ -94,14 +111,14 @@ class VelocityCreateInstruction(Instruction):
         if d["class"] != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().fromDict(d, version)
-        self.group = d.get("group", AllGroup().getGroupName())
+        self.group = d.get("groupName", AllGroup().getGroupName())
         self.temp = TemperatureQuantity()
         self.temp.fromDict(d["temp"], version)
         self.seed = d.get("seed", 12335)
         self.validate()
 
     def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"velocity {self.group} create {self.temp.convertTo(unitsystem).getMagnitude()} {self.seed} dist gaussian\n"
+        return f"velocity {self.group} create {self.temp.convertTo(unitsystem)} {self.seed} dist gaussian\n"
     
 
 class VariableStyle(Enum):
@@ -150,6 +167,15 @@ class VariableInstruction(Instruction):
         self.style = style
         self.args = args
         self.validate()
+
+    def getVariableName(self) -> str:
+        return self.variableName
+    
+    def getVariableStyle(self) -> VariableStyle:
+        return self.style
+    
+    def getArgs(self) -> str:
+        return self.args
 
     def validate(self):
         pass 
