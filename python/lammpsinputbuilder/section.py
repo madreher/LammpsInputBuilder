@@ -3,6 +3,7 @@ from typing import List
 from lammpsinputbuilder.integrator import Integrator, RunZeroIntegrator
 from lammpsinputbuilder.fileIO import FileIO
 from lammpsinputbuilder.quantities import LammpsUnitSystem
+from lammpsinputbuilder.instructions import Instruction
 
 class Section:
     def __init__(self, sectionName: str = "defaultSection") -> None:
@@ -105,20 +106,32 @@ class IntegratorSection(Section):
             result += io.addUndoCommands()
         return result
 
-class CommandsSection(Section):
+class InstructionsSection(Section):
     def __init__(self) -> None:
         super().__init__()
-        self.commands: List[str] = []
+        self.instructions: List[Instruction] = []
 
-    def addCommand(self, command: str):
-        self.commands.append(command)
+    def addInstruction(self, instruction: Instruction):
+        self.instructions.append(instruction)
 
     def toDict(self) -> dict:
         result = super().toDict()
         result["class"] = self.__class__.__name__
-        result["commands"] = [c.toDict() for c in self.commands]
+        result["instructions"] = [c.toDict() for c in self.instructions]
         return result
     
     def fromDict(self, d: dict, version: int):
         super().fromDict(d, version=version)
-        self.commands = d["commands"]
+        instructionsDict = d.get("instructions", [])
+        if len(instructionsDict) > 0:
+            import lammpsinputbuilder.loader.instructionLoader as loader
+        
+            instructionLoader = loader.InstructionLoader()
+            self.instructions = [instructionLoader.dictToInstruction(c, version) for c in instructionsDict]
+
+    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+        result =  "################# START SECTION " + self.sectionName + " #################\n\n"
+        for instruction in self.instructions:
+            result += instruction.writeInstruction(unitsystem)
+        result += "################# END SECTION " + self.sectionName + " #################\n\n"
+        return result
