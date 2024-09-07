@@ -7,6 +7,9 @@ class FileIO:
     def __init__(self, fileIOName: str = "defaultFileIO") -> None:
         self.fileIOName = fileIOName
 
+    def getFileIOName(self) -> str:
+        return self.fileIOName
+
     def toDict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
@@ -56,13 +59,28 @@ class DumpTrajectoryFileIO(FileIO):
         self.interval = interval
         self.groupName = group.getGroupName()
 
+    def getUserFields(self) -> List[str]:
+        return self.userFields
+
+    def getAddDefaultFields(self) -> bool:
+        return self.addDefaultFields
+    
+    def getDefaultFields(self) -> List[str]:
+        return self.defaultFields
+
+    def getInterval(self) -> int:
+        return self.interval
+    
+    def getGroupName(self) -> str:
+        return self.groupName
+
     def toDict(self) -> dict:
         result  = super().toDict()
         result["class"] = self.__class__.__name__ 
         result["userFields"] = self.userFields
         result["addDefaultFields"] = self.addDefaultFields
         result["interval"] = self.interval
-        result["group"] = self.groupName
+        result["groupName"] = self.groupName
         return result
 
     def fromDict(self, d: dict, version: int):
@@ -72,7 +90,7 @@ class DumpTrajectoryFileIO(FileIO):
         self.userFields = d.get("userFields", [])
         self.addDefaultFields = d.get("addDefaultFields", True)
         self.interval = d.get("interval", 100)
-        self.groupName = d.get("group", AllGroup().getGroupName())
+        self.groupName = d.get("groupName", AllGroup().getGroupName())
         pass    
 
     def addDoCommands(self) -> str:
@@ -103,16 +121,21 @@ class DumpTrajectoryFileIO(FileIO):
 class ReaxBondFileIO(FileIO):
 
     def __init__(self, fileIOName: str = "defaultReaxBondFileIO", group: Group = AllGroup(), interval: int = 100) -> None:
-        super().__init__()
-        self.fileIOName = fileIOName
+        super().__init__(fileIOName=fileIOName)
         self.groupName = group.getGroupName()
         self.interval = interval
+
+    def getGroupName(self) -> str:
+        return self.groupName
+    
+    def getInterval(self) -> int:
+        return self.interval
 
     def toDict(self) -> dict:
         result  = super().toDict()
         result["class"] = self.__class__.__name__ 
         result["fileIOName"] = self.fileIOName
-        result["group"] = self.groupName
+        result["groupName"] = self.groupName
         result["interval"] = self.interval
         return result
 
@@ -121,7 +144,7 @@ class ReaxBondFileIO(FileIO):
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().fromDict(d, version=version)
         self.fileIOName = d.get("fileIOName", "defaultReaxBondFileIO")
-        self.groupName = d.get("group", AllGroup().getGroupName())
+        self.groupName = d.get("groupName", AllGroup().getGroupName())
         self.interval = d.get("interval", 100)   
 
     def addDoCommands(self) -> str:
@@ -148,8 +171,17 @@ class ThermoFileIO(FileIO):
     def getUserFields(self) -> List[str]:
         return self.userFields
     
+    def getAddDefaultFields(self) -> bool:
+        return self.addDefaultFields
+    
     def setAddDefaultFields(self, addDefaultFields: bool):
         self.addDefaultFields = addDefaultFields
+
+    def getDefaultFields(self) -> List[str]:
+        return self.defaultFields
+
+    def getInterval(self) -> int:
+        return self.interval
 
     def toDict(self) -> dict:
         result  = super().toDict()
