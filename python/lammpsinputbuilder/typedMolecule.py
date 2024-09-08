@@ -204,3 +204,6 @@ class ReaxTypedMolecule(TypedMolecule):
     def getLammpsDataFileName(self) -> str:
         return "model.data"
     
+    def getDefaultThermoVariables(self) -> List[str]:
+        return ['step', 'v_eb', 'v_ea', 'v_elp', 'v_emol', 'v_ev', 'v_epen', 'v_ecoa', 'v_ehb', 'v_et', 'v_eco', 'v_ew', 'v_ep', 'v_efi', 'v_eqeq']
+    

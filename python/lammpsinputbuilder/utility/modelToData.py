@@ -189,7 +189,22 @@ def moleculeToLammpsInput(lammpsScriptFileName:Path, dataFilePath: Path, jobFold
             scriptContent += f"neighbor       {min([2.5, minCellDim/2])} bin\n"
             scriptContent += 'neigh_modify   every 1 delay 0 check yes\n'
 
-            scriptContent += 'run            0\n'
+            scriptContent += 'compute reax   all pair reaxff\n'
+            scriptContent += 'variable eb    equal c_reax[1]\n'
+            scriptContent += 'variable ea    equal c_reax[2]\n'
+            scriptContent += 'variable elp   equal c_reax[3]\n'
+            scriptContent += 'variable emol  equal c_reax[4]\n'
+            scriptContent += 'variable ev    equal c_reax[5]\n'
+            scriptContent += 'variable epen  equal c_reax[6]\n'
+            scriptContent += 'variable ecoa  equal c_reax[7]\n'
+            scriptContent += 'variable ehb   equal c_reax[8]\n'
+            scriptContent += 'variable et    equal c_reax[9]\n'
+            scriptContent += 'variable eco   equal c_reax[10]\n'
+            scriptContent += 'variable ew    equal c_reax[11]\n'
+            scriptContent += 'variable ep    equal c_reax[12]\n'
+            scriptContent += 'variable efi   equal c_reax[13]\n'
+            scriptContent += 'variable eqeq  equal c_reax[14]\n'
+            scriptContent += '\n'
 
             f.write(scriptContent)
 

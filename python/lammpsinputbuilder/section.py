@@ -21,9 +21,9 @@ class Section:
         self.sectionName = d.get("sectionName", "defaultSection")
         return
     
-    def addAllCommands(self) -> str:
+    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result = ""
-        result += self.addDoCommands()
+        result += self.addDoCommands(unitsystem=unitsystem)
         result += self.addUndoCommands()
         return result
     
@@ -39,25 +39,104 @@ class RecusiveSection(Section):
     def __init__(self) -> None:
         super().__init__()
         self.sections: List[Section] = []
+        self.ios: List[FileIO] = []
+        self.extensions: List[Extension] = []
+        self.groups: List[Group] = []
 
     def addSection(self, section: Section):
         self.sections.append(section)
+
+    def addFileIO(self, fileIO: FileIO):
+        self.ios.append(fileIO)
+
+    def addExtension(self, extension: Extension):
+        self.extensions.append(extension)
+
+    def addGroup(self, group: Group):
+        self.groups.append(group)
 
     def toDict(self) -> dict:
         result = super().toDict()
         result["class"] = self.__class__.__name__
         result["sections"] = [s.toDict() for s in self.sections]
+        result["fileIOs"] = [s.toDict() for s in self.ios]
+        result["extensions"] = [s.toDict() for s in self.extensions]
+        result["groups"] = [s.toDict() for s in self.groups]
         return result
     
     def fromDict(self, d: dict, version: int):
         super().fromDict(d, version=version)
         self.sections = [Section.fromDict(s) for s in d["sections"]]
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return ""
-    
-    def addUndoCommands(self) -> str:
-        return ""
+        if "fileIOs" in d.keys() and len(d["fileIOs"]) > 0:
+            ios = d["fileIOs"]
+            
+            from lammpsinputbuilder.loader.fileIOLoader import FileIOLoader
+            loader = FileIOLoader()
+
+            for io in ios:
+                self.ios.append(loader.dictToFileIO(io))
+
+        if "extensions" in d.keys() and len(d["extensions"]) > 0:
+            exts = d["extensions"]
+            
+            from lammpsinputbuilder.loader.extensionLoader import ExtensionLoader
+            loader = ExtensionLoader()
+
+            for ext in exts:
+                self.extensions.append(loader.dictToExtension(ext))
+
+        if "groups" in d.keys() and len(d["groups"]) > 0:
+            groups = d["groups"]
+            
+            from lammpsinputbuilder.loader.groupLoader import GroupLoader
+            loader = GroupLoader()
+
+            for group in groups:
+                self.groups.append(loader.dictToGroup(group))
+
+    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+        
+        # Declare all the objects which are going to live during the entire duractions of the sections
+        result = f"################# START Section {self.sectionName} #################\n"
+        result +=  "################# START Groups DECLARATION #################\n"
+        for grp in self.groups:
+            result += grp.addDoCommands()
+        result +=  "################# END Groups DECLARATION #################\n"
+        
+        result +=  "################# START Extensions DECLARATION #################\n"
+        for ext in self.extensions:
+            result += ext.addDoCommands(unitsystem)
+        result +=  "################# END Extensions DECLARATION #################\n"
+        
+        result +=  "################# START IOs DECLARATION #################\n"
+        for io in self.fileIOs:
+            result += io.addDoCommands()
+        result +=  "################# END IOs DECLARATION #################\n"
+        
+        # Everything is declared, now we can execute the differente sections
+        for section in self.sections:
+            result += section.addAllCommands(unitsystem=unitsystem)
+
+        # Everything is executed, now we can undo the differente sections
+        result +=  "################# START IO REMOVAL #################\n"
+        for io in reversed(self.fileIOs):
+            result += io.addUndoCommands()
+        result +=  "################# END IOs DECLARATION #################\n"
+        
+        result +=  "################# START Extensions REMOVAL #################\n"
+        for ext in reversed(self.extensions):
+            result += ext.addUndoCommands()
+        result +=  "################# END Extensions DECLARATION #################\n"
+        
+        result +=  "################# START Groups REMOVAL #################\n"
+        for grp in reversed(self.groups):
+            result += grp.addUndoCommands()
+        result +=  "################# END Groups DECLARATION #################\n"
+
+        result += f"################# END Section {self.sectionName} #################\n"
+
+        return result
 
 class IntegratorSection(Section):
     def __init__(self, integrator: Integrator = RunZeroIntegrator()) -> None:
