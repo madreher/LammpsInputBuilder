@@ -13,18 +13,19 @@
 | python/lammpsinputbuilder/loader/\_\_init\_\_.py        |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/loader/extensionLoader.py     |       18 |       18 |      0% |      1-24 |
 | python/lammpsinputbuilder/loader/fileIOLoader.py        |       19 |       19 |      0% |      1-25 |
+| python/lammpsinputbuilder/loader/groupLoader.py         |       19 |       19 |      0% |      1-25 |
 | python/lammpsinputbuilder/loader/instructionLoader.py   |       18 |       18 |      0% |      1-24 |
 | python/lammpsinputbuilder/loader/integratorLoader.py    |       19 |       19 |      0% |      1-25 |
 | python/lammpsinputbuilder/loader/sectionLoader.py       |       18 |       18 |      0% |      1-24 |
 | python/lammpsinputbuilder/loader/typedMoleculeLoader.py |       16 |       16 |      0% |      1-22 |
 | python/lammpsinputbuilder/quantities.py                 |      175 |       16 |     91% |73, 76, 91, 101, 113, 123, 138, 148, 161, 171, 186, 196, 207, 216, 228, 238 |
-| python/lammpsinputbuilder/section.py                    |      117 |       53 |     55% |13-16, 19-20, 23-26, 29, 32, 38-39, 42, 45-48, 51-52, 55, 58, 70-73, 76-84, 123-124, 127, 130-133, 136-142, 145-149 |
+| python/lammpsinputbuilder/section.py                    |      162 |       80 |     51% |15-18, 21-22, 25-28, 31, 34, 40-41, 44, 47-50, 53-54, 57, 60, 74, 77, 80-86, 89-124, 142, 147, 174, 179, 186-187, 190, 193-196, 199-205, 208-212 |
 | python/lammpsinputbuilder/typedMolecule.py              |      136 |       20 |     85% |29-34, 52, 55, 58, 61, 64, 89, 91, 99, 110-113, 124, 131, 161, 179 |
 | python/lammpsinputbuilder/types.py                      |       62 |       27 |     56% |14-21, 24-33, 46-49, 52-57, 70, 75, 78 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py       |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/modelToData.py        |      130 |       19 |     85% |35, 39, 94, 114, 133, 155-158, 172, 176-186 |
 | python/lammpsinputbuilder/workflowBuilder.py            |       40 |        2 |     95% |    20, 32 |
-|                                               **TOTAL** | **1472** |  **292** | **80%** |           |
+|                                               **TOTAL** | **1536** |  **338** | **78%** |           |
 
 
 ## Setup coverage badge
