@@ -4,6 +4,8 @@ from lammpsinputbuilder.integrator import Integrator, RunZeroIntegrator
 from lammpsinputbuilder.fileIO import FileIO
 from lammpsinputbuilder.quantities import LammpsUnitSystem
 from lammpsinputbuilder.instructions import Instruction
+from lammpsinputbuilder.extensions import Extension
+from lammpsinputbuilder.group import Group
 
 class Section:
     def __init__(self, sectionName: str = "defaultSection") -> None:
@@ -62,17 +64,28 @@ class IntegratorSection(Section):
         super().__init__()
         self.integrator = integrator
         self.fileIOs = []
+        self.extensions = []
+        self.groups = []
 
-    def addFileIO(self, fileIO: FileIO):
+    def addFileIO(self, fileIO: FileIO) -> None:
         self.fileIOs.append(fileIO)
+
+    def addExtension(self, extension: Extension) -> None:
+        self.extensions.append(extension)
+
+    def addGroup(self, group: Group) -> None:
+        self.groups.append(group)
 
     def toDict(self) -> dict:
         result = super().toDict()
         result["class"] = self.__class__.__name__
         result["integrator"] = self.integrator.toDict()
+        result["fileIOs"] = [f.toDict() for f in self.fileIOs]
+        result["extensions"] = [e.toDict() for e in self.extensions]
+        result["groups"] = [g.toDict() for g in self.groups]
         return result
     
-    def fromDict(self, d: dict, version: int):
+    def fromDict(self, d: dict, version: int) -> None:
         super().fromDict(d, version=version)
         if d["class"] != self.__class__.__name__:
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
@@ -82,6 +95,35 @@ class IntegratorSection(Section):
         import lammpsinputbuilder.loader.integratorLoader as loader
         integratorLoader = loader.IntegratorLoader()
         self.integrator = integratorLoader.dictToIntegrator(d["integrator"], version)
+
+        if "fileIOs" in d.keys() and len(d["fileIOs"]) > 0:
+            ios = d["fileIOs"]
+
+            import lammpsinputbuilder.loader.fileIOLoader as loader
+            fileIOLoader = loader.FileIOLoader()
+
+            for io in ios:
+                self.fileIOs.append(fileIOLoader.dictToFileIO(io))
+
+        if "extensions" in d.keys() and len(d["extensions"]) > 0:
+            exts = d["extensions"]
+
+            import lammpsinputbuilder.loader.extensionLoader as loader
+            extensionLoader = loader.ExtensionLoader()
+
+            for ext in exts:
+                self.extensions.append(extensionLoader.dictToExtension(ext))
+
+        if "groups" in d.keys() and len(d["groups"]) > 0:
+            groups = d["groups"]
+
+            import lammpsinputbuilder.loader.groupLoader as loader
+            groupLoader = loader.GroupLoader()
+
+            for group in groups:
+                self.groups.append(groupLoader.dictToGroup(group))
+
+            
         
     def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result =  "################# START SECTION " + self.sectionName + " #################\n\n"
@@ -95,6 +137,16 @@ class IntegratorSection(Section):
 
     def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         result = ""
+        result +=  "################# START Groups DECLARATION #################\n"
+        for grp in self.groups:
+            result += grp.addDoCommands()
+        result +=  "################# END Groups DECLARATION #################\n"
+        
+        result +=  "################# START Extensions DECLARATION #################\n"
+        for ext in self.extensions:
+            result += ext.addDoCommands(unitsystem)
+        result +=  "################# END Extensions DECLARATION #################\n"
+        
         result +=  "################# START IOs DECLARATION #################\n"
         for io in self.fileIOs:
             result += io.addDoCommands()
@@ -111,11 +163,22 @@ class IntegratorSection(Section):
         result +=  "################# START INTEGRATOR REMOVAL #################\n"
         result += self.integrator.addUndoCommands()
         result +=  "################# END INTEGRATOR REMOVAL #################\n"
+        
         result +=  "################# START IO REMOVAL #################\n"
         for io in reversed(self.fileIOs):
             result += io.addUndoCommands()
         result +=  "################# END IOs DECLARATION #################\n"
         
+        result +=  "################# START Extensions REMOVAL #################\n"
+        for ext in reversed(self.extensions):
+            result += ext.addUndoCommands()
+        result +=  "################# END Extensions DECLARATION #################\n"
+        
+        result +=  "################# START Groups REMOVAL #################\n"
+        for grp in reversed(self.groups):
+            result += grp.addUndoCommands()
+        result +=  "################# END Groups DECLARATION #################\n"
+
         return result
 
 class InstructionsSection(Section):
