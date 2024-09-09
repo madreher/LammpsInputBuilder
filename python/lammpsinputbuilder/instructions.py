@@ -1,5 +1,6 @@
 from lammpsinputbuilder.quantities import TimeQuantity, LammpsUnitSystem, TemperatureQuantity
 from lammpsinputbuilder.group import Group, AllGroup
+from lammpsinputbuilder.quantities import LengthQuantity
 
 from enum import Enum
 
@@ -198,3 +199,58 @@ class VariableInstruction(Instruction):
 
     def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
         return f"variable {self.variableName} {self.variableStyleToStr[self.style]} {self.args}\n"
+    
+class DisplaceAtomsInstruction(Instruction):
+    def __init__(self, instructionName: str = "defaultDisplaceAtoms", group: Group = AllGroup(), dx: LengthQuantity = LengthQuantity(0.0, "lmp_real_length"), dy: LengthQuantity = LengthQuantity(0.0, "lmp_real_length"), dz: LengthQuantity = LengthQuantity(0.0, "lmp_real_length")) -> None:
+        """
+        Initializes a new instance of the DisplaceAtomsInstruction class.
+
+        Parameters:
+        instructionName (str): The name of the instruction. Defaults to "defaultDisplaceAtom".
+        group (Group): The group to which the instruction belongs. Defaults to AllGroup.
+        dx (LengthQuantity): The displacement in the x-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dy (LengthQuantity): The displacement in the y-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dz (LengthQuantity): The displacement in the z-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
+
+        Returns:
+        None
+        """
+        super().__init__(instructionName=instructionName)
+        self.group = group.getGroupName()
+        self.dx = dx
+        self.dy = dy
+        self.dz = dz
+        self.validate()
+
+    def validate(self) -> bool:
+        return True
+    
+    def getGroupName(self) -> str:
+        return self.group
+    
+    def getDisplacement(self) -> tuple[LengthQuantity, LengthQuantity, LengthQuantity]:
+        return self.dx, self.dy, self.dz
+
+    def toDict(self) -> dict:
+        result = super().toDict()
+        result["group"] = self.group
+        result["dx"] = self.dx.toDict()
+        result["dy"] = self.dy.toDict()
+        result["dz"] = self.dz.toDict()
+        return result
+    
+    def fromDict(self, d: dict, version: int):
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version)
+        self.group = d.get("group", AllGroup().getGroupName())
+        self.dx = LengthQuantity()
+        self.dx.fromDict(d.get("dx", {}))
+        self.dy = LengthQuantity()
+        self.dy.fromDict(d.get("dy", {}))
+        self.dz = LengthQuantity()
+        self.dz.fromDict(d.get("dz", {}))
+        self.validate()
+
+    def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+        return f"displace_atoms {self.group} move {self.dx.convertTo(unitsystem)} {self.dy.convertTo(unitsystem)} {self.dz.convertTo(unitsystem)}\n"

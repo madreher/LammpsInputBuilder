@@ -86,3 +86,17 @@ def test_instructionVariable():
     assert instruction2.getVariableStyle() == VariableStyle.EQUAL
     assert instruction2.getArgs() == "{dt}"
     assert instruction2.getInstructionName() == "defaultVariable"
+
+def test_DisplaceAtomsInstruction():
+    instruction = DisplaceAtomsInstruction(instructionName="defaultDisplaceAtoms", group=AllGroup(), dx=LengthQuantity(1.0, "lmp_real_length"), dy=LengthQuantity(2.0, "lmp_real_length"), dz=LengthQuantity(3.0, "lmp_real_length"))
+    assert instruction.getGroupName() == "all"
+    displacementVector =  instruction.getDisplacement()
+    assert displacementVector[0].getMagnitude() == 1.0
+    assert displacementVector[0].getUnits() == "lmp_real_length"
+    assert displacementVector[1].getMagnitude() == 2.0
+    assert displacementVector[1].getUnits() == "lmp_real_length"
+    assert displacementVector[2].getMagnitude() == 3.0
+    assert displacementVector[2].getUnits() == "lmp_real_length"
+    assert instruction.getInstructionName() == "defaultDisplaceAtoms"
+
+    assert instruction.writeInstruction() == "displace_atoms all move 1.0 2.0 3.0\n"

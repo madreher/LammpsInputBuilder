@@ -11,6 +11,7 @@ class InstructionLoader():
         instructionTable[ResetTimestepInstruction.__name__] = ResetTimestepInstruction()
         instructionTable[SetTimestepInstruction.__name__] = SetTimestepInstruction()
         instructionTable[VelocityCreateInstruction.__name__] = VelocityCreateInstruction()
+        instructionTable[DisplaceAtomsInstruction.__name__] = DisplaceAtomsInstruction()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")
