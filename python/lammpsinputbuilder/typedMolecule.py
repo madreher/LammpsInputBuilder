@@ -1,6 +1,9 @@
 from typing import List 
 from pathlib import Path
 from ase import Atoms
+from ase.io import read as ase_read
+import shutil
+import tempfile
 
 from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileFormat, MoleculeHolder, ElectrostaticMethod, getMoleculeFileFormatFromExtension, getExtensionFromMoleculeFileFormat, getForcefieldFromExtension
 from lammpsinputbuilder.utility.modelToData import moleculeToLammpsDataPBC, moleculeToLammpsInput
@@ -79,6 +82,7 @@ class ReaxTypedMolecule(TypedMolecule):
         self.forcefieldPath = None
         self.moleculePath = None
         self.moleculeFormat = None
+        self.atoms = None
 
     def getUnitsystem(self) -> LammpsUnitSystem:
         return LammpsUnitSystem.REAL
@@ -116,6 +120,8 @@ class ReaxTypedMolecule(TypedMolecule):
         with open(self.forcefieldPath, "r") as f:
             self.forcefieldContent = f.read()
 
+        self.atoms = ase_read(self.moleculePath)
+
         self.modelLoaded = True
 
     def loadFromStrings(self, moleculeContent: str, moleculeFormat: MoleculeFileFormat, forcefieldContent: str, forcefieldFileName:Path, moleculeFileName:str = Path):
@@ -133,6 +139,17 @@ class ReaxTypedMolecule(TypedMolecule):
         self.forcefieldContent = forcefieldContent
         self.forcefieldPath = Path(forcefieldFileName)
         
+        # Create a temporary file to be read by ase
+        jobFolder = Path(tempfile.mkdtemp())
+        modelPath = jobFolder / Path("model." + getExtensionFromMoleculeFileFormat(moleculeFormat))
+
+        with open(modelPath, "w") as f:
+            f.write(moleculeContent)
+
+        self.atoms = ase_read(modelPath)
+
+        # Remove temporary folder
+        shutil.rmtree(jobFolder)
 
         self.modelLoaded = True
 
