@@ -36,8 +36,8 @@ class Section:
 
 
 class RecusiveSection(Section):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, sectionName: str = "defaultSection") -> None:
+        super().__init__(sectionName=sectionName)
         self.sections: List[Section] = []
         self.ios: List[FileIO] = []
         self.extensions: List[Extension] = []
@@ -110,7 +110,7 @@ class RecusiveSection(Section):
         result +=  "################# END Extensions DECLARATION #################\n"
         
         result +=  "################# START IOs DECLARATION #################\n"
-        for io in self.fileIOs:
+        for io in self.ios:
             result += io.addDoCommands()
         result +=  "################# END IOs DECLARATION #################\n"
         
@@ -120,7 +120,7 @@ class RecusiveSection(Section):
 
         # Everything is executed, now we can undo the differente sections
         result +=  "################# START IO REMOVAL #################\n"
-        for io in reversed(self.fileIOs):
+        for io in reversed(self.ios):
             result += io.addUndoCommands()
         result +=  "################# END IOs DECLARATION #################\n"
         
@@ -139,8 +139,8 @@ class RecusiveSection(Section):
         return result
 
 class IntegratorSection(Section):
-    def __init__(self, integrator: Integrator = RunZeroIntegrator()) -> None:
-        super().__init__()
+    def __init__(self, sectionName: str = "defaultSection", integrator: Integrator = RunZeroIntegrator()) -> None:
+        super().__init__(sectionName=sectionName)
         self.integrator = integrator
         self.fileIOs = []
         self.extensions = []
@@ -261,8 +261,8 @@ class IntegratorSection(Section):
         return result
 
 class InstructionsSection(Section):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, sectionName: str = "defaultSection") -> None:
+        super().__init__(sectionName=sectionName)
         self.instructions: List[Instruction] = []
 
     def addInstruction(self, instruction: Instruction):

@@ -35,7 +35,7 @@ def main():
                 npSelection = np.array(selections)
                 npSelection += 1
 
-                print(f"{anchorName} {npSelection}")
+                print(f"{anchorName} {npSelection.tolist()}")
 
         if "selections" in data:
             for selectionName in data["selections"].keys():
@@ -45,7 +45,7 @@ def main():
                 npSelection = np.array(selections)
                 npSelection += 1
 
-                print(f"{selectionName} {npSelection}")
+                print(f"{selectionName} {npSelection.tolist()}")
 
         if "thermostats" in data:
             for thermostatName in data["thermostats"].keys():
@@ -55,7 +55,7 @@ def main():
                 npSelection = np.array(selections)
                 npSelection += 1
 
-                print(f"{thermostatName} {npSelection}")
+                print(f"{thermostatName} {npSelection.tolist()}")
 
     print("Done")
 
