@@ -154,6 +154,12 @@ class IntegratorSection(Section):
         self.extensions = []
         self.groups = []
 
+    def getIntegrator(self) -> Integrator:
+        return self.integrator
+    
+    def setIntegrator(self, integrator: Integrator) -> None:
+        self.integrator = integrator
+
     def addFileIO(self, fileIO: FileIO) -> None:
         self.fileIOs.append(fileIO)
 

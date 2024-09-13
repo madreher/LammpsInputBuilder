@@ -68,10 +68,13 @@ def main():
     # Third section: NVE
     sectionNVE = IntegratorSection(sectionName="NVESection", integrator=NVEIntegrator(integratorName="NVE", group=groupFree, nbSteps=1000))
     # Declare the IOs for the entire workflow, will split into 2 trajectory later
-    dumpTrajectory = DumpTrajectoryFileIO(fileIOName="nve", addDefaultFields=True, interval=1, group=AllGroup())
-    reaxBond = ReaxBondFileIO(fileIOName="nve", interval=1, group=AllGroup())
+    thermoTrajectory = ThermoFileIO(fileIOName="nve", addDefaultFields=True, interval=50)
+    thermoTrajectory.setUserFields(typedMolecule.getDefaultThermoVariables())
+    dumpTrajectory = DumpTrajectoryFileIO(fileIOName="nve", addDefaultFields=True, interval=50, group=AllGroup())
+    reaxBond = ReaxBondFileIO(fileIOName="nve", interval=50, group=AllGroup())
     sectionNVE.addFileIO(dumpTrajectory)
     sectionNVE.addFileIO(reaxBond)
+    sectionNVE.addFileIO(thermoTrajectory)
     globalSection.addSection(sectionNVE)
 
     # Add the section to the workflow
