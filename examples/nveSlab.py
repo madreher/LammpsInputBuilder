@@ -1,14 +1,12 @@
 from pathlib import Path
-from uuid import uuid4
-import os
 import logging
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
 from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
-from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle
-from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO
+from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle, RunZeroIntegrator
+from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO, DumpStyle
 from lammpsinputbuilder.group import IndicesGroup, OperationGroup, OperationGroupEnum, AllGroup, ReferenceGroup
 from lammpsinputbuilder.templates.minimizeTemplate import MinimizeTemplate
 from lammpsinputbuilder.instructions import ResetTimestepInstruction, SetTimestepInstruction
@@ -76,6 +74,16 @@ def main():
     sectionNVE.addFileIO(reaxBond)
     sectionNVE.addFileIO(thermoTrajectory)
     globalSection.addSection(sectionNVE)
+
+    # Fourth section: write final state
+    # We use a RunZero section instead of a InstructionSection because reax bonds 
+    # can only be written by a fix, not a single instruction
+    sectionFinalState = IntegratorSection(sectionName="FinalSection", integrator=RunZeroIntegrator())
+    finalDump = DumpTrajectoryFileIO(fileIOName="finalState", style=DumpStyle.XYZ, interval=1, group=AllGroup())
+    finalBond = ReaxBondFileIO(fileIOName="finalState", interval=1, group=AllGroup())
+    sectionFinalState.addFileIO(finalDump)
+    sectionFinalState.addFileIO(finalBond)
+    globalSection.addSection(sectionFinalState)
 
     # Add the section to the workflow
     workflow.addSection(globalSection)

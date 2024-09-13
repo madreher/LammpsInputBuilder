@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List
 from lammpsinputbuilder.group import Group, AllGroup
+from enum import Enum
 
 class FileIO:
 
@@ -48,16 +49,20 @@ class XYZTrajectoryFileIO(FileIO):
     def getAssociatedFilePath(self) -> Path:
         return Path()
     
+class DumpStyle(Enum):
+    CUSTOM = 1,
+    XYZ = 2
 
 class DumpTrajectoryFileIO(FileIO):
 
-    def __init__(self, fileIOName: str = "defaultDumpTrajectoryFileIO", userFields: List[str] = [], addDefaultFields: bool = True, interval: int = 100, group: Group = AllGroup()) -> None:
+    def __init__(self, fileIOName: str = "defaultDumpTrajectoryFileIO", style: DumpStyle = DumpStyle.CUSTOM, userFields: List[str] = [], addDefaultFields: bool = True, interval: int = 100, group: Group = AllGroup()) -> None:
         super().__init__(fileIOName=fileIOName)
         self.userFields = userFields
         self.addDefaultFields = addDefaultFields
         self.defaultFields = ["id", "type", "x", "y", "z"]
         self.interval = interval
         self.groupName = group.getGroupName()
+        self.style = style
 
     def getUserFields(self) -> List[str]:
         return self.userFields
@@ -81,6 +86,7 @@ class DumpTrajectoryFileIO(FileIO):
         result["addDefaultFields"] = self.addDefaultFields
         result["interval"] = self.interval
         result["groupName"] = self.groupName
+        result["style"] = self.style.value
         return result
 
     def fromDict(self, d: dict, version: int):
@@ -91,31 +97,43 @@ class DumpTrajectoryFileIO(FileIO):
         self.addDefaultFields = d.get("addDefaultFields", True)
         self.interval = d.get("interval", 100)
         self.groupName = d.get("groupName", AllGroup().getGroupName())
+        self.style = DumpStyle(d.get("style", DumpStyle.CUSTOM.value))
         pass    
 
     def addDoCommands(self) -> str:
         result = ""
-        result += f"dump {self.fileIOName} {self.groupName} custom {self.interval} dump.{self.fileIOName}.lammpstrj"
-        fields = []
-        if self.addDefaultFields:
-            fields.extend(self.defaultFields)
-        fields.extend(self.userFields)
+        if self.style == DumpStyle.CUSTOM:
+            result += f"dump {self.fileIOName} {self.groupName} custom {self.interval} {self.getAssociatedFilePath()}"
+            fields = []
+            if self.addDefaultFields:
+                fields.extend(self.defaultFields)
+            fields.extend(self.userFields)
 
-        # Ensure that we always have the id to identify the atoms
-        if "id" not in fields:
-            fields.insert(0, "id")
+            # Ensure that we always have the id to identify the atoms
+            if "id" not in fields:
+                fields.insert(0, "id")
 
-        for field in fields:
-            result += f" {field}"
-        result += "\n"
-        result += f"dump_modify {self.fileIOName} sort id\n"
+            for field in fields:
+                result += f" {field}"
+            result += "\n"
+            result += f"dump_modify {self.fileIOName} sort id\n"
+        elif self.style == DumpStyle.XYZ:
+            result += f"dump {self.fileIOName} {self.groupName} xyz {self.interval} {self.getAssociatedFilePath()}\n"
+        else:
+            raise ValueError(f"Invalid dump style {self.style}.")
+        
         return result
 
     def addUndoCommands(self) -> str:
         return f"undump {self.fileIOName}\n"
 
     def getAssociatedFilePath(self) -> Path:
-        return Path(self.fileIOName + ".lammpstrj")
+        if self.style == DumpStyle.CUSTOM:
+            return Path("dump." + self.fileIOName + ".lammpstrj")
+        elif self.style == DumpStyle.XYZ:
+            return Path("dump." + self.fileIOName + ".xyz")
+        else:
+            raise ValueError(f"Invalid dump style {self.style}.")
     
 
 class ReaxBondFileIO(FileIO):
