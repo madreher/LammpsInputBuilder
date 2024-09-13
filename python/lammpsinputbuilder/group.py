@@ -184,3 +184,37 @@ class OperationGroup(Group):
     def addUndoCommands(self) -> str:
         return f"group {self.groupName} delete\n"
     
+class ReferenceGroup(Group):
+    def __init__(self, groupName: str = "defaultReferenceGroup", reference: Group = AllGroup()) -> None:
+        super().__init__(groupName)
+        self.reference = reference.getGroupName()
+
+    def getGroupName(self) -> str:
+        return self.reference
+
+    def getReference(self) -> str:
+        return self.reference
+    
+    def setReference(self, reference: Group):
+        self.reference = reference.getGroupName()
+
+    def toDict(self) -> dict:
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
+        result["reference"] = self.reference
+        return result
+
+    def fromDict(self, d: dict, version: int):
+        # Make sure that we are reading the right class
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version=version)
+        self.reference = d.get("reference", "all")
+
+    def addDoCommands(self) -> str:
+        return ""
+
+    def addUndoCommands(self) -> str:
+        return ""
+    
+    

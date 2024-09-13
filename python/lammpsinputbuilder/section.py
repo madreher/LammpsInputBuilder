@@ -66,7 +66,15 @@ class RecusiveSection(Section):
     
     def fromDict(self, d: dict, version: int):
         super().fromDict(d, version=version)
-        self.sections = [Section.fromDict(s) for s in d["sections"]]
+
+        if "sections" in d.keys() and len(d["sections"]) > 0:
+            sections = d["sections"]
+            
+            from lammpsinputbuilder.loader.sectionLoader import SectionLoader
+            loader = SectionLoader()
+
+            for section in sections:
+                self.sections.append(loader.dictToSection(section))
 
         if "fileIOs" in d.keys() and len(d["fileIOs"]) > 0:
             ios = d["fileIOs"]

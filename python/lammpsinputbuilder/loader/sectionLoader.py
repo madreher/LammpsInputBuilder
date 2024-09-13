@@ -1,6 +1,7 @@
 import copy 
 
 from lammpsinputbuilder.section import * 
+from lammpsinputbuilder.templates.templateSection import *
 
 class SectionLoader():
     def __init__(self) -> None:
@@ -10,7 +11,8 @@ class SectionLoader():
         sectionTable = {}
         sectionTable[IntegratorSection.__name__] = IntegratorSection()
         sectionTable[RecusiveSection.__name__] = RecusiveSection()
-        sectionTable[CommandsSection.__name__] = CommandsSection()
+        sectionTable[InstructionsSection.__name__] = InstructionsSection()
+        sectionTable[TemplateSection.__name__] = TemplateSection()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")

@@ -12,6 +12,7 @@ class GroupLoader:
         groupTable[EmptyGroup.__name__] = EmptyGroup()
         groupTable[OperationGroup.__name__] = OperationGroup()
         groupTable[IndicesGroup.__name__] = IndicesGroup()
+        groupTable[ReferenceGroup.__name__] = ReferenceGroup()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")

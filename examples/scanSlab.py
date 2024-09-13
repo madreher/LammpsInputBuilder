@@ -6,10 +6,13 @@ import logging
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
 from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
-from lammpsinputbuilder.section import IntegratorSection, RecusiveSection
-from lammpsinputbuilder.integrator import NVEIntegrator
+from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
+from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle
 from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO
-from lammpsinputbuilder.group import IndicesGroup, OperationGroup, OperationGroupEnum, AllGroup
+from lammpsinputbuilder.group import IndicesGroup, OperationGroup, OperationGroupEnum, AllGroup, ReferenceGroup
+from lammpsinputbuilder.templates.minimizeTemplate import MinimizeTemplate
+from lammpsinputbuilder.instructions import ResetTimestepInstruction, SetTimestepInstruction
+from lammpsinputbuilder.quantities import TimeQuantity
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -51,14 +54,24 @@ def main():
     globalSection.addGroup(groupAnchors)
     globalSection.addGroup(groupFree)
 
-    # Declare the IOs
-    dumpTrajectory = DumpTrajectoryFileIO(fileIOName="dumpTrajectory", addDefaultFields=True, interval=1, group=AllGroup())
-    reaxBond = ReaxBondFileIO(fileIOName="reaxBond", interval=1, group=AllGroup())
-    globalSection.addFileIO(dumpTrajectory)
-    globalSection.addFileIO(reaxBond)
+    # First section: Minimization 
+    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, useAnchors=True, anchorGroup=ReferenceGroup(groupName="refAnchor", reference=groupAnchors))
+    globalSection.addSection(sectionMinimization)
 
-    # Add a first simple section to run a NVE
+
+    # Second section: reset timestep
+    sectionReset = InstructionsSection(sectionName="ResetSection")
+    sectionReset.addInstruction(ResetTimestepInstruction(instructionName="resetTS", timestep=0))
+    sectionReset.addInstruction(SetTimestepInstruction(instructionName="setDT", timestep=TimeQuantity(value=1.0, units="fs")))
+    globalSection.addSection(sectionReset)
+
+    # Third section: NVE
     sectionNVE = IntegratorSection(sectionName="NVESection", integrator=NVEIntegrator(integratorName="NVE", group=groupFree, nbSteps=1000))
+    # Declare the IOs for the entire workflow, will split into 2 trajectory later
+    dumpTrajectory = DumpTrajectoryFileIO(fileIOName="nve", addDefaultFields=True, interval=1, group=AllGroup())
+    reaxBond = ReaxBondFileIO(fileIOName="nve", interval=1, group=AllGroup())
+    sectionNVE.addFileIO(dumpTrajectory)
+    sectionNVE.addFileIO(reaxBond)
     globalSection.addSection(sectionNVE)
 
     # Add the section to the workflow
