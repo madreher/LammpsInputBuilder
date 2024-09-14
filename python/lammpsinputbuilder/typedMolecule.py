@@ -2,6 +2,7 @@ from typing import List
 from pathlib import Path
 from ase import Atoms
 from ase.io import read as ase_read
+from ase.io.lammpsrun import read_lammps_dump_text as ase_read_lammps_dump_text
 import shutil
 import tempfile
 
@@ -87,7 +88,7 @@ class ReaxTypedMolecule(TypedMolecule):
     def getUnitsystem(self) -> LammpsUnitSystem:
         return LammpsUnitSystem.REAL
 
-    def loadFromFile(self, moleculePath: Path, forcefieldPath: Path):
+    def loadFromFile(self, moleculePath: Path, forcefieldPath: Path, formatHint: MoleculeFileFormat = None):
         # Check for file exist
         if not forcefieldPath.is_file():
             raise FileNotFoundError(f"File {forcefieldPath} not found.")
@@ -109,10 +110,14 @@ class ReaxTypedMolecule(TypedMolecule):
         # Read molecule
         with open(self.moleculePath, "r") as f:
             self.moleculeContent = f.read()
-            if self.moleculePath.suffix.lower() == ".xyz":
+            if formatHint is not None:
+                self.moleculeFormat = formatHint
+            elif self.moleculePath.suffix.lower() == ".xyz":
                 self.moleculeFormat = MoleculeFileFormat.XYZ
             elif self.moleculePath.suffix.lower() == ".mol2":
                 self.moleculeFormat = MoleculeFileFormat.MOL2
+            elif self.moleculePath.suffix.lower() == ".lammpstrj":
+                self.moleculeFormat = MoleculeFileFormat.LAMMPS_DUMP_TEXT
             else: # Should never happen with after the format check above
                 raise NotImplementedError(f"Molecule format {self.moleculePath.suffix} not supported.")
         
@@ -120,7 +125,11 @@ class ReaxTypedMolecule(TypedMolecule):
         with open(self.forcefieldPath, "r") as f:
             self.forcefieldContent = f.read()
 
-        self.atoms = ase_read(self.moleculePath)
+        if self.moleculeFormat == MoleculeFileFormat.LAMMPS_DUMP_TEXT:
+            with open(self.moleculePath, "r") as f:
+                self.atoms = ase_read_lammps_dump_text(f)
+        else:
+            self.atoms = ase_read(self.moleculePath)
 
         self.modelLoaded = True
 
@@ -155,6 +164,11 @@ class ReaxTypedMolecule(TypedMolecule):
 
     def isModelLoaded(self) -> bool:
         return self.modelLoaded
+    
+    def getASEAtoms(self) -> Atoms:
+        if not self.isModelLoaded():
+            raise ValueError("Model is not loaded, unable to return ASE atoms.")
+        return self.atoms
     
     def getMoleculeContent(self) -> str:
         return self.moleculeContent

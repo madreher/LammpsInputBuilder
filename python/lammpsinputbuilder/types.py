@@ -38,13 +38,16 @@ class BoundingBoxStyle(Enum):
 
 class MoleculeFileFormat(Enum):
     XYZ = 1,
-    MOL2 = 2
+    MOL2 = 2, 
+    LAMMPS_DUMP_TEXT = 3
 
 def getMoleculeFileFormatFromExtension(extension: str) -> MoleculeFileFormat:
     if extension.lower() == ".xyz":
         return MoleculeFileFormat.XYZ
     elif extension.lower() == ".mol2":
         return MoleculeFileFormat.MOL2
+    elif extension.lower() == ".lammpstrj":
+        return MoleculeFileFormat.LAMMPS_DUMP_TEXT
     else:
         raise NotImplementedError(f"Molecule format {extension} not supported.")
     

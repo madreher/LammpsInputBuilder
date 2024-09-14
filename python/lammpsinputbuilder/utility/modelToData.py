@@ -1,4 +1,5 @@
 from ase.io import write, read
+from ase.io.lammpsrun import read_lammps_dump_text as ase_read_lammps_dump_text
 from ase.atoms import Atoms
 
 import numpy as np
@@ -35,13 +36,19 @@ def moleculeToLammpsDataPBC(moleculeContent: str, moleculeFileFormat: MoleculeFi
         moleculePath = jobFolder / 'molecule.MOL2'
     elif moleculeFileFormat == MoleculeFileFormat.XYZ:
         moleculePath = jobFolder / 'molecule.XYZ'
+    elif moleculeFileFormat == MoleculeFileFormat.LAMMPS_DUMP_TEXT:
+        moleculePath = jobFolder / 'molecule.lammpstrj'
     else:   # Unreachable but kept in case the file format enum changes
         raise ValueError(f"Unknown molecule file format: {moleculeFileFormat}")
 
     with open(moleculePath, 'w') as f:
         f.write(moleculeContent)
 
-    atoms = read(moleculePath)
+    if moleculeFileFormat == MoleculeFileFormat.LAMMPS_DUMP_TEXT:
+        with open(moleculePath, "r") as f:
+            atoms = ase_read_lammps_dump_text(f)
+    else:
+        atoms = read(moleculePath)
 
     # Default cell, will be overwritten when rewritting the data file.
     atoms.set_cell([500, 500, 500])
