@@ -1,3 +1,4 @@
 ase
 pint >= 0.17
+lammps-logfile
 -r tests/requirements.test.txt

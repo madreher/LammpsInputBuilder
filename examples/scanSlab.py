@@ -3,6 +3,10 @@ import logging
 import argparse
 import subprocess
 import numpy as np
+from os import system
+import lammps_logfile
+
+import matplotlib.pyplot as plt
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
 from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
@@ -15,7 +19,7 @@ from lammpsinputbuilder.templates.minimizeTemplate import MinimizeTemplate
 from lammpsinputbuilder.instructions import DisplaceAtomsInstruction
 from lammpsinputbuilder.quantities import LengthQuantity
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
 
@@ -117,12 +121,13 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path):
     # Now that we know where the slab is, and where the head is, we can plan a trajectory
     # For this example, we are going to put the head 2A abobe the slab, and scan every 1A on x and y axis 
     desiredZDelta = 2.0
-    desiredXDelta = 1.0
-    desiredYDelta = 1.0
+    desiredXDelta = 0.2
+    desiredYDelta = 0.2
     heightTip = slabBoundingBox[1][2] + desiredZDelta
     headTargetPositions = []
     headPixel = []
     trajectoryFiles = []
+    bondFiles = []
 
     # Generate a grid of target positions
     for i,x in enumerate(np.arange(slabBoundingBox[0][0], slabBoundingBox[1][0], desiredXDelta)):
@@ -168,6 +173,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path):
         dumpIO = DumpTrajectoryFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, userFields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
         trajectoryFiles.append(dumpIO.getAssociatedFilePath())
         bondIO = ReaxBondFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
+        bondFiles.append(bondIO.getAssociatedFilePath())
         thermoIO = ThermoFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, userFields=typedMolecule.getDefaultThermoVariables())
         speSection.addFileIO(dumpIO)
         speSection.addFileIO(bondIO)
@@ -195,21 +201,60 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path):
 
     # Concatenate the trajectories
     logger.info("Concatenating trajectories...")
-
-    # This method doesn't work because the files are not ordered properly
-    #dumpTrajectoryFiles = list(jobFolder.glob("dump.*"))
-    #dumpTrajectoryFiles.sort()
-    #for i in range(len(dumpTrajectoryFiles)):
-    #    dumpTrajectoryFiles[i] = str(dumpTrajectoryFiles[i])
-    #concatTrajectoryFile = jobFolder / "concatenatedTrajectory.dump"
-    #subprocess.run("cat " + " ".join(dumpTrajectoryFiles) + " > " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
     
-    concatTrajectoryFile = jobFolder / "concatenatedTrajectory.dump"
+    concatTrajectoryFile = jobFolder / "positions.fulltrajectory.lammpstrj"
+    concatBondFile = jobFolder / "reaxbonds.fulltrajectory.txt"
     for i in range(len(trajectoryFiles)):
         trajectoryFiles[i] = str(jobFolder / trajectoryFiles[i])
-    subprocess.run("cat " + " ".join(trajectoryFiles) + " > " + str(jobFolder / "concatenatedTrajectory.dump"), shell=True, check=True, capture_output=True, cwd=jobFolder)
+        bondFiles[i] = str(jobFolder / bondFiles[i])
+    #subprocess.run("cat " + " ".join(trajectoryFiles) + " > " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    #subprocess.run("cat " + " ".join(bondFiles) + " >> " + str(concatBondFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    for file in trajectoryFiles:
+        subprocess.run("cat " + str(file) + " >> " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    for file in bondFiles:
+        subprocess.run("cat " + str(file) + " >> " + str(concatBondFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
+
     
-    logger.info("Concatenated trajectories saved in: " + str(concatTrajectoryFile))
+    logger.info("Concatenated position trajectories saved in: " + str(concatTrajectoryFile))
+    logger.info("Concatenated bonds trajectories saved in: " + str(concatBondFile))
+
+    # Move all the files from trajectory files to the new folder
+    frameFolder = jobFolder / "frames"
+    frameFolder.mkdir()
+    subprocess.run("mv dump.* " + str(frameFolder), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    subprocess.run("mv bonds.* " + str(frameFolder), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    logger.info("Frames saved in: " + str(frameFolder))
+
+    return jobFolder, headPixel
+
+def analyseFrames(jobFolder: Path, headPixel: list):
+
+    # We are going to create an imaage with a color map corresponding to the potential energy of each pixel
+
+    # First, create an empty array
+    data = np.zeros((headPixel[-1][0] + 1, headPixel[-1][1] + 1), dtype=np.float64)
+
+    # Get the log file 
+    logFile = jobFolder / "log.lammps"
+    log = lammps_logfile.File(logFile)
+
+    # Loop over the frames
+    for i in range(len(headPixel)):
+        # Get the frame
+        dataFrame = log.get(entry_name="PotEng", run_num=i)
+        #print(dataFrame)
+        # Some frames can have ["warning"] as their first value, query for the last one ro be safe
+        data[headPixel[i][0], headPixel[i][1]] = dataFrame[-1]
+
+    # Create a colormap with mathplotlib
+    cmap = plt.get_cmap('inferno')
+    plt.imshow(data, cmap=cmap, origin='lower')
+    plt.colorbar()
+    plt.savefig(jobFolder / "potentialEnergyMap.png")
+
+    logger.info("Potential energy map saved in: " + str(jobFolder / "potentialEnergyMap.png"))
+
+    
 
 
 def main(): 
@@ -225,7 +270,9 @@ def main():
     minimizedModelPath = runMinimizationSlab(lmpexec)
     logger.info(f"Minimized model path: {minimizedModelPath}")
 
-    scanSurface(lmpexec, minimizedModelPath)
+    jobFolder, headPixel = scanSurface(lmpexec, minimizedModelPath)
+
+    analyseFrames(jobFolder, headPixel)
 
         
 
