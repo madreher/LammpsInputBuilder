@@ -6,7 +6,7 @@
 |-------------------------------------------------------- | -------: | -------: | ------: | --------: |
 | python/lammpsinputbuilder/\_\_init\_\_.py               |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/extensions.py                 |      112 |        5 |     96% |18, 21, 51, 93, 134 |
-| python/lammpsinputbuilder/fileIO.py                     |      180 |       23 |     87% |24, 27, 30, 35, 38, 41, 44, 47, 50, 94, 114, 120-123, 133-136, 162, 175, 187, 196, 214, 237 |
+| python/lammpsinputbuilder/fileIO.py                     |      186 |       23 |     88% |24, 27, 30, 35, 38, 41, 44, 47, 50, 94, 117, 123-126, 136-139, 165, 178, 190, 199, 217, 243 |
 | python/lammpsinputbuilder/group.py                      |      151 |       25 |     83% |23, 26, 41, 48, 59, 90, 111, 152, 158, 170, 189-190, 193, 196, 199, 202-205, 209-212, 215, 218 |
 | python/lammpsinputbuilder/instructions.py               |      181 |       25 |     86% |24, 34, 46, 65, 74, 102, 113, 193, 235-240, 243-253 |
 | python/lammpsinputbuilder/integrator.py                 |      155 |        6 |     96% |29, 42, 69, 107, 133, 167 |
@@ -25,7 +25,7 @@
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py       |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/modelToData.py        |      151 |       23 |     85% |36, 39-42, 48-49, 101, 121, 140, 162-165, 179, 183-193 |
 | python/lammpsinputbuilder/workflowBuilder.py            |       40 |        2 |     95% |    20, 32 |
-|                                               **TOTAL** | **1729** |  **453** | **74%** |           |
+|                                               **TOTAL** | **1735** |  **453** | **74%** |           |
 
 
 ## Setup coverage badge
