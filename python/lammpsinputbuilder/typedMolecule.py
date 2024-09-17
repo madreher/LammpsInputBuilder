@@ -6,7 +6,7 @@ from ase.io.lammpsrun import read_lammps_dump_text as ase_read_lammps_dump_text
 import shutil
 import tempfile
 
-from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileFormat, MoleculeHolder, ElectrostaticMethod, getMoleculeFileFormatFromExtension, getExtensionFromMoleculeFileFormat, getForcefieldFromExtension
+from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileFormat, GlobalInformation, ElectrostaticMethod, getMoleculeFileFormatFromExtension, getExtensionFromMoleculeFileFormat, getForcefieldFromExtension
 from lammpsinputbuilder.utility.modelToData import moleculeToLammpsDataPBC, moleculeToLammpsInput
 from lammpsinputbuilder.quantities import LammpsUnitSystem
 
@@ -58,10 +58,10 @@ class TypedMolecule:
     def getUnitsystem(self) -> LammpsUnitSystem:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
     
-    def generateLammpsDataFile(self, jobFolder:Path) -> MoleculeHolder:
+    def generateLammpsDataFile(self, jobFolder:Path) -> GlobalInformation:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
     
-    def generateLammpsInputFile(self, jobFolder:Path, molecule: MoleculeHolder) -> Path:
+    def generateLammpsInputFile(self, jobFolder:Path, globalInformation: GlobalInformation) -> Path:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
     
     def getLammpsDataFileName(self) -> str:
@@ -218,19 +218,19 @@ class ReaxTypedMolecule(TypedMolecule):
         self.moleculeContent = d["moleculeContent"]
         
         
-    def generateLammpsDataFile(self, jobFolder:Path) -> MoleculeHolder:
+    def generateLammpsDataFile(self, jobFolder:Path) -> GlobalInformation:
         # TODO: Adjust code to handle the different bbox styles
-        molecule = moleculeToLammpsDataPBC(self.moleculeContent, self.moleculeFormat, jobFolder, self.getLammpsDataFileName())
+        globalInfo = moleculeToLammpsDataPBC(self.moleculeContent, self.moleculeFormat, jobFolder, self.getLammpsDataFileName())
 
         # Copy the forcefield to the job folder
         forcefieldPath = jobFolder / self.forcefieldPath.name
         with open(forcefieldPath, 'w') as f:
             f.write(self.forcefieldContent)
 
-        return molecule
+        return globalInfo
     
-    def generateLammpsInputFile(self, jobFolder:Path, molecule: MoleculeHolder) -> Path:
-        return moleculeToLammpsInput("lammps.input", jobFolder / self.getLammpsDataFileName(), jobFolder, Forcefield.REAX, self.forcefieldPath.name, molecule, electrostaticMethod=self.electrostaticMethod)
+    def generateLammpsInputFile(self, jobFolder:Path, globalInformation: GlobalInformation) -> Path:
+        return moleculeToLammpsInput("lammps.input", jobFolder / self.getLammpsDataFileName(), jobFolder, Forcefield.REAX, self.forcefieldPath.name, globalInformation, electrostaticMethod=self.electrostaticMethod)
     
     def getLammpsDataFileName(self) -> str:
         return "model.data"

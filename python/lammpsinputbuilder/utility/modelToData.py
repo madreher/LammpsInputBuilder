@@ -5,7 +5,8 @@ from ase.atoms import Atoms
 import numpy as np
 from pathlib import Path
 from typing import List
-from lammpsinputbuilder.types import MoleculeFileFormat, Forcefield, ElectrostaticMethod, MoleculeHolder
+from lammpsinputbuilder.types import MoleculeFileFormat, Forcefield, ElectrostaticMethod, GlobalInformation
+from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 def extractElementsFromData(dataPath: str) -> str:
     """
@@ -25,11 +26,13 @@ def extractElementsFromData(dataPath: str) -> str:
         elements += ' ' + line.split()[-1]
     return elements
 
-def moleculeToLammpsDataPBC(moleculeContent: str, moleculeFileFormat: MoleculeFileFormat, jobFolder:Path, dataFileName: str) -> MoleculeHolder:
+def moleculeToLammpsDataPBC(moleculeContent: str, moleculeFileFormat: MoleculeFileFormat, jobFolder:Path, dataFileName: str) -> GlobalInformation:
     """
     Convert a molecule from XYZ or MOL2 format to a LAMMPS data file.
     TODO: add support for PBC/Shrink
     """
+
+    globalInformation = GlobalInformation()
 
     # Save the molecule file in the job folder
     if moleculeFileFormat == MoleculeFileFormat.MOL2:
@@ -52,6 +55,8 @@ def moleculeToLammpsDataPBC(moleculeContent: str, moleculeFileFormat: MoleculeFi
 
     # Default cell, will be overwritten when rewritting the data file.
     atoms.set_cell([500, 500, 500])
+
+    globalInformation.setAtoms(atoms)
 
     # Write a temporary data file which doesn't contain mass information yet
     tempDataPath = jobFolder / (str(dataFileName) + '.temp')
@@ -119,17 +124,21 @@ def moleculeToLammpsDataPBC(moleculeContent: str, moleculeFileFormat: MoleculeFi
                 offset += 1
         if offset > len(lines)-1:
             raise RuntimeError("Could not find zhi in LAMMPS data file")
+        globalInformation.setBBoxCoords(bboxCoords)
         
 
         # Insert the masses in the data file so it doesn't have to be added separatly in the script file
+        elementMap = {}
         f.write('\n')
         f.write('Masses\n')
         f.write('\n')
         for i in range(len(masses_u)):
             f.write(f'{i + 1} {masses_u[i]} # {chemical_symbols_u[i]}\n')
+            elementMap[i+1] = chemical_symbols_u[i]
         f.write('\n')
         f.write('Atoms # full\n')
         f.write('\n')
+        globalInformation.setElementTable(elementMap)
 
         # Find the offset of the Atoms section
         for i in range(offset, len(lines)):
@@ -143,14 +152,14 @@ def moleculeToLammpsDataPBC(moleculeContent: str, moleculeFileFormat: MoleculeFi
         for i in range(offset, len(lines)):
             f.write(lines[i])
     
-    return MoleculeHolder(atoms, bboxCoords)
+    return globalInformation
 
-def moleculeToLammpsInput(lammpsScriptFileName:Path, dataFilePath: Path, jobFolder: Path, ffType: Forcefield, forcefieldName:str, molecule: MoleculeHolder, electrostaticMethod: ElectrostaticMethod) -> Path:
+def moleculeToLammpsInput(lammpsScriptFileName:Path, dataFilePath: Path, jobFolder: Path, ffType: Forcefield, forcefieldName:str, globalInformation:GlobalInformation, electrostaticMethod: ElectrostaticMethod) -> Path:
         lammpsScriptFilePath = jobFolder / lammpsScriptFileName
         with open(lammpsScriptFilePath, "w") as f:
 
             # Extract the simulation box
-            cellDims = molecule.getBboxDims()
+            cellDims = globalInformation.getBboxDims()
             minCellDim = min([cellDims[0], cellDims[1], cellDims[2]])
 
             # Get back the list of elements
@@ -159,8 +168,10 @@ def moleculeToLammpsInput(lammpsScriptFileName:Path, dataFilePath: Path, jobFold
             scriptContent = "# -*- mode: lammps -*-\n"
             if ffType == Forcefield.REAX:
                 scriptContent += 'units          real\n'
+                globalInformation.setUnitStyle(LammpsUnitSystem.REAL)
             elif ffType in [Forcefield.AIREBO, Forcefield.REBO, Forcefield.AIREBOM]:
                 scriptContent += 'units          metal\n'
+                globalInformation.setUnitStyle(LammpsUnitSystem.METAL)
             else:
                 raise NotImplementedError(f"Forcefield {ffType} not supported")
             scriptContent += 'atom_style     full\n'

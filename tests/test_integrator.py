@@ -1,4 +1,5 @@
 from lammpsinputbuilder.integrator import *
+from lammpsinputbuilder.types import GlobalInformation
 import pytest
 
 def test_NVEIntegrator():
@@ -19,7 +20,8 @@ def test_NVEIntegrator():
     assert integrator2.getGroupName() == "all"
     assert integrator2.getNbSteps() == 1000
 
-    assert integrator.addDoCommands() == "fix myIntegrator all nve\n"
+    info = GlobalInformation()
+    assert integrator.addDoCommands(info) == "fix myIntegrator all nve\n"
     assert integrator.addRunCommands() == "run 1000\n"
     assert integrator.addUndoCommands() == "unfix myIntegrator\n"
 
@@ -35,7 +37,8 @@ def test_RunZeroIntegrator():
     integrator2.fromDict(objDict, version=0)
     assert integrator2.getIntegratorName() == "myIntegrator"
 
-    assert integrator.addDoCommands() == ""
+    info = GlobalInformation()
+    assert integrator.addDoCommands(info) == ""
     assert integrator.addRunCommands() == "run 0\n"
     assert integrator.addUndoCommands() == ""
 
@@ -66,7 +69,8 @@ def test_MinimizeIntegrator():
     assert integrator2.getMaxiter() == 400
     assert integrator2.getMaxeval() == 50000
 
-    assert integrator.addDoCommands() == ""
+    info = GlobalInformation()
+    assert integrator.addDoCommands(info) == ""
     runCmds = integrator.addRunCommands().splitlines()
     assert runCmds[0] == "min_style cg"
     assert runCmds[1] == "minimize 0.02 0.03 400 50000"
@@ -84,7 +88,8 @@ def test_MultipassIntegrator():
     integrator2.fromDict(objDict, version=0)
     assert integrator2.getIntegratorName() == "myIntegrator"
 
-    assert integrator.addDoCommands() == ""
+    info = GlobalInformation()
+    assert integrator.addDoCommands(info) == ""
     assert integrator.addRunCommands() == """min_style      cg
 minimize       1.0e-10 1.0e-10 10000 100000
 min_style      hftn

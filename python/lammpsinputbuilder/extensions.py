@@ -1,5 +1,6 @@
 from lammpsinputbuilder.group import AllGroup, Group
 from lammpsinputbuilder.quantities import LammpsUnitSystem, TemperatureQuantity, TimeQuantity, ForceQuantity, VelocityQuantity
+from lammpsinputbuilder.types import GlobalInformation
 
 class Extension:
     def __init__(self, computationName: str = "defaultComputation") -> None:
@@ -14,7 +15,7 @@ class Extension:
     def fromDict(self, d: dict, version: int):
         self.computationName = d.get("computationName", "defaultComputation")
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return ""
 
     def addUndoCommands(self) -> str:
@@ -59,8 +60,8 @@ class LangevinCompute(Extension):
         self.damp.fromDict(d["damp"], version)
         self.seed = d.get("seed", 122345)
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"fix {self.computationName} {self.group} langevin {self.startTemp.convertTo(unitsystem)} {self.endTemp.convertTo(unitsystem)} {self.damp.convertTo(unitsystem)} {self.seed}\n"
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+        return f"fix {self.computationName} {self.group} langevin {self.startTemp.convertTo(globalInformation.getUnitStyle())} {self.endTemp.convertTo(globalInformation.getUnitStyle())} {self.damp.convertTo(globalInformation.getUnitStyle())} {self.seed}\n"
 
     def addUndoCommands(self) -> str:
         return f"unfix {self.computationName}\n"
@@ -100,8 +101,8 @@ class SetForceCompute(Extension):
         self.fz = ForceQuantity()
         self.fz.fromDict(d["fz"], version)
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"fix {self.computationName} {self.group} setforce {self.fx.convertTo(unitsystem)} {self.fy.convertTo(unitsystem)} {self.fz.convertTo(unitsystem)}\n"
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+        return f"fix {self.computationName} {self.group} setforce {self.fx.convertTo(globalInformation.getUnitStyle())} {self.fy.convertTo(globalInformation.getUnitStyle())} {self.fz.convertTo(globalInformation.getUnitStyle())}\n"
 
     def addUndoCommands(self) -> str:
         return f"unfix {self.computationName}\n"
@@ -141,8 +142,8 @@ class MoveCompute(Extension):
         self.vz = VelocityQuantity()
         self.vz.fromDict(d["vz"], version)
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"fix {self.computationName} {self.group} move linear {self.vx.convertTo(unitsystem)} {self.vy.convertTo(unitsystem)} {self.vz.convertTo(unitsystem)}\n"
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+        return f"fix {self.computationName} {self.group} move linear {self.vx.convertTo(globalInformation.getUnitStyle())} {self.vy.convertTo(globalInformation.getUnitStyle())} {self.vz.convertTo(globalInformation.getUnitStyle())}\n"
 
     def addUndoCommands(self) -> str:
         return f"unfix {self.computationName}\n"

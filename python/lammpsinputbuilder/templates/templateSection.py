@@ -3,6 +3,7 @@ from lammpsinputbuilder.fileIO import FileIO
 from lammpsinputbuilder.group import Group
 from lammpsinputbuilder.section import Section
 from lammpsinputbuilder.extensions import Extension
+from lammpsinputbuilder.types import GlobalInformation
 from typing import List
 
 class TemplateSection(Section):
@@ -59,7 +60,7 @@ class TemplateSection(Section):
             for group in groups:
                 self.groups.append(loader.dictToGroup(group))
 
-    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
         # Declare all the objects which are going to live during the entire duractions of the sections
         result = f"################# START Section {self.sectionName} #################\n"
         result +=  "################# START Groups DECLARATION #################\n"
@@ -69,18 +70,18 @@ class TemplateSection(Section):
         
         result +=  "################# START Extensions DECLARATION #################\n"
         for ext in self.extensions:
-            result += ext.addDoCommands(unitsystem)
+            result += ext.addDoCommands(globalInformation=globalInformation)
         result +=  "################# END Extensions DECLARATION #################\n"
         
         result +=  "################# START IOs DECLARATION #################\n"
         for io in self.ios:
-            result += io.addDoCommands()
+            result += io.addDoCommands(globalInformation=globalInformation)
         result +=  "################# END IOs DECLARATION #################\n"
         
         # Everything is declared, now we can execute the differente sections
         sections = self.generateSections()
         for section in sections:
-            result += section.addAllCommands(unitsystem=unitsystem)
+            result += section.addAllCommands(globalInformation=globalInformation)
 
         # Everything is executed, now we can undo the differente sections
         result +=  "################# START IO REMOVAL #################\n"

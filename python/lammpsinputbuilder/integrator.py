@@ -1,5 +1,6 @@
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.quantities import LammpsUnitSystem
+from lammpsinputbuilder.types import GlobalInformation
 
 from enum import Enum
 
@@ -19,7 +20,7 @@ class Integrator:
     def fromDict(self, d: dict, version: int):
         self.integratorName = d.get("integratorName", "defaultIntegrator")
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return ""
 
     def addUndoCommands(self) -> str:
@@ -72,7 +73,7 @@ class NVEIntegrator(Integrator):
         self.nbSteps = d.get("nbSteps", 5000)
 
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return f"fix {self.integratorName} {self.group} nve\n"
 
     def addUndoCommands(self) -> str:
@@ -138,7 +139,7 @@ class MinimizeIntegrator(Integrator):
         self.maxiter = d["maxiter"]
         self.maxeval = d["maxeval"]
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return ""
 
     def addUndoCommands(self) -> str:
@@ -167,7 +168,7 @@ class MultipassMinimizeIntegrator(Integrator):
             raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().fromDict(d, version)
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return ""
 
     def addUndoCommands(self) -> str:

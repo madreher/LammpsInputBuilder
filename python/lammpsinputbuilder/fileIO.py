@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List
 from lammpsinputbuilder.group import Group, AllGroup
+from lammpsinputbuilder.types import GlobalInformation
 from enum import Enum
 
 class FileIO:
@@ -20,7 +21,7 @@ class FileIO:
     def fromDict(self, d: dict, version: int):
         self.fileIOName = d.get("fileIOName", "defaultFileIO")
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return ""
     
     def addUndoCommands(self) -> str:
@@ -40,7 +41,7 @@ class XYZTrajectoryFileIO(FileIO):
     def fromDict(self, d: dict, version: int):
         pass    
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return ""
 
     def addUndoCommands(self) -> str:
@@ -100,7 +101,7 @@ class DumpTrajectoryFileIO(FileIO):
         self.style = DumpStyle(d.get("style", DumpStyle.CUSTOM.value))
         pass    
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         result = ""
         if self.style == DumpStyle.CUSTOM:
             result += f"dump {self.fileIOName} {self.groupName} custom {self.interval} {self.getAssociatedFilePath()}"
@@ -120,6 +121,13 @@ class DumpTrajectoryFileIO(FileIO):
                 result += f" {field}"
             result += "\n"
             result += f"dump_modify {self.fileIOName} sort id\n"
+            if "element" in fields:
+                if len(globalInformation.getElementTable()) == 0:
+                    raise RuntimeError("\'element\' is part of the dump file custom fields, but the element table is empty. Unable to produce to correct trajectory file.")
+                result += f"dump_modify {self.fileIOName} element"
+                for elem in globalInformation.getElementTable().values():
+                    result += f" {elem}"
+                result += "\n"
         elif self.style == DumpStyle.XYZ:
             result += f"dump {self.fileIOName} {self.groupName} xyz {self.interval} {self.getAssociatedFilePath()}\n"
         else:
@@ -168,7 +176,7 @@ class ReaxBondFileIO(FileIO):
         self.groupName = d.get("groupName", AllGroup().getGroupName())
         self.interval = d.get("interval", 100)   
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return f"fix {self.fileIOName} {self.groupName} reaxff/bonds {self.interval} bonds.{self.fileIOName}.txt\n"
 
     def addUndoCommands(self) -> str:
@@ -220,7 +228,7 @@ class ThermoFileIO(FileIO):
         self.addDefaultFields = d.get("addDefaultFields", True)
         self.interval = d.get("interval", 10)
 
-    def addDoCommands(self) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         result = ""
         result += f"thermo {self.interval}\n"
         fields = []

@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import List 
 from ase import Atoms
+from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 class Forcefield(Enum):
     REAX = 1,
@@ -82,3 +83,41 @@ class MoleculeHolder():
 
     def getBboxDims(self) -> List:
         return self.bboxDims
+    
+class GlobalInformation:
+    def __init__(self) -> None:
+        self.unitStyle = None
+        self.elementTable = {}
+        self.atoms = None
+        self.bboxCoords = None
+        self.bboxDims = None
+
+    def setAtoms(self, atoms: Atoms):
+        self.atoms = atoms
+
+    def getAtoms(self) -> Atoms:
+        return self.atoms
+    
+    def setBBoxCoords(self, bboxCoords: List):
+        if len(bboxCoords) != 6:
+            raise ValueError("Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
+        self.bboxCoords = bboxCoords
+        self.bboxDims = [bboxCoords[1] - bboxCoords[0], bboxCoords[3] - bboxCoords[2], bboxCoords[5] - bboxCoords[4]]
+
+    def getBBoxCoords(self) -> List:
+        return self.bboxCoords
+
+    def getBboxDims(self) -> List:
+        return self.bboxDims
+    
+    def setUnitStyle(self, unitStyle: LammpsUnitSystem):
+        self.unitStyle = unitStyle
+
+    def getUnitStyle(self) -> LammpsUnitSystem:
+        return self.unitStyle
+    
+    def setElementTable(self, elementTable: dict):
+        self.elementTable = elementTable
+
+    def getElementTable(self) -> dict:
+        return self.elementTable

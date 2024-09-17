@@ -3,6 +3,7 @@ import pytest
 from lammpsinputbuilder.extensions import MoveCompute, LangevinCompute, SetForceCompute
 from lammpsinputbuilder.group import AllGroup
 from lammpsinputbuilder.quantities import VelocityQuantity, LammpsUnitSystem, TemperatureQuantity, TimeQuantity, ForceQuantity
+from lammpsinputbuilder.types import GlobalInformation
 
 def test_MoveCompute():
     obj  = MoveCompute("myMoveCompute", group=AllGroup(), vx=VelocityQuantity(1.0, "angstrom/ps"), vy=VelocityQuantity(2.0, "angstrom/ps"), vz=VelocityQuantity(3.0, "angstrom/ps"))
@@ -37,8 +38,12 @@ def test_MoveCompute():
 
     assert loadBackObj.toDict() == dictResult
 
-    assert obj.addDoCommands(LammpsUnitSystem.METAL) == "fix myMoveCompute all move linear 1.0 2.0 3.0\n"
-    assert obj.addDoCommands(LammpsUnitSystem.REAL) == "fix myMoveCompute all move linear 0.001 0.002 0.003\n"
+    infoMetal = GlobalInformation()
+    infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
+    assert obj.addDoCommands(infoMetal) == "fix myMoveCompute all move linear 1.0 2.0 3.0\n"
+    infoReal = GlobalInformation()
+    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
+    assert obj.addDoCommands(infoReal) == "fix myMoveCompute all move linear 0.001 0.002 0.003\n"
     assert obj.addUndoCommands() == "unfix myMoveCompute\n"
 
 def test_SetForceCompute():
@@ -80,8 +85,12 @@ def test_SetForceCompute():
 
     assert loadBackObj.toDict() == dictResult
 
-    assert obj.addDoCommands(LammpsUnitSystem.METAL) == "fix mySetForceCompute all setforce 0.04336410424180094 0.08672820848360188 0.13009231272540284\n"
-    assert obj.addDoCommands(LammpsUnitSystem.REAL) == "fix mySetForceCompute all setforce 1.0 2.0 3.0\n"
+    infoMetal = GlobalInformation()
+    infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
+    assert obj.addDoCommands(infoMetal) == "fix mySetForceCompute all setforce 0.04336410424180094 0.08672820848360188 0.13009231272540284\n"
+    infoReal = GlobalInformation()
+    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
+    assert obj.addDoCommands(infoReal) == "fix mySetForceCompute all setforce 1.0 2.0 3.0\n"
     assert obj.addUndoCommands() == "unfix mySetForceCompute\n"
 
 def test_LangevinCompute():
@@ -127,7 +136,11 @@ def test_LangevinCompute():
 
     assert loadBackObj.toDict() == dictResult
 
-    assert obj.addDoCommands(LammpsUnitSystem.METAL) == "fix myLangevinCompute all langevin 1.0 2.0 3.0 122345\n"
-    assert obj.addDoCommands(LammpsUnitSystem.REAL) == "fix myLangevinCompute all langevin 1.0 2.0 2999.9999999999995 122345\n"
+    infoMetal = GlobalInformation()
+    infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
+    assert obj.addDoCommands(infoMetal) == "fix myLangevinCompute all langevin 1.0 2.0 3.0 122345\n"
+    infoReal = GlobalInformation()
+    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
+    assert obj.addDoCommands(infoReal) == "fix myLangevinCompute all langevin 1.0 2.0 2999.9999999999995 122345\n"
     assert obj.addUndoCommands() == "unfix myLangevinCompute\n"
 

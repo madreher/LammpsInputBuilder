@@ -8,6 +8,7 @@ import logging
 import tempfile
 
 logger = logging.getLogger(__name__)
+    
 
 class WorkflowBuilder:
 
@@ -42,8 +43,8 @@ class WorkflowBuilder:
         logger.debug(f"WorkflowBuilder generated the job folder: {jobFolder}")
 
         # Write the initial Lammps files
-        molecule = self.molecule.generateLammpsDataFile(jobFolder)
-        inputPath = self.molecule.generateLammpsInputFile(jobFolder, molecule)
+        globalInformation = self.molecule.generateLammpsDataFile(jobFolder)
+        inputPath = self.molecule.generateLammpsInputFile(jobFolder, globalInformation)
 
         # System is now declared, we can add sections to the input file
 
@@ -56,7 +57,7 @@ class WorkflowBuilder:
         # Now we can add the sections
         sectionContent = ""
         for section in self.sections:
-            sectionContent += section.addAllCommands(self.getTypedMolecule().getUnitsystem())
+            sectionContent += section.addAllCommands(globalInformation)
 
         with open(workflowInputPath, "a") as f:
             f.write(sectionContent)

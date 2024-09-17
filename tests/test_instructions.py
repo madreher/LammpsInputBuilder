@@ -5,7 +5,8 @@ def test_instructionsResetTimestep():
     assert instruction.getTimestep() == 20
     assert instruction.getInstructionName() == "defaultResetTimestep"
 
-    assert instruction.writeInstruction() == "reset_timestep 20\n"
+    info = GlobalInformation()
+    assert instruction.writeInstruction(info) == "reset_timestep 20\n"
 
     objDict = instruction.toDict()
     assert objDict["class"] == "ResetTimestepInstruction"
@@ -23,8 +24,13 @@ def test_instructionsSetTimestep():
     assert instruction.getTimestep().getUnits() == "fs"
     assert instruction.getInstructionName() == "defaultSetTimestep"
 
-    assert instruction.writeInstruction(LammpsUnitSystem.REAL) == "timestep 20.0\n"
-    assert instruction.writeInstruction(LammpsUnitSystem.METAL) == "timestep 0.02\n"
+    infoReal = GlobalInformation()
+    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
+    assert instruction.writeInstruction(infoReal) == "timestep 20.0\n"
+
+    infoMetal = GlobalInformation()
+    infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
+    assert instruction.writeInstruction(infoMetal) == "timestep 0.02\n"
 
     objDict = instruction.toDict()
     assert objDict["class"] == "SetTimestepInstruction"
@@ -46,7 +52,9 @@ def test_instructionVelocityCreate():
     assert instruction.getSeed() == 12335
     assert instruction.getInstructionName() == "defaultVelocityCreate"
 
-    assert instruction.writeInstruction() == "velocity all create 300.0 12335 dist gaussian\n"
+    infoReal = GlobalInformation()
+    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
+    assert instruction.writeInstruction(infoReal) == "velocity all create 300.0 12335 dist gaussian\n"
 
     objDict = instruction.toDict()
     assert objDict["class"] == "VelocityCreateInstruction"
@@ -71,7 +79,8 @@ def test_instructionVariable():
     assert instruction.getArgs() == "{dt}"
     assert instruction.getInstructionName() == "defaultVariable"
 
-    assert instruction.writeInstruction() == "variable defaultVariable equal {dt}\n"
+    info = GlobalInformation()
+    assert instruction.writeInstruction(info) == "variable defaultVariable equal {dt}\n"
 
     objDict = instruction.toDict()
     assert objDict["class"] == "VariableInstruction"
@@ -99,4 +108,9 @@ def test_DisplaceAtomsInstruction():
     assert displacementVector[2].getUnits() == "lmp_real_length"
     assert instruction.getInstructionName() == "defaultDisplaceAtoms"
 
-    assert instruction.writeInstruction() == "displace_atoms all move 1.0 2.0 3.0\n"
+    infoReal = GlobalInformation()
+    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
+    assert instruction.writeInstruction(infoReal) == "displace_atoms all move 1.0 2.0 3.0\n"
+    infoMetal = GlobalInformation()
+    infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
+    assert instruction.writeInstruction(infoMetal) == "displace_atoms all move 1.0 2.0 3.0\n"

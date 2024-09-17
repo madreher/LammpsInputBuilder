@@ -6,6 +6,7 @@ from lammpsinputbuilder.quantities import LammpsUnitSystem
 from lammpsinputbuilder.instructions import Instruction
 from lammpsinputbuilder.extensions import Extension
 from lammpsinputbuilder.group import Group
+from lammpsinputbuilder.types import GlobalInformation
 
 class Section:
     def __init__(self, sectionName: str = "defaultSection") -> None:
@@ -21,13 +22,13 @@ class Section:
         self.sectionName = d.get("sectionName", "defaultSection")
         return
     
-    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
         result = ""
-        result += self.addDoCommands(unitsystem=unitsystem)
+        result += self.addDoCommands(globalInformation=globalInformation)
         result += self.addUndoCommands()
         return result
     
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         return ""
     
     def addUndoCommands(self) -> str:
@@ -103,7 +104,7 @@ class RecusiveSection(Section):
             for group in groups:
                 self.groups.append(loader.dictToGroup(group))
 
-    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
         
         # Declare all the objects which are going to live during the entire duractions of the sections
         result = f"################# START Section {self.sectionName} #################\n"
@@ -114,17 +115,17 @@ class RecusiveSection(Section):
         
         result +=  "################# START Extensions DECLARATION #################\n"
         for ext in self.extensions:
-            result += ext.addDoCommands(unitsystem)
+            result += ext.addDoCommands(globalInformation=globalInformation)
         result +=  "################# END Extensions DECLARATION #################\n"
         
         result +=  "################# START IOs DECLARATION #################\n"
         for io in self.ios:
-            result += io.addDoCommands()
+            result += io.addDoCommands(globalInformation=globalInformation)
         result +=  "################# END IOs DECLARATION #################\n"
         
         # Everything is declared, now we can execute the differente sections
         for section in self.sections:
-            result += section.addAllCommands(unitsystem=unitsystem)
+            result += section.addAllCommands(globalInformation=globalInformation)
 
         # Everything is executed, now we can undo the differente sections
         result +=  "################# START IO REMOVAL #################\n"
@@ -218,9 +219,9 @@ class IntegratorSection(Section):
 
             
         
-    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
         result =  "################# START SECTION " + self.sectionName + " #################\n\n"
-        result += self.addDoCommands(unitsystem)
+        result += self.addDoCommands(globalInformation=globalInformation)
         result +=  "################# START RUN INTEGRATOR FOR SECTION " + self.sectionName + " #################\n"
         result += self.integrator.addRunCommands()
         result +=  "################# END RUN INTEGRATOR FOR SECTION " + self.sectionName + " #################\n"
@@ -228,7 +229,7 @@ class IntegratorSection(Section):
         result += "################# END SECTION " + self.sectionName + " #################\n\n"
         return result
 
-    def addDoCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
         result = ""
         result +=  "################# START Groups DECLARATION #################\n"
         for grp in self.groups:
@@ -237,16 +238,16 @@ class IntegratorSection(Section):
         
         result +=  "################# START Extensions DECLARATION #################\n"
         for ext in self.extensions:
-            result += ext.addDoCommands(unitsystem)
+            result += ext.addDoCommands(globalInformation=globalInformation)
         result +=  "################# END Extensions DECLARATION #################\n"
         
         result +=  "################# START IOs DECLARATION #################\n"
         for io in self.fileIOs:
-            result += io.addDoCommands()
+            result += io.addDoCommands(globalInformation=globalInformation)
         result +=  "################# END IOs DECLARATION #################\n"
         
         result +=  "################# START INTEGRATOR DECLARATION #################\n"
-        result += self.integrator.addDoCommands(unitsystem)
+        result += self.integrator.addDoCommands(globalInformation=globalInformation)
         result +=  "################# END INTEGRATOR DECLARATION #################\n"
         return result
     
@@ -297,9 +298,9 @@ class InstructionsSection(Section):
             instructionLoader = loader.InstructionLoader()
             self.instructions = [instructionLoader.dictToInstruction(c, version) for c in instructionsDict]
 
-    def addAllCommands(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
         result =  "################# START SECTION " + self.sectionName + " #################\n\n"
         for instruction in self.instructions:
-            result += instruction.writeInstruction(unitsystem)
+            result += instruction.writeInstruction(globalInformation=globalInformation)
         result += "################# END SECTION " + self.sectionName + " #################\n\n"
         return result

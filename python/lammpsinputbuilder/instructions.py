@@ -1,6 +1,7 @@
 from lammpsinputbuilder.quantities import TimeQuantity, LammpsUnitSystem, TemperatureQuantity
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.quantities import LengthQuantity
+from lammpsinputbuilder.types import GlobalInformation
 
 from enum import Enum
 
@@ -20,7 +21,7 @@ class Instruction:
     def fromDict(self, d: dict, version: int):
         self.instructionName = d.get("instructionName", "defaultInstruction")
 
-    def writeInstruction(self) -> str:
+    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
         return ""
     
 class ResetTimestepInstruction(Instruction):
@@ -48,7 +49,7 @@ class ResetTimestepInstruction(Instruction):
         self.timestep = d.get("timestep", 0)
         self.validate()
 
-    def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
         return f"reset_timestep {self.timestep}\n"
     
 class SetTimestepInstruction(Instruction):
@@ -77,8 +78,8 @@ class SetTimestepInstruction(Instruction):
         self.timestep.fromDict(d["timestep"], version)
         self.validate()
 
-    def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"timestep {self.timestep.convertTo(unitsystem)}\n"
+    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
+        return f"timestep {self.timestep.convertTo(globalInformation.getUnitStyle())}\n"
     
 class VelocityCreateInstruction(Instruction):
     def __init__(self, instructionName: str = "defaultVelocityCreate", group: Group = AllGroup(), temp: TemperatureQuantity = TemperatureQuantity(300, "kelvin"), seed: int =12335) -> None:
@@ -118,8 +119,8 @@ class VelocityCreateInstruction(Instruction):
         self.seed = d.get("seed", 12335)
         self.validate()
 
-    def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"velocity {self.group} create {self.temp.convertTo(unitsystem)} {self.seed} dist gaussian\n"
+    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
+        return f"velocity {self.group} create {self.temp.convertTo(globalInformation.getUnitStyle())} {self.seed} dist gaussian\n"
     
 
 class VariableStyle(Enum):
@@ -197,7 +198,7 @@ class VariableInstruction(Instruction):
         self.args = d.get("args", "")
         self.validate()
 
-    def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
+    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
         return f"variable {self.variableName} {self.variableStyleToStr[self.style]} {self.args}\n"
     
 class DisplaceAtomsInstruction(Instruction):
@@ -252,5 +253,6 @@ class DisplaceAtomsInstruction(Instruction):
         self.dz.fromDict(d.get("dz", {}))
         self.validate()
 
-    def writeInstruction(self, unitsystem: LammpsUnitSystem = LammpsUnitSystem.REAL) -> str:
-        return f"displace_atoms {self.group} move {self.dx.convertTo(unitsystem)} {self.dy.convertTo(unitsystem)} {self.dz.convertTo(unitsystem)}\n"
+    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
+        return f"displace_atoms {self.group} move {self.dx.convertTo(globalInformation.getUnitStyle())} {self.dy.convertTo(globalInformation.getUnitStyle())} {self.dz.convertTo(globalInformation.getUnitStyle())}\n"
+    
