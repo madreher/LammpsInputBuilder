@@ -107,7 +107,10 @@ class DumpTrajectoryFileIO(FileIO):
             fields = []
             if self.addDefaultFields:
                 fields.extend(self.defaultFields)
-            fields.extend(self.userFields)
+            if len(self.userFields) > 0:
+                for field in self.userFields:
+                    if field not in fields:
+                        fields.append(field)
 
             # Ensure that we always have the id to identify the atoms
             if "id" not in fields:
@@ -223,7 +226,10 @@ class ThermoFileIO(FileIO):
         fields = []
         if self.addDefaultFields:
             fields.extend(self.defaultFields)
-        fields.extend(self.userFields)
+        if len(self.userFields) > 0:
+            for field in self.userFields:
+                if field not in self.defaultFields:
+                    fields.append(field)
         result += f"thermo_style custom"
         for field in fields:
             result += f" {field}"
