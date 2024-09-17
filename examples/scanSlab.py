@@ -19,13 +19,61 @@ from lammpsinputbuilder.templates.minimizeTemplate import MinimizeTemplate
 from lammpsinputbuilder.instructions import DisplaceAtomsInstruction
 from lammpsinputbuilder.quantities import LengthQuantity
 
+import hashlib
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
 
-def runMinimizationSlab(lmpExecPath: Path) -> Path:
+def readBondPairsFromFrame(filePath: Path) -> list:
+    result = []
+    counter = 0
+    with open(filePath, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith("#"):
+                continue
+
+            # Column format:
+            # id type nb id_1...id_nb mol bo_1...bo_nb abo nlp q
+            # 48 1 1 23 0         1.127         1.127         1.000         0.000
+            #print(f"Line {counter}, current line:" + line)
+            fields = line.split()
+            atomID = int(fields[0])
+            nbBonds = int(fields[2])
+            if nbBonds <= 0:
+                continue
+            bonded = []
+            if nbBonds > 0:
+                for i in range(3, 3 + nbBonds):
+                    bonded.append(int(fields[i]))
+            startBondOrder = 3 + nbBonds + 1
+            bondOrders = []
+            for i in range(startBondOrder, startBondOrder + nbBonds):
+                bondOrders.append(float(fields[i]))
+            for i in range(0, nbBonds):
+                # We only keep bonds with higher ID to avoid duplicate when considering the inversed bond pair
+                # We only care about bonds with order > 0.5, below would not really be a bond in the chemistry sense
+                if bonded[i] > atomID and bondOrders[i] > 0.5: 
+                    result.append([atomID, bonded[i]])
+            #print(f"Line {counter}, current result:" + str(result))
+            #counter += 1
+            #if counter > 50:
+            #    break
+    #print(result)
+    return result
+
+
+def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     # In the first workflow, we're going to minimize the system only
-    modelData = Path(__file__).parent.parent / 'data' / 'models' / 'scan.fullmodel.xyz'
+    if model == "passivated":
+        modelData = Path(__file__).parent.parent / 'data' / 'models' / 'scan.fullmodel.xyz'
+    elif model == "headopen":
+        modelData = Path(__file__).parent.parent / 'data' / 'models' / 'scan.head.depassivated.fullmodel.xyz'
+    elif model == "headslabopen":
+        modelData = Path(__file__).parent.parent / 'data' / 'models' / 'scan.slab.head.depassivated.fullmodel.xyz'
+    else:
+        raise ValueError(f"Unknown model {model}")
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
     typedMolecule = ReaxTypedMolecule(
         bboxStyle=BoundingBoxStyle.PERIODIC,
@@ -36,11 +84,27 @@ def runMinimizationSlab(lmpExecPath: Path) -> Path:
     workflow.setTypedMolecule(typedMolecule)
 
     # Selection of 1-based indices, extracted from scanSelections.json
-    indiceAnchorTooltip = [312, 313, 314, 315, 316, 317, 322, 323, 324, 325, 326, 327, 328, 329, 330]
-    indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311]
-    indiceHead = [339]
-    indicesTooltip = [312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339]
-    indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 100, 107, 125, 192, 193, 200, 207, 208, 217, 240, 244, 251]
+    if model == "passivated":
+        indiceAnchorTooltip = [312, 313, 314, 315, 316, 317, 322, 323, 324, 325, 326, 327, 328, 329, 330]
+        indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311]
+        indiceHead = [339]
+        indicesTooltip = [312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339]
+        indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 100, 107, 125, 192, 193, 200, 207, 208, 217, 240, 244, 251]
+    elif model == "headopen":
+        indiceAnchorTooltip = [312, 313, 314, 315, 316, 317, 322, 323, 324, 325, 326, 327, 328, 329, 330]
+        indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311]
+        indiceHead = [338]
+        indicesTooltip = [312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338]
+        indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 100, 107, 125, 192, 193, 200, 207, 208, 217, 240, 244, 251]
+    elif model == "headslabopen":
+        indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 192, 200, 207, 217, 238, 240, 241, 244, 251]
+        indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310]
+        indiceHead = [337]
+        indiceAnchorTooltip = [311, 312, 313, 314, 315, 316, 321, 322, 323, 324, 325, 326, 327, 328, 329]
+        indicesTooltip = [311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337]
+    else:
+        raise ValueError(f"Unknown model {model}")
+    forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
 
     # Create the groups 
     groupTooltip  = IndicesGroup(groupName="tooltip", indices=indicesTooltip)
@@ -87,7 +151,7 @@ def runMinimizationSlab(lmpExecPath: Path) -> Path:
     
     return jobFolder / finalDump.getAssociatedFilePath()
 
-def scanSurface(lmpExecPath: Path, xyzPath: Path):
+def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float):
 
     # Load the model to get atom positions
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
@@ -99,12 +163,26 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path):
 
     # List of relevant atoms 
     # Selection of 1-based indices, extracted from scanSelections.json
-    indiceAnchorTooltip = [312, 313, 314, 315, 316, 317, 322, 323, 324, 325, 326, 327, 328, 329, 330]
-    indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311]
-    indiceHead = [339]
-    indicesTooltip = [312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339]
-    indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 100, 107, 125, 192, 193, 200, 207, 208, 217, 240, 244, 251]
-
+    if model == "passivated":
+        indiceAnchorTooltip = [312, 313, 314, 315, 316, 317, 322, 323, 324, 325, 326, 327, 328, 329, 330]
+        indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311]
+        indiceHead = [339]
+        indicesTooltip = [312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339]
+        indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 100, 107, 125, 192, 193, 200, 207, 208, 217, 240, 244, 251]
+    elif model == "headopen":
+        indiceAnchorTooltip = [312, 313, 314, 315, 316, 317, 322, 323, 324, 325, 326, 327, 328, 329, 330]
+        indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311]
+        indiceHead = [338]
+        indicesTooltip = [312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338]
+        indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 100, 107, 125, 192, 193, 200, 207, 208, 217, 240, 244, 251]
+    elif model == "headslabopen":
+        indiceAnchorSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 192, 200, 207, 217, 238, 240, 241, 244, 251]
+        indiceHead = [337]
+        indiceAnchorTooltip = [311, 312, 313, 314, 315, 316, 321, 322, 323, 324, 325, 326, 327, 328, 329]
+        indicesTooltip = [311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337]
+        indicesSlab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310]
+    else:
+        raise ValueError(f"Unknown model {model}")
    
     # Get the positions and the list of atoms for the slab to compute its bounding box
     positions = typedMolecule.getASEAtoms().get_positions()
@@ -120,9 +198,10 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path):
 
     # Now that we know where the slab is, and where the head is, we can plan a trajectory
     # For this example, we are going to put the head 2A abobe the slab, and scan every 1A on x and y axis 
-    desiredZDelta = 2.0
-    desiredXDelta = 0.2
-    desiredYDelta = 0.2
+    desiredZDelta = zplane
+    desiredXDelta = 1.0
+    desiredYDelta = 1.0
+    logger.info(f"Generating trajectory with the following parameters: zplane={zplane}, xdelta={desiredXDelta}, ydelta={desiredYDelta}")
     heightTip = slabBoundingBox[1][2] + desiredZDelta
     headTargetPositions = []
     headPixel = []
@@ -207,6 +286,8 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path):
     for i in range(len(trajectoryFiles)):
         trajectoryFiles[i] = str(jobFolder / trajectoryFiles[i])
         bondFiles[i] = str(jobFolder / bondFiles[i])
+
+    # Not using a single command with join because it leads to a command line too long when many files are concatenated
     #subprocess.run("cat " + " ".join(trajectoryFiles) + " > " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
     #subprocess.run("cat " + " ".join(bondFiles) + " >> " + str(concatBondFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
     for file in trajectoryFiles:
@@ -227,7 +308,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path):
 
     return jobFolder, headPixel
 
-def analyseFrames(jobFolder: Path, headPixel: list):
+def drawPotentialEnergyMap(jobFolder: Path, headPixel: list):
 
     # We are going to create an imaage with a color map corresponding to the potential energy of each pixel
 
@@ -251,28 +332,86 @@ def analyseFrames(jobFolder: Path, headPixel: list):
     plt.imshow(data, cmap=cmap, origin='lower')
     plt.colorbar()
     plt.savefig(jobFolder / "potentialEnergyMap.png")
+    plt.clf()
 
     logger.info("Potential energy map saved in: " + str(jobFolder / "potentialEnergyMap.png"))
+
+def drawBondConfigurationMap(jobFolder: Path, headPixel: list):
+
+    # We create an image where each pixel corresponds to a bond configuration, i.e an set of bond pairs
+    # Currently, we only consider bond pairs, regardless of the type. Should probably be refined in the next iteration
+
+    colorMap = {}
+    data = np.zeros((headPixel[-1][0] + 1, headPixel[-1][1] + 1), dtype=np.int32)
+
+    frameFolder = jobFolder / "frames"
+    currentID = 0
+
+    for i in range(len(headPixel)):
+
+        bondsFile = frameFolder / f"bonds.{headPixel[i][0]}_{headPixel[i][1]}.txt"
+        bondPairs = readBondPairsFromFrame(bondsFile)
+
+        # Sort the pairs first by the first atom id, then by the second atom id
+        npBondPairs = np.array(bondPairs)
+        sortedPairs = npBondPairs[np.lexsort((npBondPairs[:,1], npBondPairs[:,0]))]
+
+        # Compute a unique ID corresponding to this list of bond pairs
+        hashObj = hashlib.new("md5")
+        hashObj.update(sortedPairs.tobytes())
+        id = hashObj.hexdigest()
+
+        if id not in colorMap:
+            # We found a new bond configuration, adding it to the color map
+            colorMap[id] = currentID
+            data[headPixel[i][0], headPixel[i][1]] = currentID
+            currentID += 1
+        else:
+            # We have seen this bond configuration before, just use the same ID
+            data[headPixel[i][0], headPixel[i][1]] = colorMap[id]
+
+    # Create a colormap with mathplotlib
+    cmap = plt.get_cmap('inferno')
+    plt.imshow(data, cmap=cmap, origin='lower')
+    plt.colorbar()
+    plt.savefig(jobFolder / "bondConfigurationMap.png")
+    plt.clf()
+
+    logger.info("Bonds configuration map saved in: " + str(jobFolder / "bondConfigurationMap.png"))
+
+
+
+
 
     
 
 
 def main(): 
+    modelAvailables = ['passivated', 'headopen', "headslabopen"]
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--lmpexec', type=str, required=True, help="Path to the lammps executable.")
+    argparser.add_argument('--model', type=str, required=True, help="Model to use {}".format(modelAvailables))
+    argparser.add_argument('--zplane', type=float, default=2.0, help="Z plane above the slab to scan")
 
     args = argparser.parse_args()
     
     lmpexec = Path(args.lmpexec)
     if not lmpexec.exists():
         raise FileNotFoundError(f"Could not find lammps executable at {lmpexec}")
+
+    if args.model not in modelAvailables:
+        raise ValueError(f"Model must be one of the following: {modelAvailables}")
     
-    minimizedModelPath = runMinimizationSlab(lmpexec)
+    zplane = args.zplane
+    
+    minimizedModelPath = runMinimizationSlab(lmpexec, args.model)
     logger.info(f"Minimized model path: {minimizedModelPath}")
 
-    jobFolder, headPixel = scanSurface(lmpexec, minimizedModelPath)
+    jobFolder, headPixel = scanSurface(lmpexec, minimizedModelPath, args.model, zplane)
 
-    analyseFrames(jobFolder, headPixel)
+    drawPotentialEnergyMap(jobFolder, headPixel)
+
+    drawBondConfigurationMap(jobFolder, headPixel)
 
         
 
