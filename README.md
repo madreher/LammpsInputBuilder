@@ -23,8 +23,7 @@ With this organization, the main objectives of LammpsInputBuilder are as follows
 A LammpsInputBuilder starts by declaring a `WorkflowBuilder` object. This object is responsible for hosting the workflow definition and converting it into a Lammps script.
 The `WorkflowBuilder` is composed of two main parts: a `TypedMolecule`, and a list of `Section`.
 
-![WorkflowBuilder chart](data/images/WorkflowBuilder.svg)
-<img src="data/images/WorkflowBuilder.svg" alt="WorkflowBuilder chart" height="200"/>
+<img src="data/images/WorkflowBuilder.svg" alt="WorkflowBuilder chart" height="400"/>
 
 A `TypedMolecule` represent a molecular model with a forcefield assigned to it. Currently, LIB supports ReaxFF and Airebo potentiels but other could be added in the future. With a `TypedMolecule`, the `WorkflowBuilder` can generate a Lammps data file as well as the beginning of the input script.
 
