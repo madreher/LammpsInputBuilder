@@ -25,9 +25,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 logger = logging.getLogger(__name__)
 
-def readBondPairsFromFrame(filePath: Path) -> list:
+def readBondPairsFromFrame(filePath: Path, minbondOrder:float) -> list:
     result = []
-    counter = 0
+    ignoredBondPairs = 0
     with open(filePath, 'r') as f:
         lines = f.readlines()
         for line in lines:
@@ -54,14 +54,14 @@ def readBondPairsFromFrame(filePath: Path) -> list:
             for i in range(0, nbBonds):
                 # We only keep bonds with higher ID to avoid duplicate when considering the inversed bond pair
                 # We only care about bonds with order > 0.5, below would not really be a bond in the chemistry sense
-                if bonded[i] > atomID and bondOrders[i] > 0.5: 
-                    result.append([atomID, bonded[i]])
-            #print(f"Line {counter}, current result:" + str(result))
-            #counter += 1
-            #if counter > 50:
-            #    break
-    #print(result)
-    return result
+                if bonded[i] > atomID:
+                    if bondOrders[i] > minbondOrder: 
+                        result.append([atomID, bonded[i]])
+                    else:
+                        logger.debug(f"Skipping bond {atomID} - {bonded[i]} with bond order {bondOrders[i]} in file {filePath}")
+                        ignoredBondPairs += 1
+
+    return result, ignoredBondPairs
 
 
 def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
@@ -151,7 +151,7 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     
     return jobFolder / finalDump.getAssociatedFilePath()
 
-def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float):
+def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xydelta:float):
 
     # Load the model to get atom positions
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
@@ -199,8 +199,8 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float):
     # Now that we know where the slab is, and where the head is, we can plan a trajectory
     # For this example, we are going to put the head 2A abobe the slab, and scan every 1A on x and y axis 
     desiredZDelta = zplane
-    desiredXDelta = 1.0
-    desiredYDelta = 1.0
+    desiredXDelta = xydelta
+    desiredYDelta = xydelta
     logger.info(f"Generating trajectory with the following parameters: zplane={zplane}, xdelta={desiredXDelta}, ydelta={desiredYDelta}")
     heightTip = slabBoundingBox[1][2] + desiredZDelta
     headTargetPositions = []
@@ -336,7 +336,7 @@ def drawPotentialEnergyMap(jobFolder: Path, headPixel: list):
 
     logger.info("Potential energy map saved in: " + str(jobFolder / "potentialEnergyMap.png"))
 
-def drawBondConfigurationMap(jobFolder: Path, headPixel: list):
+def drawBondConfigurationMap(jobFolder: Path, headPixel: list, minbondOrder:float):
 
     # We create an image where each pixel corresponds to a bond configuration, i.e an set of bond pairs
     # Currently, we only consider bond pairs, regardless of the type. Should probably be refined in the next iteration
@@ -346,11 +346,14 @@ def drawBondConfigurationMap(jobFolder: Path, headPixel: list):
 
     frameFolder = jobFolder / "frames"
     currentID = 0
+    totalIgnoredBondPaired = 0
+    logger.info("Start computing bond configurations with a minimum bond order of " + str(minbondOrder))
 
     for i in range(len(headPixel)):
 
         bondsFile = frameFolder / f"bonds.{headPixel[i][0]}_{headPixel[i][1]}.txt"
-        bondPairs = readBondPairsFromFrame(bondsFile)
+        bondPairs, ignoredPaired = readBondPairsFromFrame(bondsFile, minbondOrder)
+        totalIgnoredBondPaired += ignoredPaired
 
         # Sort the pairs first by the first atom id, then by the second atom id
         npBondPairs = np.array(bondPairs)
@@ -371,11 +374,18 @@ def drawBondConfigurationMap(jobFolder: Path, headPixel: list):
             data[headPixel[i][0], headPixel[i][1]] = colorMap[id]
 
     # Create a colormap with mathplotlib
-    cmap = plt.get_cmap('inferno')
-    plt.imshow(data, cmap=cmap, origin='lower')
+    #cmap = plt.get_cmap('inferno')
+    cmap = plt.get_cmap('tab20')
+    plt.imshow(data, cmap=cmap, origin='lower', interpolation='none')
     plt.colorbar()
     plt.savefig(jobFolder / "bondConfigurationMap.png")
     plt.clf()
+
+    logger.info("Number of configurations found: " + str(len(colorMap)))
+    if totalIgnoredBondPaired > 0:
+        logger.warning("Number of ignored bond pairs: " + str(totalIgnoredBondPaired) + ". Rerun with \'debug\' log level to list the ignored bonds.")
+    else:
+        logger.info("No bond pairs ignored.")
 
     logger.info("Bonds configuration map saved in: " + str(jobFolder / "bondConfigurationMap.png"))
 
@@ -388,10 +398,14 @@ def drawBondConfigurationMap(jobFolder: Path, headPixel: list):
 
 def main(): 
     modelAvailables = ['passivated', 'headopen', "headslabopen"]
+    logLevelAvailables = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--lmpexec', type=str, required=True, help="Path to the lammps executable.")
     argparser.add_argument('--model', type=str, required=True, help="Model to use {}".format(modelAvailables))
     argparser.add_argument('--zplane', type=float, default=2.0, help="Z plane above the slab to scan")
+    argparser.add_argument('--deltaxy', type=float, default=1.0, help="Delta x and y for the scan")
+    argparser.add_argument('--loglevel', type=str, default="INFO", help="Log level")
+    argparser.add_argument('--min-bond-order', type=float, default=0.5, help="Minimum bond order to consider a bond pair. Pairs with a lower bond order will be ignored.")
 
     args = argparser.parse_args()
     
@@ -402,16 +416,22 @@ def main():
     if args.model not in modelAvailables:
         raise ValueError(f"Model must be one of the following: {modelAvailables}")
     
+    if args.loglevel not in logLevelAvailables:
+        raise ValueError(f"Log level must be one of the following: {logLevelAvailables}")
+    
+    logger.setLevel(args.loglevel)
     zplane = args.zplane
+    xydelta = args.deltaxy
+    minBondOrder = args.min_bond_order
     
     minimizedModelPath = runMinimizationSlab(lmpexec, args.model)
     logger.info(f"Minimized model path: {minimizedModelPath}")
 
-    jobFolder, headPixel = scanSurface(lmpexec, minimizedModelPath, args.model, zplane)
+    jobFolder, headPixel = scanSurface(lmpexec, minimizedModelPath, args.model, zplane, xydelta)
 
     drawPotentialEnergyMap(jobFolder, headPixel)
 
-    drawBondConfigurationMap(jobFolder, headPixel)
+    drawBondConfigurationMap(jobFolder, headPixel, minBondOrder)
 
         
 
