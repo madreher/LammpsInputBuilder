@@ -23,6 +23,8 @@ With this organization, the main objectives of LammpsInputBuilder are as follows
 A LammpsInputBuilder starts by declaring a `WorkflowBuilder` object. This object is responsible for hosting the workflow definition and converting it into a Lammps script.
 The `WorkflowBuilder` is composed of two main parts: a `TypedMolecule`, and a list of `Section`.
 
+![WorkflowBuilder chart](data/images/WorkflowBuilder.svg)
+
 A `TypedMolecule` represent a molecular model with a forcefield assigned to it. Currently, LIB supports ReaxFF and Airebo potentiels but other could be added in the future. With a `TypedMolecule`, the `WorkflowBuilder` can generate a Lammps data file as well as the beginning of the input script.
 
 A `Section` generally represents a phase in a simulation workflow which could be reuse in another workflow. A `Section` can represent a minimization protocol, a NVE, a system warmup, etc. A `Section` can be recursive and be decomposed to another sequence of sub sections as well. A non recursive `Section` is often tied to a time integration process (minimize, nve, nvt), but certain `Section` can also be used as a way to modify the current state of the simulation, for instance to reset the timestep counter after a minimization or setup the velocity vectors of the atoms. 
@@ -31,7 +33,7 @@ A non recursive `Section` is usually built around an `Integrator` object. The `I
 
 **Important**: A `Section` represents a scope for all the objects within it. The `Integrator`, `Group`, `Extension`, and `FileIO` objects assigned within the `Section` are declared at the start of the `Section` and but are also **removed** at the end of the `Section`. Consequently, if a following `Section` needs to use a `Group` previously declared, it will have to declare it again. This approach was chosen to enforce the clean deletion of every identifier during the execution of the Lammps script. Note that in the case of the `RecursiveSection`, the scope of the `Group`, `Extension`, and `FileIO` objects is visible to all the sub sections within the `RecursiveSection` and can thus be used by its sub sections.
 
-TODO: Add two figures: 1) WorkflowBuilder object, 2) IntegratorSection
+![Section Organization](data/images/Sections.svg)
 
 ### Unrolling the workflow into a Lammps script
 
