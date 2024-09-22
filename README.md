@@ -505,7 +505,7 @@ Another important note is that a no point we perform a time integration step. In
 Once this is done, we can run the workflow. This workflow will produce two files per frame. In the script `examples/scanSlab.py`, we added a postprocessing step to concatenate all the files into a single trajectory file for simplicity and moved all the individual frame files into a subfolder.
 
 This workflow produced the following trajectory:
-TODO: add gif of trajectory
+![Trajectory of the scan, 1/10 frame](data/video/scan_traj_openhead.webm)
 
 #### Phase 3: Analysis
 
