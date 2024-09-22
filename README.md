@@ -307,6 +307,8 @@ In this example, we are going to use a passivated slab and a molecular tooltip w
 
 ![Passivated slab and tooltip with open head](data/images/slabHeadDepassivated.png)
 
+**IMPORTANT**: The code snippets provided are extracted from `examples/scanSlab.py` and may not be complete for the sake of space. Please refer to the complete example for a workinf example out of the box.
+
 The first step in this process is to determine the atom indices of the groups we are going to use. I used [Radahn](https://github.com/madreher/radahn) to visualize the model and do the selection. Other tools like Ovito or SAMSON may allow to do the same task. In total, we are defining 5 selections:
 - The entire slab
 - The entire tooltip
@@ -326,6 +328,8 @@ With this being done, we can start to load the molecular model with LIB. This is
     workflow = WorkflowBuilder ()
     workflow.setTypedMolecule(typedMolecule)
 ```
+
+#### Phase 1: Minimization
 
 Looking at the model, it first need to be minimized before doing anything else. We are first going to create a workflow only dedicated to the minimization process. One important aspect of this model is that it contains anchors. Consequently, the anchor atoms should not be part of any type of time-integration process. However, the `minimize` command in Lammps doesn't allow to specify a group to apply the minimization onto. The way to do it is to use the `setforce` [command](https://docs.lammps.org/fix_setforce.html) from Lammps and set the force of the atoms part of an anchor to 0. LIB provides a convenient `Template` to implement this protocol. The minimization can then be done as follows:
 ```
@@ -366,6 +370,9 @@ Looking at the model, it first need to be minimized before doing anything else. 
 
     # Generate the inputs
     jobFolder = workflow.generateInputs()
+
+    # Get the final XYZ state
+    finalXYZ = finalDump.getAssociatedFilePath()
 ```
 Setting up the minimization is done in several phases:
 - Define the different list of indices corresponding to our selections
@@ -375,3 +382,224 @@ Setting up the minimization is done in several phases:
 - Create a second section which is going to run a single point energy calculation to save the state of the system after the minimization.
 
 During this phase, we introduced two new objects: the `MinimizeTemplate` and the `ReferenceGroup` object. The `MinimizeTemplate` is a dedicated `Template` object designed to make easier the creation of a minimization process when anchors are involved. One problem with this setup though is that it does require a `Group` to speficy the atoms part of the anchor. However, because the anchor group is given to the `MinimizeTemplate`, LIB has to consider that the `Group` is part of the `MinimizeTemplate` scope, and will therefor delete it at the end of `MinimizeTemplate`. This is not desirable in this case because that group was declared as part of the `RecursiveSection` and we would want its lifetime to be tied to the `RecursiveSection` and not the `MinimizeTemplate`. To address this problem, LIB offers the `ReferenceGroup` this is like a pointer to another group without owning the referred group. This way, when the `ReferenceGroup` gets out of scope at the end of the `MinimizeTemplate`, it won't delete the group it refers to, i.e the anchor group in this case.
+
+#### Phase 2: Scan
+
+In this phase, we are going to displace the tooltip to various positions above the above the slab. The tooltip will follow a grid at a given height. To define the grid position, we first need to know bounding box of the slab after minimization. To do so, we are going to create a new `TypedMolecule` and load the model that we generated after the minimization. This can be done as follows:
+```
+    # Load the model to get atom positions
+    xyzPath = previousJobFolder / finalXYZ
+    forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
+    typedMolecule = ReaxTypedMolecule(
+        bboxStyle=BoundingBoxStyle.PERIODIC,
+        electrostaticMethod=ElectrostaticMethod.QEQ
+    )
+    typedMolecule.loadFromFile(xyzPath, forcefield)
+```
+Once the model is loaded, we need to compute the bounding box of the slab specifically. To do so, we need the list of atom indices forming the slab that we have defined previously, and access to the current positions. Internally, the `TypedMolecule` object store a ASE Atoms object which can be querried to access atom positions. This can be done as follows:
+```
+    # Get the positions and the list of atoms for the slab to compute its bounding box
+    positions = typedMolecule.getASEAtoms().get_positions()
+    slabIndicesZeroBased = np.array(indicesSlab) - 1
+    slabPositions = np.take(positions, slabIndicesZeroBased, axis=0)
+
+    # Compute the bounding box oif the slab
+    slabBoundingBox = np.min(slabPositions, axis=0), np.max(slabPositions, axis=0)
+```
+Note that the previous selection we used were 1-based because Lammps count indices from 1. So we need to generate a new list of indices starting from 0 instead to get the right positions. 
+
+Now that we have the bounding box of the slab, we need to get the current position of the head of the tooltip:
+```
+    # Get the position of the head 
+    headInitialPosition = positions[indiceHead[0] - 1]
+```
+
+Now we have all the information needed to define the grid above the slab. The grid is define by a 3 user settings: dx, dy, dz where dx and dy are the spacing we want on the grid between 2 data points, and dz is the desired different between the top height of the slab and the head of the tooltip.
+
+The x,y coordinates can be generated as follow:
+```
+    desiredZDelta = 1.5
+    desiredXDelta = 0.5
+    desiredYDelta = 0.5
+    logger.info(f"Generating trajectory with the following parameters: zplane={zplane}, xdelta={desiredXDelta}, ydelta={desiredYDelta}")
+    heightTip = slabBoundingBox[1][2] + desiredZDelta
+    headTargetPositions = []
+    headPixel = []
+    trajectoryFiles = []
+    bondFiles = []
+
+    # Generate a grid of target positions
+    for i,x in enumerate(np.arange(slabBoundingBox[0][0], slabBoundingBox[1][0], desiredXDelta)):
+        for j,y in enumerate(np.arange(slabBoundingBox[0][1], slabBoundingBox[1][1], desiredYDelta)):
+            headTargetPosition = np.array([x, y, heightTip])
+            headTargetPositions.append(headTargetPosition)
+            headPixel.append([i, j])
+```
+During the generate of the grid, we save the corresponding tooltip position for the head as well as the coordinate on the grid. This will be useful later on when we will want to analyse the files produced. Now that we have collected all the positions where we want to move the tooltip, we can create the desired workflow.
+```
+    # Now that we have the target positions, we can prepare the lammps script
+    workflow = WorkflowBuilder ()
+    workflow.setTypedMolecule(typedMolecule)
+
+    # Create the groups 
+    groupTooltip  = IndicesGroup(groupName="tooltip", indices=indicesTooltip)
+    groupAnchorTooltip = IndicesGroup(groupName="anchorTooltip", indices=indiceAnchorTooltip)
+    groupAnchorSlab = IndicesGroup(groupName="anchorSlab", indices=indiceAnchorSlab)
+    groupAnchors = OperationGroup(groupName="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(groupName="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+
+    # Declare the global groups and IOs which are going to run for every operation
+    globalSection = RecusiveSection(sectionName="GlobalSection")
+    globalSection.addGroup(groupTooltip)
+    globalSection.addGroup(groupAnchorSlab)
+    globalSection.addGroup(groupAnchorTooltip)
+    globalSection.addGroup(groupAnchors)
+    globalSection.addGroup(groupFree)
+
+    for i, headTargetPosition in enumerate(headTargetPositions):
+
+        # For each target, we are going to do the following:
+        # 1. Move the head to the target
+        # 2. Perform a SPE 
+        # 4. Write the positions and bonds
+        # 3. Move the head back to the initial position
+
+        stepSection = RecusiveSection(sectionName=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
+        moveForwardSection = InstructionsSection(sectionName="MoveForwardSection")
+        moveForwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instructionName="moveforward", group=ReferenceGroup(groupName="tooltip", reference=groupTooltip), 
+                                                                        dx=LengthQuantity(value=headTargetPosition[0] - headInitialPosition[0], units="lmp_real_length"),
+                                                                        dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="lmp_real_length"),
+                                                                        dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="lmp_real_length")))
+        speSection = IntegratorSection(sectionName="SPESection", integrator=RunZeroIntegrator())
+        dumpIO = DumpTrajectoryFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, userFields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
+        trajectoryFiles.append(dumpIO.getAssociatedFilePath())
+        bondIO = ReaxBondFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
+        bondFiles.append(bondIO.getAssociatedFilePath())
+        thermoIO = ThermoFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, userFields=typedMolecule.getDefaultThermoVariables())
+        speSection.addFileIO(dumpIO)
+        speSection.addFileIO(bondIO)
+        speSection.addFileIO(thermoIO)
+        moveBackwardSection = InstructionsSection(sectionName="MoveBackwardSection")
+        moveBackwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instructionName="movebackward", group=ReferenceGroup(groupName="tooltip", reference=groupTooltip), 
+                                                                        dx=LengthQuantity(value=headInitialPosition[0] - headTargetPosition[0], units="lmp_real_length"),
+                                                                        dy=LengthQuantity(value=headInitialPosition[1] - headTargetPosition[1], units="lmp_real_length"),
+                                                                        dz=LengthQuantity(value=headInitialPosition[2] - headTargetPosition[2], units="lmp_real_length")))
+        stepSection.addSection(moveForwardSection)
+        stepSection.addSection(speSection)
+        stepSection.addSection(moveBackwardSection)
+        globalSection.addSection(stepSection)
+
+
+    workflow.addSection(globalSection)
+
+    # Generate the inputs
+    jobFolder = workflow.generateInputs()
+    logger.info(f"Scan inputs generated in the job folder: {jobFolder}")
+```
+The important part of this workflow is within the for loop. For each coordinate, we crea te a `Section` which will displace the tooltip to the right position, perform a single point energy calculation to calculate the potential energy of the system as well as get the bond pairs from reax. Once this is done, we displace back the tooltip to its original position. 
+
+Note that it would be possible to simply follow a path from a coordinate to the next without getting back to the original position. However, this approach would introduce small numerical drifts over time and the tooltip would not end up being exactly where we want it to be. Going back to the starting position each time avoid accumulating these small errors. 
+
+Another important note is that a no point we perform a time integration step. In particular, the tooltip is *displaced* but not *moved* which are different in Lammps semantic. 
+
+Once this is done, we can run the workflow. This workflow will produce two files per frame. In the script `examples/scanSlab.py`, we added a postprocessing step to concatenate all the files into a single trajectory file for simplicity and moved all the individual frame files into a subfolder.
+
+This workflow produced the following trajectory:
+TODO: add gif of trajectory
+
+#### Phase 3: Analysis
+
+This phase is outside the scope of `LammpsInputBuilder`, but is still provided in the interest of providing a complete experiment from input preparation to analysis.
+
+The first analysis we are going to do is to generate an image of the potential energy to observe its variations depending on the position of the tooltip. For each tooltip position, we stored a 2D coordinate which will correspond to a pixel on an image.
+
+We are going to rely on `matplotlib` to generate the corresponding image and `lammps_logfile` to read the potential energy from the log file.
+
+The image can be generated as follows:
+```
+    # First, create an empty array
+    data = np.zeros((headPixel[-1][0] + 1, headPixel[-1][1] + 1), dtype=np.float64)
+
+    # Get the log file 
+    logFile = jobFolder / "log.lammps"
+    log = lammps_logfile.File(logFile)
+
+    # Loop over the frames
+    for i in range(len(headPixel)):
+        # Get the frame
+        dataFrame = log.get(entry_name="PotEng", run_num=i)
+        # Some frames can have ["warning"] as their first value, query for the last one to be safe
+        data[headPixel[i][0], headPixel[i][1]] = dataFrame[-1]
+
+    # Create a colormap with mathplotlib
+    cmap = plt.get_cmap('inferno')
+    plt.imshow(data, cmap=cmap, origin='lower')
+    plt.colorbar()
+    plt.savefig(jobFolder / "potentialEnergyMap.png")
+    plt.clf()
+```
+This will generate the following image:
+![Potential Energy](data/images/potentialEnergyMap_headopen_xy0-5_z1-5.png)
+
+In this picture, we can see the difference in energy above the slab when tooltip is above it.
+
+Another question we would like to answer is does the bonds rearrange themselves when the tooltip is displaced. In particular, the head of a tooltip has an open valence and could potentially grab a hydrogen on the surface. 
+
+To evaluate this, we are going to draw another image were the color is going to represent a given set of bond pairs. Consequently, different colors will means that some bond have rearranged. This can be done as follows:
+```
+    # We create an image where each pixel corresponds to a bond configuration, i.e an set of bond pairs
+    # Currently, we only consider bond pairs, regardless of the type. Should probably be refined in the next iteration
+
+    colorMap = {}
+    data = np.zeros((headPixel[-1][0] + 1, headPixel[-1][1] + 1), dtype=np.int32)
+
+    frameFolder = jobFolder / "frames"
+    currentID = 0
+    totalIgnoredBondPaired = 0
+    logger.info("Start computing bond configurations with a minimum bond order of " + str(minbondOrder))
+
+    for i in range(len(headPixel)):
+
+        bondsFile = frameFolder / f"bonds.{headPixel[i][0]}_{headPixel[i][1]}.txt"
+        bondPairs, ignoredPaired = readBondPairsFromFrame(bondsFile, minbondOrder)
+        totalIgnoredBondPaired += ignoredPaired
+
+        # Sort the pairs first by the first atom id, then by the second atom id
+        npBondPairs = np.array(bondPairs)
+        sortedPairs = npBondPairs[np.lexsort((npBondPairs[:,1], npBondPairs[:,0]))]
+
+        # Compute a unique ID corresponding to this list of bond pairs
+        hashObj = hashlib.new("md5")
+        hashObj.update(sortedPairs.tobytes())
+        id = hashObj.hexdigest()
+
+        if id not in colorMap:
+            # We found a new bond configuration, adding it to the color map
+            colorMap[id] = currentID
+            data[headPixel[i][0], headPixel[i][1]] = currentID
+            currentID += 1
+        else:
+            # We have seen this bond configuration before, just use the same ID
+            data[headPixel[i][0], headPixel[i][1]] = colorMap[id]
+
+    # Create a colormap with mathplotlib
+    #cmap = plt.get_cmap('inferno')
+    cmap = plt.get_cmap('tab20')
+    plt.imshow(data, cmap=cmap, origin='lower', interpolation='none')
+    plt.colorbar()
+    plt.savefig(jobFolder / "bondConfigurationMap.png")
+    plt.clf()
+```
+
+For each frame, we read the list of bonds produced by reax to determinate the available bond pairs. We perform a small filtering on bonds which have a bond order deemed to low to be meaningful. Once we have the full list of bond pairs, we sort the list of bonds and generate a unique ID identifying this specific list. Sorting the list of bonds is mandatory to ensure that two arrays with the same list of bonds but in a different order would become the same list and therfor end up with the same unique ID. When a new frame is read and an ID is gennerated, we check if we have already encountered this ID. If no, we assign a new color to the ID and store it. If yes, we assigned the color associated to this ID to the current pixel. 
+
+This will produce the following image:
+![Map of bond individual configurations](data/images/bondConfigurationMap_headopen_xy0-5_z1-5.png)
+
+With this picture, we see that the scan generate a total of 10 different bond lists. For most of the scan (dark blue), no new bonds are performed. However, the scan does show some spot on the surface were likely the tooltip is close enough to interact with the surface. With this image, the user can quickly go back to individual frames to see what happens in these spots of interest.
+
+For a full working example of this workflow, please refer to the script `examples/scanSlab.py`.
+
+
+
+
