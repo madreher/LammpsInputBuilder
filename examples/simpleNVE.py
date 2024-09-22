@@ -10,9 +10,11 @@ from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
 from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection
-from lammpsinputbuilder.integrator import NVEIntegrator
+from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeIntegrator, MinimizeStyle
 from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO
+from lammpsinputbuilder.extensions import LangevinCompute
 from lammpsinputbuilder.group import AllGroup
+from lammpsinputbuilder.quantities import TemperatureQuantity, TimeQuantity
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -34,16 +36,58 @@ def main():
     workflow = WorkflowBuilder ()
     workflow.setTypedMolecule(typedMolecule)
 
-    # Create a NVE Section
-    section = IntegratorSection(integrator=NVEIntegrator())
-    pos = DumpTrajectoryFileIO(fileIOName="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
-    section.addFileIO(pos)
-    bonds = ReaxBondFileIO(fileIOName="bonds", interval=10, group=AllGroup())
-    section.addFileIO(bonds)
-    thermo = ThermoFileIO(fileIOName="thermo", addDefaultFields=True, interval=10)
-    section.addFileIO(thermo)
+    # Create a minimization Section 
+    sectionMin = IntegratorSection(
+        integrator=MinimizeIntegrator(
+            integratorName="Minimize",
+            style=MinimizeStyle.CG, 
+            etol=0.01,
+            ftol=0.01, 
+            maxiter=100, 
+            maxeval=10000))
+    workflow.addSection(sectionMin)
 
-    workflow.addSection(section)
+    # Create a Langevin Section
+    sectionWarmup = IntegratorSection(
+        integrator=NVEIntegrator(
+            integratorName="warmup",
+            group=AllGroup(),
+            nbSteps=10000
+        )
+    )
+    langevinWarmup = LangevinCompute(
+        computeName="langevin",
+        group=AllGroup(), 
+        startTemp=TemperatureQuantity(1, "K"),
+        endTemp=TemperatureQuantity(300, "K"),
+        damp=TimeQuantity(1, "ps"),
+        seed=12345
+    )
+    sectionWarmup.addExtension(langevinWarmup)
+    workflow.addSection(sectionWarmup)
+
+    # Create a NVE Section
+    sectionNVE = IntegratorSection(integrator=NVEIntegrator(
+        integratorName="equilibrium",
+        group=AllGroup(),
+        nbSteps=100000
+    ))
+    langevinWarmup = LangevinCompute(
+        computeName="langevin",
+        group=AllGroup(), 
+        startTemp=TemperatureQuantity(300, "K"),
+        endTemp=TemperatureQuantity(300, "K"),
+        damp=TimeQuantity(1, "ps"),
+        seed=12345
+    )
+    pos = DumpTrajectoryFileIO(fileIOName="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
+    sectionNVE.addFileIO(pos)
+    bonds = ReaxBondFileIO(fileIOName="bonds", interval=10, group=AllGroup())
+    sectionNVE.addFileIO(bonds)
+    thermo = ThermoFileIO(fileIOName="thermo", addDefaultFields=True, interval=10)
+    sectionNVE.addFileIO(thermo)
+
+    workflow.addSection(sectionNVE)
 
 
     # Generate the inputs

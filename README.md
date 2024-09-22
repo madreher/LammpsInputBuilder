@@ -171,9 +171,105 @@ When converting the workflow into Lammps commands, the `WorkflowBuilder` knows w
 
 ## Workflow examples
 
-### Minimize and NVE
+### Minimize, Warm Up, and NVE
 
-TODO: Step by step description of the simpleNVE example.
+In this example, we are going to create a simple workflow composed of 3 stages: minimization, follow up by a thermalization phase, and finally an equilibration phase.
+
+The first step is to declare a model and assigned a forcefield to it. In this example, we are going to use the benzene molecule with a reaxff potential file. This is done with the following code:
+
+```
+    modelData = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+    forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
+
+    typedMolecule = ReaxTypedMolecule(
+        bboxStyle=BoundingBoxStyle.PERIODIC,
+        electrostaticMethod=ElectrostaticMethod.QEQ
+    )
+    typedMolecule.loadFromFile(modelData, forcefield)
+
+    # Create the workflow. In this case, it's only the molecule
+    workflow = WorkflowBuilder ()
+    workflow.setTypedMolecule(typedMolecule)
+```
+
+The `TypedMolecule` object represent the molecular system with its settings. Currently, we only need to setup the periodic condition style and the partial charges method, be additional settings may become available in the future. Once the `TypedMolecule` object is created an initialized, it can be added to a `WorkflowBuilder` object. With this base, we can start to add `Section` objects to the workflow.
+
+In the first `Section`, we are going to minimize the model. This can be done by using a `IntegratorSection` with a `MinimizeIntegrator` object as follows:
+```
+    # Create a minimization Section 
+    sectionMin = IntegratorSection(
+        integrator=MinimizeIntegrator(
+            integratorName="Minimize",
+            style=MinimizeStyle.CG, 
+            etol=0.01,
+            ftol=0.01, 
+            maxiter=100, 
+            maxeval=10000))
+    workflow.addSection(sectionMin)
+```
+For this example, we won't use any additionnal extensions or file ios. Once the section is fully declared, it can be added to the `WorkflowBuilder` object.
+
+Now that the model is minimize, we can warm up the molecular system in the second `Section`. To do so, we are going to use a `langevin` thermostat to raise the temperature of the system to 300K. A `langevin` thermostat must be used in conjonction to a process doing the time integration. In this case, we are going to use a `nve`. This can be done as follows:
+
+```
+    # Create a Langevin Section
+    sectionWarmup = IntegratorSection(
+        integrator=NVEIntegrator(
+            integratorName="warmup",
+            group=AllGroup(),
+            nbSteps=10000
+        )
+    )
+    langevinWarmup = LangevinCompute(
+        computeName="langevin",
+        group=AllGroup(), 
+        startTemp=TemperatureQuantity(1, "K"),
+        endTemp=TemperatureQuantity(300, "K"),
+        damp=TimeQuantity(1, "ps"),
+        seed=12345
+    )
+    sectionWarmup.addExtension(langevinWarmup)
+    workflow.addSection(sectionWarmup)
+```
+During this phase, we created a new `IntegratorObject` but this time with a `NVEIntegrator`. The `NVEIntegrator` will take care of declaring a `fix nve` and advancing the simulation. The langevin thermostat can be added via an `Extension` object with parameters following the [Lammps documentation](https://docs.lammps.org/fix_langevin.html). Note that the langevin has parameters representing temperature and time, and we are using their respective `Quantity` objects. 
+
+To complete this example, we are going to run an equilibration phase at 300K with the addition of trajectories. Running the equilibration phase is almost identical to the previous phase, except that the langevin thermostat will remain at constant temperature. During this run, we are going to add a trajectory for atom properties, bond properties, and explicite thermo fields. This can be achieved as follows:
+```
+    # Create a NVE Section
+    sectionNVE = IntegratorSection(integrator=NVEIntegrator(
+        integratorName="equilibrium",
+        group=AllGroup(),
+        nbSteps=100000
+    ))
+    langevinWarmup = LangevinCompute(
+        computeName="langevin",
+        group=AllGroup(), 
+        startTemp=TemperatureQuantity(300, "K"),
+        endTemp=TemperatureQuantity(300, "K"),
+        damp=TimeQuantity(1, "ps"),
+        seed=12345
+    )
+    pos = DumpTrajectoryFileIO(fileIOName="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
+    sectionNVE.addFileIO(pos)
+    bonds = ReaxBondFileIO(fileIOName="bonds", interval=10, group=AllGroup())
+    sectionNVE.addFileIO(bonds)
+    thermo = ThermoFileIO(fileIOName="thermo", addDefaultFields=True, interval=10)
+    sectionNVE.addFileIO(thermo)
+
+    workflow.addSection(sectionNVE)
+```
+Just like `Extension` objects, the `FileIO` objects are added to their respective section and will only be active during the duraction of that phase. Note that for the thermo io, we are using the `TypedMolecule` object to obtain several variable names. This is because the pair command associated to the forcefield can produce dedicated values. This method allow the `ThermoFileIO` to adapt to the type for forcefield used without having to modify later on if the `TypedMolecule` object changes.
+
+Now that all the phases are declared and added to the workflow, the Lammps inputs can be generated as follow:
+```
+    # Generate the inputs
+    jobFolder = workflow.generateInputs()
+
+    logger.info(f"Inputs generated in the job folder: {jobFolder}")
+
+```
+This code will produce all the necessary inputs in a job folder ready to be executed. The complete code of this example can be found at `examples/simpleNVE.py`.
+
 
 ### Scan of a surface with a tip
 
