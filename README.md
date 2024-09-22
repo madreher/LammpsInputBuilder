@@ -16,6 +16,36 @@ With this organization, the main objectives of LammpsInputBuilder are as follows
 - Create a reusable library of common Sections types to easily chain common operations without having to copy Lammps code
 - Make is possible for external tools to generate Lammps inputs via a JSON representation of a workflow (under construction)
 
+Here is a simple example on how to load a molecular model, assign a reax potential to it, and minimize it: 
+```
+    modelData = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+    forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
+
+    typedMolecule = ReaxTypedMolecule(
+        bboxStyle=BoundingBoxStyle.PERIODIC,
+        electrostaticMethod=ElectrostaticMethod.QEQ
+    )
+    typedMolecule.loadFromFile(modelData, forcefield)
+
+    # Create the workflow. In this case, it's only the molecule
+    workflow = WorkflowBuilder ()
+    workflow.setTypedMolecule(typedMolecule)
+
+    # Create a minimization Section 
+    sectionMin = IntegratorSection(
+        integrator=MinimizeIntegrator(
+            integratorName="Minimize",
+            style=MinimizeStyle.CG, 
+            etol=0.01,
+            ftol=0.01, 
+            maxiter=100, 
+            maxeval=10000))
+    workflow.addSection(sectionMin)
+
+    # Generate the inputs
+    jobFolder = workflow.generateInputs()
+```
+
 ## How does a Workflow work?
 
 ### Main Objects
@@ -273,5 +303,75 @@ This code will produce all the necessary inputs in a job folder ready to be exec
 
 ### Scan of a surface with a tip
 
-TODO: Step by step description of the scanSlab example.
+In this example, we are going to use a passivated slab and a molecular tooltip where the head of the tooltip has an open valence. The goal of this exemple is to move the tooltip above the slab, perform a single point energy at each step, and for each step analyse the potential energy of the system as well as the list of bonds in the system. To obtain the list of bonds and simulation the system, we are going to rely on reaxff.
 
+![Passivated slab and tooltip with open head](data/images/slabHeadDepassivated.png)
+
+The first step in this process is to determine the atom indices of the groups we are going to use. I used [Radahn](https://github.com/madreher/radahn) to visualize the model and do the selection. Other tools like Ovito or SAMSON may allow to do the same task. In total, we are defining 5 selections:
+- The entire slab
+- The entire tooltip
+- The anchor of the slab (bottom layer of the slab)
+- The anchor of the tooltip (top layer of the tooltip)
+- The head, i.e the last atom at the bottom of the tooltip
+
+With this being done, we can start to load the molecular model with LIB. This is done as follow:
+```
+    # Load the model to get atom positions
+    forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
+    typedMolecule = ReaxTypedMolecule(
+        bboxStyle=BoundingBoxStyle.PERIODIC,
+        electrostaticMethod=ElectrostaticMethod.QEQ
+    )
+    typedMolecule.loadFromFile(xyzPath, forcefield)
+    workflow = WorkflowBuilder ()
+    workflow.setTypedMolecule(typedMolecule)
+```
+
+Looking at the model, it first need to be minimized before doing anything else. We are first going to create a workflow only dedicated to the minimization process. One important aspect of this model is that it contains anchors. Consequently, the anchor atoms should not be part of any type of time-integration process. However, the `minimize` command in Lammps doesn't allow to specify a group to apply the minimization onto. The way to do it is to use the `setforce` [command](https://docs.lammps.org/fix_setforce.html) from Lammps and set the force of the atoms part of an anchor to 0. LIB provides a convenient `Template` to implement this protocol. The minimization can then be done as follows:
+```
+    # Declare the arrays of selections (check examples/scanSlab.py for the list of indices)
+    indiceAnchorTooltip = [...]
+    indicesSlab = [...]
+    indiceHead = [338]
+    indicesTooltip = [...]
+
+    # Create the groups 
+    groupTooltip  = IndicesGroup(groupName="tooltip", indices=indicesTooltip)
+    groupAnchorTooltip = IndicesGroup(groupName="anchorTooltip", indices=indiceAnchorTooltip)
+    groupAnchorSlab = IndicesGroup(groupName="anchorSlab", indices=indiceAnchorSlab)
+    groupAnchors = OperationGroup(groupName="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(groupName="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+
+    # Declare the global groups and IOs which are going to run for every operation
+    globalSection = RecusiveSection(sectionName="GlobalSection")
+    globalSection.addGroup(groupTooltip)
+    globalSection.addGroup(groupAnchorSlab)
+    globalSection.addGroup(groupAnchorTooltip)
+    globalSection.addGroup(groupAnchors)
+    globalSection.addGroup(groupFree)
+
+    # First section: Minimization 
+    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, useAnchors=True, anchorGroup=ReferenceGroup(groupName="refAnchor", reference=groupAnchors))
+    globalSection.addSection(sectionMinimization)
+
+    sectionFinalState = IntegratorSection(sectionName="FinalSection", integrator=RunZeroIntegrator())
+    finalDump = DumpTrajectoryFileIO(fileIOName="finalState", style=DumpStyle.CUSTOM, interval=1, group=AllGroup(), userFields=["id", "type", "element", "x", "y", "z"])
+    finalBond = ReaxBondFileIO(fileIOName="finalState", interval=1, group=AllGroup())
+    sectionFinalState.addFileIO(finalDump)
+    sectionFinalState.addFileIO(finalBond)
+    globalSection.addSection(sectionFinalState)
+
+    # Add the section to the workflow
+    workflow.addSection(globalSection)
+
+    # Generate the inputs
+    jobFolder = workflow.generateInputs()
+```
+Setting up the minimization is done in several phases:
+- Define the different list of indices corresponding to our selections
+- Create a `RecursiveSection` as we will want to run multiple `Section` objects
+- Create the `Group` objects and assign them to the `RecursiveSection` object.
+- Create the `MinimizeTemplate` object with the specification of the anchor group
+- Create a second section which is going to run a single point energy calculation to save the state of the system after the minimization.
+
+During this phase, we introduced two new objects: the `MinimizeTemplate` and the `ReferenceGroup` object. The `MinimizeTemplate` is a dedicated `Template` object designed to make easier the creation of a minimization process when anchors are involved. One problem with this setup though is that it does require a `Group` to speficy the atoms part of the anchor. However, because the anchor group is given to the `MinimizeTemplate`, LIB has to consider that the `Group` is part of the `MinimizeTemplate` scope, and will therefor delete it at the end of `MinimizeTemplate`. This is not desirable in this case because that group was declared as part of the `RecursiveSection` and we would want its lifetime to be tied to the `RecursiveSection` and not the `MinimizeTemplate`. To address this problem, LIB offers the `ReferenceGroup` this is like a pointer to another group without owning the referred group. This way, when the `ReferenceGroup` gets out of scope at the end of the `MinimizeTemplate`, it won't delete the group it refers to, i.e the anchor group in this case.
