@@ -63,6 +63,8 @@ A non recursive `Section` is usually built around an `Integrator` object. The `I
 
 **Important**: A `Section` represents a scope for all the objects within it. The `Integrator`, `Group`, `Extension`, and `FileIO` objects assigned within the `Section` are declared at the start of the `Section` and but are also **removed** at the end of the `Section`. Consequently, if a following `Section` needs to use a `Group` previously declared, it will have to declare it again. This approach was chosen to enforce the clean deletion of every identifier during the execution of the Lammps script. Note that in the case of the `RecursiveSection`, the scope of the `Group`, `Extension`, and `FileIO` objects is visible to all the sub sections within the `RecursiveSection` and can thus be used by its sub sections.
 
+Finally, the last category of objects is the `TemplateSection`. A `TemplateSection` is the base class to definie high level tasks which may be composed one or several `Section` objects. The example, the class `MinimizeTemplate` provide a high level object to define a minimization and specify a group of anchors without the need for the user to know how to setup anchors during a minimization. To create a new task, the developer need to extend the class `TemplateSection` and implement the methods `generateSections()` if the task can be decomposed in sections, and override the function `addAllCommands()` if the `TemplateSection` does not follow organization of the `TemplateSection`. 
+
 ![Section Organization](data/images/Sections.svg)
 
 ### Unrolling the workflow into a Lammps script and data file
