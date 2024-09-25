@@ -116,3 +116,28 @@ jump           SELF loop1
 label          break1
 variable       i delete\n"""
     assert integrator.addUndoCommands() == ""
+
+def test_ManualIntegrator():
+    integrator = ManualIntegrator(integratorName="myIntegrator", cmdDo="do", cmdUndo="undo", cmdRun="run")
+    assert integrator.getIntegratorName() == "myIntegrator"
+
+    assert integrator.getDoCommands() == "do"
+    assert integrator.getUndoCommands() == "undo"
+    assert integrator.getRunCommands() == "run"
+
+    objDict = integrator.toDict()
+    assert objDict["class"] == "ManualIntegrator"
+    assert objDict["integratorName"] == "myIntegrator"
+    assert objDict["cmdDo"] == "do"
+    assert objDict["cmdUndo"] == "undo"
+    assert objDict["cmdRun"] == "run"
+
+    integrator2 = ManualIntegrator()
+    integrator2.fromDict(objDict, version=0)
+    assert integrator2.getIntegratorName() == "myIntegrator"
+
+    info = GlobalInformation()
+    assert integrator.addDoCommands(info) == "do\n"
+    assert integrator.addRunCommands() == "run\n"
+    assert integrator.addUndoCommands() == "undo\n"
+

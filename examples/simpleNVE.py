@@ -84,7 +84,7 @@ def main():
     sectionNVE.addFileIO(pos)
     bonds = ReaxBondFileIO(fileIOName="bonds", interval=10, group=AllGroup())
     sectionNVE.addFileIO(bonds)
-    thermo = ThermoFileIO(fileIOName="thermo", addDefaultFields=True, interval=10)
+    thermo = ThermoFileIO(fileIOName="thermo", addDefaultFields=True, interval=10, userFields=typedMolecule.getDefaultThermoVariables())
     sectionNVE.addFileIO(thermo)
 
     workflow.addSection(sectionNVE)

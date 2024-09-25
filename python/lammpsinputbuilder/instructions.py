@@ -200,7 +200,7 @@ class VariableInstruction(Instruction):
 
     def writeInstruction(self, globalInformation:GlobalInformation) -> str:
         return f"variable {self.variableName} {self.variableStyleToStr[self.style]} {self.args}\n"
-    
+
 class DisplaceAtomsInstruction(Instruction):
     def __init__(self, instructionName: str = "defaultDisplaceAtoms", group: Group = AllGroup(), dx: LengthQuantity = LengthQuantity(0.0, "lmp_real_length"), dy: LengthQuantity = LengthQuantity(0.0, "lmp_real_length"), dz: LengthQuantity = LengthQuantity(0.0, "lmp_real_length")) -> None:
         """
@@ -255,4 +255,23 @@ class DisplaceAtomsInstruction(Instruction):
 
     def writeInstruction(self, globalInformation:GlobalInformation) -> str:
         return f"displace_atoms {self.group} move {self.dx.convertTo(globalInformation.getUnitStyle())} {self.dy.convertTo(globalInformation.getUnitStyle())} {self.dz.convertTo(globalInformation.getUnitStyle())}\n"
+
+class ManualInstruction(Instruction):
+    def __init__(self, instructionName: str = "defaultManual", cmd: str = "") -> None:
+        super().__init__(instructionName=instructionName)
+        self.cmd = cmd
+
+    def toDict(self) -> dict:
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
+        result["cmd"] = self.cmd
+        return result
     
+    def fromDict(self, d: dict, version: int):
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version)
+        self.cmd = d.get("cmd", "")
+
+    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
+        return f"{self.cmd}\n"

@@ -209,3 +209,54 @@ class MultipassMinimizeIntegrator(Integrator):
         commands += f'label          break1\n'
         commands += f'variable       i delete\n'
         return commands
+    
+class ManualIntegrator(Integrator):
+
+    def __init__(self, integratorName: str = "Manual", cmdDo: str = "", cmdUndo: str = "", cmdRun: str = "") -> None:
+        super().__init__(integratorName=integratorName)
+        self.cmdDo = cmdDo
+        self.cmdUndo = cmdUndo
+        self.cmdRun = cmdRun
+
+    def getDoCommands(self) -> str:
+        return self.cmdDo
+    
+    def getUndoCommands(self) -> str:
+        return self.cmdUndo
+    
+    def getRunCommands(self) -> str:
+        return self.cmdRun
+
+    def toDict(self) -> dict:
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
+        result["cmdDo"] = self.cmdDo
+        result["cmdUndo"] = self.cmdUndo
+        result["cmdRun"] = self.cmdRun
+        return result
+    
+    def fromDict(self, d: dict, version: int):
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version)
+        self.cmdDo = d["cmdDo"]
+        self.cmdUndo = d["cmdUndo"]
+        self.cmdRun = d["cmdRun"]
+
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+        if self.cmdDo.endswith("\n"):
+            return self.cmdDo
+        else:
+            return self.cmdDo + "\n"
+
+    def addUndoCommands(self) -> str:
+        if self.cmdUndo.endswith("\n"):
+            return self.cmdUndo
+        else:
+            return self.cmdUndo + "\n"
+
+    def addRunCommands(self) -> str:
+        if self.cmdRun.endswith("\n"):
+            return self.cmdRun
+        else:
+            return self.cmdRun + "\n"

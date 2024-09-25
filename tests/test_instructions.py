@@ -114,3 +114,18 @@ def test_DisplaceAtomsInstruction():
     infoMetal = GlobalInformation()
     infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
     assert instruction.writeInstruction(infoMetal) == "displace_atoms all move 1.0 2.0 3.0\n"
+
+def test_ManualInstruction():
+    instruction = ManualInstruction(instructionName="defaultManual", cmd="manual")
+    assert instruction.getInstructionName() == "defaultManual"
+    assert instruction.writeInstruction(GlobalInformation()) == "manual\n"
+
+    objDict = instruction.toDict()
+    assert objDict["class"] == "ManualInstruction"
+    assert objDict["instructionName"] == "defaultManual"
+    assert objDict["cmd"] == "manual"
+
+    instruction2 = ManualInstruction()
+    instruction2.fromDict(objDict, version=0)
+    assert instruction2.getInstructionName() == "defaultManual"
+    assert instruction2.writeInstruction(GlobalInformation()) == "manual\n"

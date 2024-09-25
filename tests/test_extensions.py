@@ -1,12 +1,13 @@
 import pytest
 
-from lammpsinputbuilder.extensions import MoveCompute, LangevinCompute, SetForceCompute
+from lammpsinputbuilder.extensions import MoveExtension, LangevinExtension, SetForceExtension, ManualExtension, InstructionExtension
 from lammpsinputbuilder.group import AllGroup
 from lammpsinputbuilder.quantities import VelocityQuantity, LammpsUnitSystem, TemperatureQuantity, TimeQuantity, ForceQuantity
 from lammpsinputbuilder.types import GlobalInformation
+from lammpsinputbuilder.instructions import ResetTimestepInstruction
 
-def test_MoveCompute():
-    obj  = MoveCompute("myMoveCompute", group=AllGroup(), vx=VelocityQuantity(1.0, "angstrom/ps"), vy=VelocityQuantity(2.0, "angstrom/ps"), vz=VelocityQuantity(3.0, "angstrom/ps"))
+def test_MoveExtension():
+    obj  = MoveExtension("myMoveExtension", group=AllGroup(), vx=VelocityQuantity(1.0, "angstrom/ps"), vy=VelocityQuantity(2.0, "angstrom/ps"), vz=VelocityQuantity(3.0, "angstrom/ps"))
     assert obj.group == "all"
     assert obj.vx.getMagnitude() == 1.0
     assert obj.vx.getUnits() == "angstrom/ps"
@@ -23,9 +24,9 @@ def test_MoveCompute():
     assert dictResult["vy"]["units"] == "angstrom/ps"
     assert dictResult["vz"]["magnitude"] == 3.0
     assert dictResult["vz"]["units"] == "angstrom/ps"
-    assert dictResult["class"] == "MoveCompute"
+    assert dictResult["class"] == "MoveExtension"
 
-    loadBackObj = MoveCompute()
+    loadBackObj = MoveExtension()
     loadBackObj.fromDict(dictResult, version=0)
 
     assert loadBackObj.group == "all"
@@ -40,15 +41,15 @@ def test_MoveCompute():
 
     infoMetal = GlobalInformation()
     infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
-    assert obj.addDoCommands(infoMetal) == "fix myMoveCompute all move linear 1.0 2.0 3.0\n"
+    assert obj.addDoCommands(infoMetal) == "fix myMoveExtension all move linear 1.0 2.0 3.0\n"
     infoReal = GlobalInformation()
     infoReal.setUnitStyle(LammpsUnitSystem.REAL)
-    assert obj.addDoCommands(infoReal) == "fix myMoveCompute all move linear 0.001 0.002 0.003\n"
-    assert obj.addUndoCommands() == "unfix myMoveCompute\n"
+    assert obj.addDoCommands(infoReal) == "fix myMoveExtension all move linear 0.001 0.002 0.003\n"
+    assert obj.addUndoCommands() == "unfix myMoveExtension\n"
 
-def test_SetForceCompute():
-    obj = SetForceCompute(
-        "mySetForceCompute", 
+def test_SetForceExtension():
+    obj = SetForceExtension(
+        "mySetForceExtension", 
         group=AllGroup(), 
         fx=ForceQuantity(1.0, "lmp_real_force"), 
         fy=ForceQuantity(2.0, "lmp_real_force"), 
@@ -70,9 +71,9 @@ def test_SetForceCompute():
     assert dictResult["fy"]["units"] == "lmp_real_force"
     assert dictResult["fz"]["magnitude"] == 3.0
     assert dictResult["fz"]["units"] == "lmp_real_force"
-    assert dictResult["class"] == "SetForceCompute"
+    assert dictResult["class"] == "SetForceExtension"
 
-    loadBackObj = SetForceCompute()
+    loadBackObj = SetForceExtension()
     loadBackObj.fromDict(dictResult, version=0)
 
     assert loadBackObj.group == "all"
@@ -87,15 +88,15 @@ def test_SetForceCompute():
 
     infoMetal = GlobalInformation()
     infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
-    assert obj.addDoCommands(infoMetal) == "fix mySetForceCompute all setforce 0.04336410424180094 0.08672820848360188 0.13009231272540284\n"
+    assert obj.addDoCommands(infoMetal) == "fix mySetForceExtension all setforce 0.04336410424180094 0.08672820848360188 0.13009231272540284\n"
     infoReal = GlobalInformation()
     infoReal.setUnitStyle(LammpsUnitSystem.REAL)
-    assert obj.addDoCommands(infoReal) == "fix mySetForceCompute all setforce 1.0 2.0 3.0\n"
-    assert obj.addUndoCommands() == "unfix mySetForceCompute\n"
+    assert obj.addDoCommands(infoReal) == "fix mySetForceExtension all setforce 1.0 2.0 3.0\n"
+    assert obj.addUndoCommands() == "unfix mySetForceExtension\n"
 
-def test_LangevinCompute():
-    obj = LangevinCompute(
-        "myLangevinCompute", 
+def test_LangevinExtension():
+    obj = LangevinExtension(
+        "myLangevinExtension", 
         group=AllGroup(), 
         startTemp=TemperatureQuantity(1.0, "K"), 
         endTemp=TemperatureQuantity(2.0, "K"), 
@@ -120,9 +121,9 @@ def test_LangevinCompute():
     assert dictResult["damp"]["magnitude"] == 3.0
     assert dictResult["damp"]["units"] == "ps"
     assert dictResult["seed"] == 122345
-    assert dictResult["class"] == "LangevinCompute"
+    assert dictResult["class"] == "LangevinExtension"
 
-    loadBackObj = LangevinCompute()
+    loadBackObj = LangevinExtension()
     loadBackObj.fromDict(dictResult, version=0)
 
     assert loadBackObj.group == "all"
@@ -138,9 +139,57 @@ def test_LangevinCompute():
 
     infoMetal = GlobalInformation()
     infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
-    assert obj.addDoCommands(infoMetal) == "fix myLangevinCompute all langevin 1.0 2.0 3.0 122345\n"
+    assert obj.addDoCommands(infoMetal) == "fix myLangevinExtension all langevin 1.0 2.0 3.0 122345\n"
     infoReal = GlobalInformation()
     infoReal.setUnitStyle(LammpsUnitSystem.REAL)
-    assert obj.addDoCommands(infoReal) == "fix myLangevinCompute all langevin 1.0 2.0 2999.9999999999995 122345\n"
-    assert obj.addUndoCommands() == "unfix myLangevinCompute\n"
+    assert obj.addDoCommands(infoReal) == "fix myLangevinExtension all langevin 1.0 2.0 2999.9999999999995 122345\n"
+    assert obj.addUndoCommands() == "unfix myLangevinExtension\n"
+
+def test_InstructionExtension():
+    instr = ResetTimestepInstruction(
+            instructionName="myInstruction", 
+            timestep=10
+        )
+    obj = InstructionExtension(
+        instruction=instr)
+
+    dictResult = obj.toDict()
+    assert dictResult["instruction"] == instr.toDict()
+    assert dictResult["class"] == "InstructionExtension"
+
+    loadBackObj = InstructionExtension()
+    loadBackObj.fromDict(dictResult, version=0)
+
+    assert loadBackObj.instruction.toDict() == instr.toDict()
+
+    assert loadBackObj.toDict() == dictResult
+
+def test_ManualExtension():
+    obj = ManualExtension(
+        extensionName="myManualExtension",
+        doCmd="myDoCmd",
+        undoCmd="myUndoCmd"
+    )
+
+    assert obj.extensionName == "myManualExtension"
+    assert obj.doCmd == "myDoCmd"
+    assert obj.undoCmd == "myUndoCmd"
+
+    dictResult = obj.toDict()
+    assert dictResult["extensionName"] == "myManualExtension"
+    assert dictResult["doCmd"] == "myDoCmd"
+    assert dictResult["undoCmd"] == "myUndoCmd"
+    assert dictResult["class"] == "ManualExtension"
+
+    loadBackObj = ManualExtension()
+    loadBackObj.fromDict(dictResult, version=0)
+
+    assert loadBackObj.extensionName == "myManualExtension"
+    assert loadBackObj.doCmd == "myDoCmd"
+    assert loadBackObj.undoCmd == "myUndoCmd"
+
+    assert loadBackObj.toDict() == dictResult
+
+
+
 
