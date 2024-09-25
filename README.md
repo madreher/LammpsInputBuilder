@@ -21,6 +21,8 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
     from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
     from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
     from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+    from lammpsinputbuilder.section import IntegratorSection
+    from lammpsinputbuilder.integrator import MinimizeIntegrator, MinimizeStyle
 
     modelData = Path('benzene.xyz')
     forcefield = Path('ffield.reax.Fe_O_C_H.reax') 
@@ -61,7 +63,7 @@ The `WorkflowBuilder` is composed of two main parts: a `TypedMolecule`, and a li
 
 A `TypedMolecule` represents a molecular model with a forcefield assigned to it. Currently, LIB supports ReaxFF and Airebo potentials but other could be added in the future. With a `TypedMolecule`, the `WorkflowBuilder` can generate a Lammps data file as well as the beginning of the input script.
 
-A `Section` generally represents a phase in a simulation workflow which could be reuse in another workflow. A `Section` can represent a minimization protocol, a NVE, a system warmup, etc. A `Section` can be recursive and be decomposed into a sequence of sub sections as well. A non recursive `Section` is often tied to a time integration process (minimize, nve, nvt), but certain `Section` can also be used as a way to modify the current state of the simulation, for instance to reset the timestep counter after a minimization or setup the velocity vectors of the atoms. 
+A `Section` generally represents a phase in a simulation workflow which could be reused in another workflow. A `Section` can represent a minimization protocol, a NVE, a system warmup, etc. A `Section` can be recursive and be decomposed into a sequence of sub sections as well. A non recursive `Section` is often tied to a integration process (minimize, nve, nvt), but certain `Section` can also be used as a way to modify the current state of the simulation, for instance to reset the timestep counter after a minimization or setup the velocity vectors of the atoms. 
 
 A non recursive `Section` is usually built around an `Integrator` object. The `Integrator` object represents the process advancing the simulation. Current `Integrator` include the `MinimizeIntegrator`, `NVEIntegrator`, or `RunZeroIntegrator`, each of which is responsible for generating a `run` command or equivalent during their execution. In addition to the `Integrator`, a `Section` can host a list of `Group`, `Instruction`, `Extension`, and `FileIO` objects. A `Group` object represents a list of atoms selected based on different criterias. This object is a wrapper around the different ways Lammps offers to create atom selections. The `Instruction` object is a wrapper around commands which modify the current state of the simulation but without involving any time integration step. The `FileIO` objects are wrapper around the different methods that Lammps offer to write trajectory files during the time integration process. Finally, `Extension` objects are wrapper around different additionnal computations (`fix`, `compute`) which are being executed at the same time as the `Integrator`.
 
@@ -88,7 +90,7 @@ LammpsInputBuilder maintain this logic by requiring all its types of objects to 
 
 The first step is to translate the `TypedMolecule` object. The data file is generated internally by [ASE](https://wiki.fysik.dtu.dk/ase/). The initial Lammps input script is based on a preconfigured template with the necessary adjustements to account for the type of forcefield used.
 
-Dev note: This is a sufficient approach for now because LIB only supports ReaxFF and Airebo potentiel which only requires the Atom section in the Lammps data file. Other forcefield might require a different approach or backend.
+Dev note: This is a sufficient approach for now because LIB only supports ReaxFF and Airebo potentiel which only requires the Atom section in the Lammps data file. Other forcefield might require a different approach or backend (ex: [moltemplate](https://www.moltemplate.org/)).
 
 Examples of Lammps files produced for a benzene with a reaxff potential. 
 
@@ -155,13 +157,13 @@ variable eqeq  equal c_reax[14]
 
 #### Unrolling the Extension, FileIO, and Group objects
 
-All the `Extension`, `FileIO`, and `Group` objects implement the function `addDoCommands()` and `addUndoCommands()` command to declare and stop respectively their actions. These funcions are responsible for converting from their respecting objects to Lammps commands. The separation of *do* and *undo* allows other objects to be able to manipulate the scope or lifetime of these objects as necessary. 
+All the `Extension`, `FileIO`, and `Group` objects implement the function `addDoCommands()` and `addUndoCommands()` command to declare and stop respectively their actions. These functions are responsible for converting from their respecting objects to Lammps commands. The separation of *do* and *undo* allows other objects to be able to manipulate the scope or lifetime of these objects as necessary. 
 
-Dev note on `ThermoIO`: The *thermo* keyword in Lammps works differently than the other `FileIO` objects. In particular, a *thermo* is always active and part of the `log.lammps` file. Therefor the `ThermoIO` doesn't have a scope per say. Instead, declaring a new `ThermoIO` object will override the previous IO settings and replace them with the new object settings. See [here](https://docs.lammps.org/thermo_style.html) for more information about thermo in Lammps. 
+Dev note on `ThermoIO`: The *thermo* keyword in Lammps works differently than the other `FileIO` objects. In particular, a *thermo* is always active and part of the `log.lammps` file. Therefore the `ThermoIO` doesn't have a scope per say. Instead, declaring a new `ThermoIO` object will override the previous IO settings and replace them with the new object settings. See [here](https://docs.lammps.org/thermo_style.html) for more information about thermo in Lammps. 
 
 #### Unrolling the Instructions objects
 
-Unlike the previous objects, the `Instruction` objects doesn't have a *undo* operation available to them. Consequently, they implement the function `writeInstruction()` to convert the object to Lammps commands. Because of this, `Instruction` objects as well do not have a notion of scope. They simply perform their task one time and the script will continue. 
+Unlike the previous objects, the `Instruction` objects doesn't have a *undo* operation available to them. Consequently, they implement the function `writeInstruction()` to convert the object to Lammps commands. Because of this, `Instruction` objects as well do not have a notion of scope. They simply perform their task one time and the script continues. 
 
 #### Unrolling the Integrator objects
 
@@ -203,13 +205,15 @@ This can be a challenge because commands parameters need to follow the unit syst
 
 To avoid this problem and make a workflow definition agnostic of a given unit set, LIB wraps numerical parameters into `Quantity` objects representing different physical properties. A `Quantity` object represents a type of physical property, a numerical value, and a unit associated with it. A `Quantity` type exists for each type of units declared in Lammps (temperature, length, force, etc). A `Quantity` object can be converted to a new unit on demand. This is done by using [Pint](https://pint.readthedocs.io/en/stable/) in the backend.
 
-When converting the workflow into Lammps commands, the `WorkflowBuilder` knows which unit style is used, and can therefor require to convert all the `Quantity` objects to the right units when writting commands. This mechanism ensures that a user can define a workflow once, and change the Lammps unit set at will without ever having to update its workflow because of improper units. 
+When converting the workflow into Lammps commands, the `WorkflowBuilder` knows which unit style is used, and can therefor require to convert all the `Quantity` objects to the right units when writting commands. This mechanism ensures that a user can define a workflow once, and change the Lammps unit set at will without having to update every physical quantities. 
 
 ## Workflow examples
 
 ### Minimize, Warm Up, and NVE
 
-In this example, we are going to create a simple workflow composed of 3 stages: minimization, follow up by a thermalization phase, and finally an equilibration phase.
+In this example, we are going to model a single benzene molecule in vacuum. First, we load the molecular system and assign a force field onto it, e.g. ReaxFF. Next, we create a simple workflow composed of 3 stages: energy minimization, heating from 0K to 300K, relaxation at 300K.
+
+#### Molecule model definition and potential assignement
 
 The first step is to declare a model and assign a forcefield to it. In this example, we are going to use the benzene molecule with a reaxff potential file. This is done with the following code:
 
@@ -228,7 +232,9 @@ The first step is to declare a model and assign a forcefield to it. In this exam
     workflow.setTypedMolecule(typedMolecule)
 ```
 
-The `TypedMolecule` object represents the molecular system with its settings. Currently, we only need to setup the periodic condition style and the partial charges method. Additional settings may become available in the future. Once the `TypedMolecule` object is created and initialized, it can be added to a `WorkflowBuilder` object. With this base, we can start to add `Section` objects to the workflow.
+The `ReaxTypedMolecule` object represents the molecular system with its settings. Currently, we only need to setup the periodic condition style and the partial charges method. Additional settings may become available in the future. Once the `TypedMolecule` object is created and initialized, it can be added to a `WorkflowBuilder` object. With this base, we can start to add `Section` objects to the workflow.
+
+#### Minimization phase
 
 In the first `Section`, we are going to minimize the model. This can be done by using a `IntegratorSection` with a `MinimizeIntegrator` object as follows:
 ```
@@ -244,6 +250,8 @@ In the first `Section`, we are going to minimize the model. This can be done by 
     workflow.addSection(sectionMin)
 ```
 For this example, we won't use any additionnal extensions or file ios. Once the section is fully declared, it can be added to the `WorkflowBuilder` object.
+
+#### Warmup phase
 
 Now that the model is minimized, we can warm up the molecular system in the second `Section`. To do so, we are going to use a `langevin` thermostat to raise the temperature of the system to 300K. A `langevin` thermostat must be used in conjonction to a process doing the time integration. In this case, we are going to use a `nve`. This can be done as follows:
 
@@ -267,7 +275,9 @@ Now that the model is minimized, we can warm up the molecular system in the seco
     sectionWarmup.addExtension(langevinWarmup)
     workflow.addSection(sectionWarmup)
 ```
-During this phase, we created a new `IntegratorObject` but this time with a `NVEIntegrator`. The `NVEIntegrator` will take care of declaring a `fix nve` and advancing the simulation. The langevin thermostat can be added via an `Extension` object with parameters following the [Lammps documentation](https://docs.lammps.org/fix_langevin.html). Note that the langevin extension has parameters representing temperature and time and relies on their respective `Quantity` objects. 
+During this phase, we created a new `IntegratorSection` but this time with a `NVEIntegrator`. The `NVEIntegrator` will take care of declaring a `fix nve` and advancing the simulation. The langevin thermostat can be added via an `Extension` object with parameters following the [Lammps documentation](https://docs.lammps.org/fix_langevin.html). Note that the langevin extension has parameters representing temperature and time and relies on their respective `Quantity` objects. 
+
+#### Relaxation phase
 
 To complete this example, we are going to run an equilibration phase at 300K with the addition of trajectories. Running the equilibration phase is almost identical to the previous phase, except that the langevin thermostat will remain at constant temperature. During this run, we are going to add a trajectory for atom properties, bond properties, and explicit thermo fields. This can be achieved as follows:
 ```
@@ -309,13 +319,13 @@ This code will produce all the necessary inputs in a job folder ready to be exec
 
 ### Scan of a surface with a tip
 
-In this example, we are going to use a passivated slab and a molecular tooltip where the head of the tooltip has an open valence. The goal of this exemple is to move the tooltip above the slab, perform a single point energy calculation at each step, and for each step analyse the potential energy of the system as well as the list of bonds in the system. To obtain the list of bonds and simulation the system, we are going to rely on reaxff.
+In this example, we are going to use a passivated slab and a molecular tooltip where the head of the tooltip has an open valence. The goal of this exemple is to move the tooltip above the slab, perform a single point energy calculation at each step, and for each step analyse the potential energy of the system as well as the list of bonds in the system. We are going to model our system using ReaxFF. As we move the tip above the surface, we will export the bonds that will form and break dynamically.
 
 ![Passivated slab and tooltip with open head](data/images/slabHeadDepassivated.png)
 
-**IMPORTANT**: The code snippets provided are extracted from `examples/scanSlab.py` and may not be complete for the sake of space. Please refer to the complete example for a workinf example out of the box.
+**IMPORTANT**: The code snippets provided are extracted from `examples/scanSlab.py` and may not be complete for the sake of space. Please refer to the complete example for a working example out of the box.
 
-The first step in this process is to determine the atom indices of the groups we are going to use. I used [Radahn](https://github.com/madreher/radahn) to visualize the model and do the selection. Other tools like Ovito or SAMSON may allow to do the same task. OVerall, we are defining 5 selections:
+The first step in this process is to determine the atom indices of the groups we are going to use. I used [Radahn](https://github.com/madreher/radahn) to visualize the model and do the selection. Other tools like [Ovito](https://www.ovito.org/) or [VMD](https://www.ks.uiuc.edu/Research/vmd/) may allow to do the same task. OVerall, we are defining 5 selections:
 - The entire slab
 - The entire tooltip
 - The anchor of the slab (bottom layer of the slab)
@@ -340,7 +350,7 @@ With this being done, we can start to load the molecular model with LammpsInputG
 
 #### Phase 1: Minimization
 
-Looking at the model, it first needs to be minimized before doing anything else. We are first going to create a workflow only dedicated to the minimization process. One important aspect of this model is that it contains anchors. Consequently, the anchored atoms should not be part of any type of time-integration process. However, the `minimize` command in Lammps doesn't allow to specify a group to apply the minimization onto. The way to do it is to use the `setforce` [command](https://docs.lammps.org/fix_setforce.html) from Lammps and set the force of the atoms part of an anchor to 0. LIB provides a convenient `Template` to implement this protocol. The minimization can then be done as follows:
+The molecular system XYZ coordinates need to be adjusted to lower the initial energy prior to running any time-dependant simulation. We are first going to create a workflow only dedicated to the minimization process. One important aspect of this model is that it contains anchors and free atoms. Therefore, we put the atoms into specific groups to treat them independently. The force applied onto the anchors must be set to zero to prevent them from moving during the energy minimization step. LIB provides a convenient `Template` to implement this protocol. See also [setforce](https://docs.lammps.org/fix_setforce.html) command from Lammps. The minimization can then be done as follows:
 ```
     # Declare the arrays of selections (check examples/scanSlab.py for the list of indices)
     indiceAnchorTooltip = [...]
@@ -364,7 +374,12 @@ Looking at the model, it first needs to be minimized before doing anything else.
     globalSection.addGroup(groupFree)
 
     # First section: Minimization 
-    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, useAnchors=True, anchorGroup=ReferenceGroup(groupName="refAnchor", reference=groupAnchors))
+
+    # We are going to use the groupAnchors as well during the minimization, create a reference for it 
+    # The reference is necessary to prevent the sectionMinimize to delete the group at the end of the section.
+    refGroupAnchor = ReferenceGroup(groupName="refAnchor", reference=groupAnchors)
+
+    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, useAnchors=True, anchorGroup=refGroupAnchor)
     globalSection.addSection(sectionMinimization)
 
     sectionFinalState = IntegratorSection(sectionName="FinalSection", integrator=RunZeroIntegrator())
@@ -550,7 +565,7 @@ The image can be generated as follows:
 This will generate the following image:
 ![Potential Energy](data/images/potentialEnergyMap_headopen_xy0-5_z1-5.png)
 
-In this picture, we can see the difference in energy above the slab when tooltip is above it.
+This picture shows the total potential energy of the system as a function of the XY coordinates of the tooltip above the slab.
 
 Another question we would like to answer is: does the bonds rearrange themselves when the tooltip is displaced? In particular, the head of a tooltip has an open valence and could potentially grab a hydrogen on the surface. 
 
@@ -600,7 +615,7 @@ To evaluate this, we are going to draw another image where the color is going to
     plt.clf()
 ```
 
-For each frame, we read the list of bonds produced by reax to determinate the available bond pairs. We filter out the bond pairs which have a bond order deemed too low to be meaningful. Once we have the full list of bond pairs, we sort the list of bonds and generate a unique ID identifying this specific list. Sorting the list of bonds is mandatory to ensure that two arrays with the same list of bonds but in a different order would become the same list and therfor end up with the same unique ID. When a new frame is read and an ID is gennerated, we check if we have already encountered this ID. If no, we assign a new color to the ID and store it. If yes, we assign the color associated to this ID to the current pixel. 
+For each frame, we read the list of bonds produced by ReaxFF to determinate the available bond pairs. We filter out the bond pairs which have a bond order deemed too low to be meaningful. Once we have the full list of bond pairs, we sort the list of bonds and generate a unique ID identifying this specific list. Sorting the list of bonds is mandatory to ensure that two arrays with the same list of bonds but in a different order would become the same list and therfor end up with the same unique ID. When a new frame is read and an ID is gennerated, we check if we have already encountered this ID. If no, we assign a new color to the ID and store it. If yes, we assign the color associated to this ID to the current pixel. 
 
 This will produce the following image:
 ![Map of bond individual configurations](data/images/bondConfigurationMap_headopen_xy0-5_z1-5.png)

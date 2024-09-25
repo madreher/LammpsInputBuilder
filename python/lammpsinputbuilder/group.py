@@ -189,7 +189,10 @@ class ReferenceGroup(Group):
         super().__init__(groupName)
         self.reference = reference.getGroupName()
 
-    def getReference(self) -> str:
+    def getGroupName(self) -> str:
+        return self.reference
+
+    def getReferenceName(self) -> str:
         return self.reference
     
     def setReference(self, reference: Group):

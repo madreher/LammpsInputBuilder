@@ -53,7 +53,7 @@ class MinimizeTemplate(TemplateSection):
             # Minimization is always done on all the atoms. 
             # To create anchors during the minimization, we need to set the force to 0 on the anchor group
             section.addGroup(self.anchorGroup)
-            section.addExtension(SetForceExtension(computationName="zeroForceAnchor", group=self.anchorGroup, fx=ForceQuantity(0.0), fy=ForceQuantity(0.0), fz=ForceQuantity(0.0)))
+            section.addExtension(SetForceExtension(extensionName="zeroForceAnchor", group=self.anchorGroup, fx=ForceQuantity(0.0), fy=ForceQuantity(0.0), fz=ForceQuantity(0.0)))
 
 
         return [section]

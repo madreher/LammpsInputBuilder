@@ -198,10 +198,10 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
 
     # Now that we know where the slab is, and where the head is, we can plan a trajectory
     # For this example, we are going to put the head 2A abobe the slab, and scan every 1A on x and y axis 
-    desiredZDelta = zplane
-    desiredXDelta = xydelta
-    desiredYDelta = xydelta
-    logger.info(f"Generating trajectory with the following parameters: zplane={zplane}, xdelta={desiredXDelta}, ydelta={desiredYDelta}")
+    desiredZDelta = LengthQuantity(zplane, 'angstrom').getMagnitude()
+    desiredXDelta = LengthQuantity(xydelta, 'angstrom').getMagnitude()
+    desiredYDelta = LengthQuantity(xydelta, 'angstrom').getMagnitude()
+    logger.info(f"Generating trajectory with the following parameters in A: zplane={zplane}, xdelta={desiredXDelta}, ydelta={desiredYDelta}")
     heightTip = slabBoundingBox[1][2] + desiredZDelta
     headTargetPositions = []
     headPixel = []
@@ -244,10 +244,12 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
 
         stepSection = RecusiveSection(sectionName=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
         moveForwardSection = InstructionsSection(sectionName="MoveForwardSection")
+
+        # Unit note: ASE positions are in Angstroms
         moveForwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instructionName="moveforward", group=ReferenceGroup(groupName="tooltip", reference=groupTooltip), 
-                                                                        dx=LengthQuantity(value=headTargetPosition[0] - headInitialPosition[0], units="lmp_real_length"),
-                                                                        dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="lmp_real_length"),
-                                                                        dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="lmp_real_length")))
+                                                                        dx=LengthQuantity(value=headTargetPosition[0] - headInitialPosition[0], units="angstrom"),
+                                                                        dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="angstrom"),
+                                                                        dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="angstrom")))
         speSection = IntegratorSection(sectionName="SPESection", integrator=RunZeroIntegrator())
         dumpIO = DumpTrajectoryFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, userFields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
         trajectoryFiles.append(dumpIO.getAssociatedFilePath())
@@ -259,9 +261,9 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
         speSection.addFileIO(thermoIO)
         moveBackwardSection = InstructionsSection(sectionName="MoveBackwardSection")
         moveBackwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instructionName="movebackward", group=ReferenceGroup(groupName="tooltip", reference=groupTooltip), 
-                                                                        dx=LengthQuantity(value=headInitialPosition[0] - headTargetPosition[0], units="lmp_real_length"),
-                                                                        dy=LengthQuantity(value=headInitialPosition[1] - headTargetPosition[1], units="lmp_real_length"),
-                                                                        dz=LengthQuantity(value=headInitialPosition[2] - headTargetPosition[2], units="lmp_real_length")))
+                                                                        dx=LengthQuantity(value=headInitialPosition[0] - headTargetPosition[0], units="angstrom"),
+                                                                        dy=LengthQuantity(value=headInitialPosition[1] - headTargetPosition[1], units="angstrom"),
+                                                                        dz=LengthQuantity(value=headInitialPosition[2] - headTargetPosition[2], units="angstrom")))
         stepSection.addSection(moveForwardSection)
         stepSection.addSection(speSection)
         stepSection.addSection(moveBackwardSection)
@@ -275,6 +277,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
     logger.info(f"Scan inputs generated in the job folder: {jobFolder}")
 
     # Run the workflow
+    logger.info(f"Starting the scan process...")
     subprocess.run("mpirun -np 1 " + str(lmpExecPath) + " -in " + str(jobFolder / "workflow.input"), shell=True, check=True, capture_output=True, cwd=jobFolder)
     logger.info(f"Scan completed in the job folder: {jobFolder}")
 
