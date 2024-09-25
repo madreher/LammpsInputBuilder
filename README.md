@@ -5,17 +5,17 @@
 | Name                                                    |    Stmts |     Miss |   Cover |   Missing |
 |-------------------------------------------------------- | -------: | -------: | ------: | --------: |
 | python/lammpsinputbuilder/\_\_init\_\_.py               |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/extensions.py                 |      113 |        5 |     96% |19, 22, 52, 94, 135 |
-| python/lammpsinputbuilder/fileIO.py                     |      194 |       24 |     88% |25, 28, 31, 36, 39, 42, 45, 48, 51, 95, 118, 126, 131-134, 144-147, 173, 186, 198, 207, 225, 251 |
-| python/lammpsinputbuilder/group.py                      |      151 |       25 |     83% |23, 26, 41, 48, 59, 90, 111, 152, 158, 170, 189-190, 193, 196, 199, 202-205, 209-212, 215, 218 |
-| python/lammpsinputbuilder/instructions.py               |      182 |       25 |     86% |25, 35, 47, 66, 75, 103, 114, 194, 236-241, 244-254 |
-| python/lammpsinputbuilder/integrator.py                 |      156 |        6 |     96% |30, 43, 70, 108, 134, 168 |
+| python/lammpsinputbuilder/extensions.py                 |      161 |       15 |     91% |20, 23, 53, 95, 136, 166, 174, 178, 196, 202-205, 208-211 |
+| python/lammpsinputbuilder/fileIO.py                     |      230 |       28 |     88% |25, 28, 31, 36, 39, 42, 45, 48, 51, 95, 118, 126, 131-134, 144-147, 173, 186, 198, 207, 225, 251, 268, 280, 288, 294 |
+| python/lammpsinputbuilder/group.py                      |      182 |       29 |     84% |23, 26, 41, 48, 59, 90, 111, 152, 158, 170, 189-190, 193, 196, 199-202, 206-209, 212, 215, 227, 233, 245, 252, 258 |
+| python/lammpsinputbuilder/instructions.py               |      198 |       26 |     87% |25, 35, 47, 66, 75, 103, 114, 194, 236-241, 244-254, 272 |
+| python/lammpsinputbuilder/integrator.py                 |      194 |       10 |     95% |30, 43, 70, 108, 134, 168, 240, 248, 254, 260 |
 | python/lammpsinputbuilder/loader/\_\_init\_\_.py        |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/loader/extensionLoader.py     |       18 |       18 |      0% |      1-24 |
-| python/lammpsinputbuilder/loader/fileIOLoader.py        |       19 |       19 |      0% |      1-25 |
-| python/lammpsinputbuilder/loader/groupLoader.py         |       20 |       20 |      0% |      1-26 |
-| python/lammpsinputbuilder/loader/instructionLoader.py   |       19 |       19 |      0% |      1-25 |
-| python/lammpsinputbuilder/loader/integratorLoader.py    |       19 |       19 |      0% |      1-25 |
+| python/lammpsinputbuilder/loader/extensionLoader.py     |       19 |       19 |      0% |      1-25 |
+| python/lammpsinputbuilder/loader/fileIOLoader.py        |       20 |       20 |      0% |      1-26 |
+| python/lammpsinputbuilder/loader/groupLoader.py         |       21 |       21 |      0% |      1-27 |
+| python/lammpsinputbuilder/loader/instructionLoader.py   |       20 |        2 |     90% |    18, 21 |
+| python/lammpsinputbuilder/loader/integratorLoader.py    |       20 |       20 |      0% |      1-26 |
 | python/lammpsinputbuilder/loader/sectionLoader.py       |       20 |       20 |      0% |      1-26 |
 | python/lammpsinputbuilder/loader/typedMoleculeLoader.py |       16 |       16 |      0% |      1-22 |
 | python/lammpsinputbuilder/quantities.py                 |      175 |       16 |     91% |73, 76, 91, 101, 113, 123, 138, 148, 161, 171, 186, 196, 207, 216, 228, 238 |
@@ -25,7 +25,7 @@
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py       |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/modelToData.py        |      160 |       24 |     85% |39, 42-45, 51-52, 106, 126, 149, 172-176, 190, 194-204 |
 | python/lammpsinputbuilder/workflowBuilder.py            |       40 |        3 |     92% |21, 25, 33 |
-|                                               **TOTAL** | **1785** |  **465** | **74%** |           |
+|                                               **TOTAL** | **1959** |  **475** | **76%** |           |
 
 
 ## Setup coverage badge
