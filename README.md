@@ -5,9 +5,9 @@
 
 ## TLDR
 
-LammpsInputBuilder (or LIB) is a Python library designed to generate Lammps inputs from a molecule file and a workflow high level definition.
+LammpsInputBuilder (or LIB) is a Python library designed to generate Lammps inputs from a molecular model, a forcefield, and a workflow high level definition.
 
-The goal is to provide an API able to create a Lammps input and data scripts to declare a model followed by a sequence of operations. The current implementation supports ReaxFF and Rebo potentials for the model defintion, with the possibility to extend to other types of forcefields later on. 
+The goal is to provide an API able to create a Lammps input and data scripts to load a molecular model, assign a forcefield to it, and execute a sequence of operations. The current implementation supports ReaxFF and Rebo potentials for the model defintion, with the possibility to extend to other types of forcefields later on. 
 
 Operations are organized in Sections, where each section is organized around typically but not necessary a time integration operations (minimize, nve, run 0, etc). Each Section can be extended to added addition computations (fix, compute, etc) running at the same time of the main time integration operation. 
 
@@ -18,8 +18,12 @@ With this organization, the main objectives of LammpsInputBuilder are:
 
 Here is a simple example on how to load a molecular model, assign a reax potential to it, and minimize the model: 
 ```
-    modelData = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
-    forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
+    from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
+    from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
+    from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+
+    modelData = Path('benzene.xyz')
+    forcefield = Path('ffield.reax.Fe_O_C_H.reax') 
 
     typedMolecule = ReaxTypedMolecule(
         bboxStyle=BoundingBoxStyle.PERIODIC,
@@ -28,7 +32,7 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
     typedMolecule.loadFromFile(modelData, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
-    workflow = WorkflowBuilder ()
+    workflow = WorkflowBuilder()
     workflow.setTypedMolecule(typedMolecule)
 
     # Create a minimization Section 
@@ -252,8 +256,8 @@ Now that the model is minimized, we can warm up the molecular system in the seco
             nbSteps=10000
         )
     )
-    langevinWarmup = LangevinCompute(
-        computeName="langevin",
+    langevinWarmup = LangevinExtensioln(
+        extensionName="langevin",
         group=AllGroup(), 
         startTemp=TemperatureQuantity(1, "K"),
         endTemp=TemperatureQuantity(300, "K"),
@@ -273,8 +277,8 @@ To complete this example, we are going to run an equilibration phase at 300K wit
         group=AllGroup(),
         nbSteps=100000
     ))
-    langevinWarmup = LangevinCompute(
-        computeName="langevin",
+    langevinWarmup = LangevinExtensioln(
+        extensionName="langevin",
         group=AllGroup(), 
         startTemp=TemperatureQuantity(300, "K"),
         endTemp=TemperatureQuantity(300, "K"),
