@@ -12,7 +12,7 @@ from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection
 from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeIntegrator, MinimizeStyle
 from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO
-from lammpsinputbuilder.extensions import LangevinCompute
+from lammpsinputbuilder.extensions import LangevinExtension
 from lammpsinputbuilder.group import AllGroup
 from lammpsinputbuilder.quantities import TemperatureQuantity, TimeQuantity
 
@@ -55,8 +55,8 @@ def main():
             nbSteps=10000
         )
     )
-    langevinWarmup = LangevinCompute(
-        computeName="langevin",
+    langevinWarmup = LangevinExtension(
+        extensionName="langevin",
         group=AllGroup(), 
         startTemp=TemperatureQuantity(1, "K"),
         endTemp=TemperatureQuantity(300, "K"),
@@ -72,8 +72,8 @@ def main():
         group=AllGroup(),
         nbSteps=100000
     ))
-    langevinWarmup = LangevinCompute(
-        computeName="langevin",
+    langevinWarmup = LangevinExtension(
+        extensionName="langevin",
         group=AllGroup(), 
         startTemp=TemperatureQuantity(300, "K"),
         endTemp=TemperatureQuantity(300, "K"),
