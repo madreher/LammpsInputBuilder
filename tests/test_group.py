@@ -1,6 +1,6 @@
 import pytest 
 
-from lammpsinputbuilder.group import AllGroup, EmptyGroup,IndicesGroup, OperationGroup, OperationGroupEnum
+from lammpsinputbuilder.group import *
 
 def test_AllGroup():
     grp = AllGroup()
@@ -97,3 +97,25 @@ def test_OperationGroup():
 
     with pytest.raises(ValueError):
         grp5 = OperationGroup( groupName="myOperationGroup", op = OperationGroupEnum.UNION, otherGroups=[])
+
+def test_ManualGroup():
+    grp = ManualGroup( groupName="myManualGroup", doCmd="myDoCmd", undoCmd="myUndoCmd")
+
+    assert grp.getGroupName() == "myManualGroup"
+    assert grp.getDoCmd() == "myDoCmd"
+    assert grp.getUndoCmd() == "myUndoCmd"
+
+    assert grp.addDoCommands() == "myDoCmd\n"
+    assert grp.addUndoCommands() == "myUndoCmd\n"
+
+    objDict = grp.toDict()
+    assert objDict["groupName"] == "myManualGroup"
+    assert objDict["doCmd"] == "myDoCmd"
+    assert objDict["undoCmd"] == "myUndoCmd"
+    assert objDict["class"] == "ManualGroup"
+
+    grp2 = ManualGroup()
+    grp2.fromDict(objDict, version=0)
+    assert grp2.getGroupName() == "myManualGroup"
+    assert grp2.getDoCmd() == "myDoCmd"
+    assert grp2.getUndoCmd() == "myUndoCmd"

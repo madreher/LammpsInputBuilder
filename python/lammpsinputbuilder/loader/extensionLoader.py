@@ -8,9 +8,10 @@ class ExtensionLoader():
 
     def dictToExtension(self, d:dict, version:int=0):
         extensionTable = {}
-        extensionTable[SetForceCompute.__name__] = SetForceCompute()
-        extensionTable[LangevinCompute.__name__] = LangevinCompute()
-        extensionTable[MoveCompute.__name__] = MoveCompute()
+        extensionTable[SetForceExtension.__name__] = SetForceExtension()
+        extensionTable[LangevinExtension.__name__] = LangevinExtension()
+        extensionTable[MoveExtension.__name__] = MoveExtension()
+        extensionTable[ManualExtension.__name__] = ManualExtension()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")

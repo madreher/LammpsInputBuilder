@@ -3,7 +3,7 @@ from lammpsinputbuilder.section import Section, IntegratorSection
 from lammpsinputbuilder.templates.templateSection import TemplateSection
 from lammpsinputbuilder.integrator import MinimizeIntegrator, MinimizeStyle
 from lammpsinputbuilder.group import Group, AllGroup
-from lammpsinputbuilder.extensions import SetForceCompute
+from lammpsinputbuilder.extensions import SetForceExtension
 from lammpsinputbuilder.quantities import ForceQuantity
 
 class MinimizeTemplate(TemplateSection):
@@ -53,7 +53,7 @@ class MinimizeTemplate(TemplateSection):
             # Minimization is always done on all the atoms. 
             # To create anchors during the minimization, we need to set the force to 0 on the anchor group
             section.addGroup(self.anchorGroup)
-            section.addExtension(SetForceCompute(computationName="zeroForceAnchor", group=self.anchorGroup, fx=ForceQuantity(0.0), fy=ForceQuantity(0.0), fz=ForceQuantity(0.0)))
+            section.addExtension(SetForceExtension(computationName="zeroForceAnchor", group=self.anchorGroup, fx=ForceQuantity(0.0), fy=ForceQuantity(0.0), fz=ForceQuantity(0.0)))
 
 
         return [section]

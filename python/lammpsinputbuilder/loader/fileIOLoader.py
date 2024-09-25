@@ -12,6 +12,7 @@ class FileIOLoader():
         fileIOTable[DumpTrajectoryFileIO.__name__] = DumpTrajectoryFileIO()
         fileIOTable[XYZTrajectoryFileIO.__name__] = XYZTrajectoryFileIO()
         fileIOTable[ThermoFileIO.__name__] = ThermoFileIO()
+        fileIOTable[ManualFileIO.__name__] = ManualFileIO()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")

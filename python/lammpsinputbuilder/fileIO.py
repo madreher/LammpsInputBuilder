@@ -249,4 +249,52 @@ class ThermoFileIO(FileIO):
 
     def getAssociatedFilePath(self) -> Path:
         return Path("lammps.log")
+    
+class ManualFileIO(FileIO):
+
+    def __init__(self, fileIOName: str = "defaultManualFileIO", doCmd:str = "", undoCmd: str = "", associatedFilePath:str = "") -> None: # ) -> None: # ) -> None:
+        super().__init__(fileIOName=fileIOName)
+        self.doCmd = doCmd
+        self.undoCmd = undoCmd
+        self.associatedFilePath = associatedFilePath
+
+    def getDoCmd(self) -> str:
+        return self.doCmd
+
+    def getUndoCmd(self) -> str:
+        return self.undoCmd
+
+    def getAssociatedFilePath(self) -> Path:
+        return Path(self.associatedFilePath)
+
+    def toDict(self) -> dict:
+        result  = super().toDict()
+        result["class"] = self.__class__.__name__ 
+        result["doCmd"] = self.doCmd
+        result["undoCmd"] = self.undoCmd
+        result["associatedFilePath"] = self.associatedFilePath
+        return result
+
+    def fromDict(self, d: dict, version: int):
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version=version)
+        self.doCmd = d.get("doCmd", "")
+        self.undoCmd = d.get("undoCmd", "")
+        self.associatedFilePath = d.get("associatedFilePath", "")
+
+    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+        if self.doCmd.endswith("\n"):
+            return self.doCmd
+        else:
+            return self.doCmd + "\n"
+
+    def addUndoCommands(self) -> str:
+        if self.undoCmd.endswith("\n"):
+            return self.undoCmd
+        else:
+            return self.undoCmd + "\n"
+    
+    def getAssociatedFilePath(self) -> Path:
+        return Path(self.associatedFilePath)
 

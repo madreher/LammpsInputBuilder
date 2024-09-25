@@ -88,4 +88,29 @@ def test_ThermoFileIO():
     assert cmds[1] == "thermo_style custom step temp pe ke etotal press a b c"
     assert obj.addUndoCommands() == ""
 
+def test_ManualFileIO():
+    obj = ManualFileIO(fileIOName="testFile", doCmd="startFile", undoCmd="endFile", associatedFilePath="testfile")
+    assert obj.getFileIOName() == "testFile"
+    assert obj.getDoCmd() == "startFile"
+    assert obj.getUndoCmd() == "endFile"
+    assert obj.getAssociatedFilePath() == Path("testfile")
+
+    dictObj = obj.toDict()
+    assert dictObj["class"] == "ManualFileIO"
+    assert dictObj["fileIOName"] == "testFile"
+    assert dictObj["doCmd"] == "startFile"
+    assert dictObj["undoCmd"] == "endFile"
+    assert dictObj["associatedFilePath"] == "testfile"
+
+    obj2 = ManualFileIO()
+    obj2.fromDict(dictObj, version=0)
+    assert obj2.getFileIOName() == "testFile"
+    assert obj2.getDoCmd() == "startFile"
+    assert obj2.getUndoCmd() == "endFile"
+    assert obj2.getAssociatedFilePath() == Path("testfile")
+
+    info = GlobalInformation()
+    assert obj.addDoCommands(info) == "startFile\n"
+    assert obj.addUndoCommands() == "endFile\n"
+
 

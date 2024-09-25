@@ -189,9 +189,6 @@ class ReferenceGroup(Group):
         super().__init__(groupName)
         self.reference = reference.getGroupName()
 
-    def getGroupName(self) -> str:
-        return self.reference
-
     def getReference(self) -> str:
         return self.reference
     
@@ -216,5 +213,52 @@ class ReferenceGroup(Group):
 
     def addUndoCommands(self) -> str:
         return ""
+    
+class ManualGroup(Group):
+    def __init__(self, groupName: str = "defaultManualGroup", doCmd:str = "", undoCmd:str = "") -> None:
+        super().__init__(groupName)
+        self.doCmd = doCmd
+        self.undoCmd = undoCmd
+
+    def getDoCmd(self) -> str:
+        return self.doCmd
+    
+    def setDoCmd(self, doCmd: str):
+        self.doCmd = doCmd
+
+    def getUndoCmd(self) -> str:
+        return self.undoCmd
+    
+    def setUndoCmd(self, undoCmd: str):
+        self.undoCmd = undoCmd
+
+    def toDict(self) -> dict:
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
+        result["doCmd"] = self.doCmd
+        result["undoCmd"] = self.undoCmd
+        return result
+
+    def fromDict(self, d: dict, version: int):
+        # Make sure that we are reading the right class
+        if d["class"] != self.__class__.__name__:
+            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().fromDict(d, version=version)
+        self.doCmd = d.get("doCmd", "")
+        self.undoCmd = d.get("undoCmd", "")
+
+    def addDoCommands(self) -> str:
+        if self.doCmd.endswith("\n"):
+            return self.doCmd
+        else:
+            return self.doCmd + "\n"
+
+    def addUndoCommands(self) -> str:
+        if self.undoCmd.endswith("\n"):
+            return self.undoCmd
+        else:
+            return self.undoCmd + "\n"
+
+    
     
     
