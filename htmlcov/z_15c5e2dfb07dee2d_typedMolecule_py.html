@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_15c5e2dfb07dee2d_types_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
-            created at 2024-09-25 23:26 +0000
+            created at 2024-09-26 04:30 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -92,7 +92,7 @@
     <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">lammpsinputbuilder</span><span class="op">.</span><span class="nam">utility</span><span class="op">.</span><span class="nam">modelToData</span> <span class="key">import</span> <span class="nam">moleculeToLammpsDataPBC</span><span class="op">,</span> <span class="nam">moleculeToLammpsInput</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">lammpsinputbuilder</span><span class="op">.</span><span class="nam">quantities</span> <span class="key">import</span> <span class="nam">LammpsUnitSystem</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">class</span> <span class="nam">TypedMolecule</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">class</span> <span class="nam">TypedMolecularSystem</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">    Handler for a molecular system with a forcefield assigned to it. This class is responsible for </span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">    generating a LAMMPS data file for the system as well as the correspinding start of the input file.</span>&nbsp;</span><span class="r"></span></p>
@@ -150,7 +150,7 @@
     <p class="mis show_mis"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">        <span class="key">raise</span> <span class="nam">NotImplementedError</span><span class="op">(</span><span class="fst">f"</span><span class="fst">Method not implemented by class </span><span class="op">{</span><span class="nam">__class__</span><span class="op">}</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t"><span class="key">class</span> <span class="nam">ReaxTypedMolecule</span><span class="op">(</span><span class="nam">TypedMolecule</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t"><span class="key">class</span> <span class="nam">ReaxTypedMolecularSystem</span><span class="op">(</span><span class="nam">TypedMolecularSystem</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t"><span class="str">    Handler for a molecular system with a Reax forcefield assigned to it. This class is responsible for </span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t"><span class="str">    generating a LAMMPS data file for the system as well as the correspinding start of the input file.</span>&nbsp;</span><span class="r"></span></p>
@@ -329,7 +329,7 @@
             <a class="nav" href="z_15c5e2dfb07dee2d_types_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.1">coverage.py v7.6.1</a>,
-            created at 2024-09-25 23:26 +0000
+            created at 2024-09-26 04:30 +0000
         </p>
     </div>
 </footer>
