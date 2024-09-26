@@ -2,7 +2,7 @@ from pathlib import Path
 import logging
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
+from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
 from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle, RunZeroIntegrator
@@ -20,7 +20,7 @@ def main():
     modelData = Path(__file__).parent.parent / 'data' / 'models' / 'scan.fullmodel.xyz'
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -28,7 +28,7 @@ def main():
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 
     # Selection of 1-based indices, extracted from scanSelections.json
     indicesTooltip = [312, 313, 314, 315, 316, 317, 322, 323, 324, 325, 326, 327, 328, 329, 330]

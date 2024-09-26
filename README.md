@@ -19,7 +19,7 @@ With this organization, the main objectives of LammpsInputBuilder are:
 Here is a simple example on how to load a molecular model, assign a reax potential to it, and minimize the model: 
 ```
     from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-    from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
+    from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
     from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
     from lammpsinputbuilder.section import IntegratorSection
     from lammpsinputbuilder.integrator import MinimizeIntegrator, MinimizeStyle
@@ -27,7 +27,7 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
     modelData = Path('benzene.xyz')
     forcefield = Path('ffield.reax.Fe_O_C_H.reax') 
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -35,7 +35,7 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 
     # Create a minimization Section 
     sectionMin = IntegratorSection(
@@ -57,11 +57,11 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
 ### Main Objects
 
 A LammpsInputBuilder starts by declaring a `WorkflowBuilder` object. This object is responsible for hosting the workflow definition and converting it into a Lammps script.
-The `WorkflowBuilder` is composed of two main parts: a `TypedMolecule`, and a list of `Section`.
+The `WorkflowBuilder` is composed of two main parts: a `TypedMolecularSystem`, and a list of `Section`.
 
 <img src="data/images/WorkflowBuilder.svg" alt="WorkflowBuilder chart" height="400" />
 
-A `TypedMolecule` represents a molecular model with a forcefield assigned to it. Currently, LIB supports ReaxFF and Airebo potentials but other could be added in the future. With a `TypedMolecule`, the `WorkflowBuilder` can generate a Lammps data file as well as the beginning of the input script.
+A `TypedMolecularSystem` represents a molecular model with a forcefield assigned to it. Currently, LIB supports ReaxFF and Airebo potentials but other could be added in the future. With a `TypedMolecularSystem`, the `WorkflowBuilder` can generate a Lammps data file as well as the beginning of the input script.
 
 A `Section` generally represents a phase in a simulation workflow which could be reused in another workflow. A `Section` can represent a minimization protocol, a NVE, a system warmup, etc. A `Section` can be recursive and be decomposed into a sequence of sub sections as well. A non recursive `Section` is often tied to a integration process (minimize, nve, nvt), but certain `Section` can also be used as a way to modify the current state of the simulation, for instance to reset the timestep counter after a minimization or setup the velocity vectors of the atoms. 
 
@@ -86,9 +86,9 @@ In Lammps, a lot of commands have a declaration and removal command which should
 
 LammpsInputBuilder maintain this logic by requiring all its types of objects to provide a *do* and *undo* command whenever relavant. The only exceptions to this rule are the `Instruction` objects which do not have an *undo* counter part. For example, the command `reset_timestep` simply sets the `step` counter to a new value, therfor it doesn't need to be stopped or undone, it is a simple one time action. 
 
-#### Unrolling the TypedMolecule
+#### Unrolling the TypedMolecularSystem
 
-The first step is to translate the `TypedMolecule` object. The data file is generated internally by [ASE](https://wiki.fysik.dtu.dk/ase/). The initial Lammps input script is based on a preconfigured template with the necessary adjustements to account for the type of forcefield used.
+The first step is to translate the `TypedMolecularSystem` object. The data file is generated internally by [ASE](https://wiki.fysik.dtu.dk/ase/). The initial Lammps input script is based on a preconfigured template with the necessary adjustements to account for the type of forcefield used.
 
 Dev note: This is a sufficient approach for now because LIB only supports ReaxFF and Airebo potentiel which only requires the Atom section in the Lammps data file. Other forcefield might require a different approach or backend (ex: [moltemplate](https://www.moltemplate.org/)).
 
@@ -221,7 +221,7 @@ The first step is to declare a model and assign a forcefield to it. In this exam
     modelData = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -229,10 +229,10 @@ The first step is to declare a model and assign a forcefield to it. In this exam
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 ```
 
-The `ReaxTypedMolecule` object represents the molecular system with its settings. Currently, we only need to setup the periodic condition style and the partial charges method. Additional settings may become available in the future. Once the `TypedMolecule` object is created and initialized, it can be added to a `WorkflowBuilder` object. With this base, we can start to add `Section` objects to the workflow.
+The `ReaxTypedMolecularSystem` object represents the molecular system with its settings. Currently, we only need to setup the periodic condition style and the partial charges method. Additional settings may become available in the future. Once the `TypedMolecularSystem` object is created and initialized, it can be added to a `WorkflowBuilder` object. With this base, we can start to add `Section` objects to the workflow.
 
 #### Minimization phase
 
@@ -304,7 +304,7 @@ To complete this example, we are going to run an equilibration phase at 300K wit
 
     workflow.addSection(sectionNVE)
 ```
-Just like `Extension` objects, the `FileIO` objects are added to their respective section and will only be active during the duraction of that phase. Note that for the thermo io, we are using the `TypedMolecule` object to obtain several variable names. This is because the pair command associated to the forcefield can produce dedicated values. This approach allows the `ThermoFileIO` to adapt to the type of forcefield used without having to modify it later on if the `TypedMolecule` object changes.
+Just like `Extension` objects, the `FileIO` objects are added to their respective section and will only be active during the duraction of that phase. Note that for the thermo io, we are using the `TypedMolecularSystem` object to obtain several variable names. This is because the pair command associated to the forcefield can produce dedicated values. This approach allows the `ThermoFileIO` to adapt to the type of forcefield used without having to modify it later on if the `TypedMolecularSystem` object changes.
 
 Now that all the phases are declared and added to the workflow, the Lammps inputs can be generated as follow:
 ```
@@ -332,20 +332,20 @@ The first step in this process is to determine the atom indices of the groups we
 - The anchor of the tooltip (top layer of the tooltip)
 - The head, i.e the last atom at the bottom of the tooltip
 
-TODO: Add screenshop of the selections
+![Group decomposition of the model](data/images/SlabGroups.svg)
 
 With this being done, we can start to load the molecular model with LammpsInputGenerator. This is done as follows:
 
 ```
     # Load the model to get atom positions
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
     typedMolecule.loadFromFile(xyzPath, forcefield)
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 ```
 
 #### Phase 1: Minimization
@@ -409,18 +409,18 @@ During this phase, we introduced two new objects: the `MinimizeTemplate` and the
 
 #### Phase 2: Scan
 
-In this phase, we are going to displace the tooltip to various positions above the above the slab. The tooltip will follow a grid at a given height. To define the grid position, we first need to know the bounding box of the slab after minimization. To do so, we are going to create a new `TypedMolecule` and load the model that we generated after the minimization. This can be done as follows:
+In this phase, we are going to displace the tooltip to various positions above the above the slab. The tooltip will follow a grid at a given height. To define the grid position, we first need to know the bounding box of the slab after minimization. To do so, we are going to create a new `TypedMolecularSystem` and load the model that we generated after the minimization. This can be done as follows:
 ```
     # Load the model to get atom positions
     xyzPath = previousJobFolder / finalXYZ
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
     typedMolecule.loadFromFile(xyzPath, forcefield)
 ```
-Once the model is loaded, we need to compute the bounding box of the slab specifically. To do so, we need the list of atom indices forming the slab that we have defined previously, and the current positions. Internally, the `TypedMolecule` object stores a ASE [Atoms](https://wiki.fysik.dtu.dk/ase/ase/atoms.html) object which can be querried to access atom positions. This can be done as follows:
+Once the model is loaded, we need to compute the bounding box of the slab specifically. To do so, we need the list of atom indices forming the slab that we have defined previously, and the current positions. Internally, the `TypedMolecularSystem` object stores a ASE [Atoms](https://wiki.fysik.dtu.dk/ase/ase/atoms.html) object which can be querried to access atom positions. This can be done as follows:
 ```
     # Get the positions and the list of atoms for the slab to compute its bounding box
     positions = typedMolecule.getASEAtoms().get_positions()
@@ -463,7 +463,7 @@ During the generation of the grid, we save the corresponding tooltip positions f
 ```
     # Now that we have the target positions, we can prepare the lammps script
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 
     # Create the groups 
     groupTooltip  = IndicesGroup(groupName="tooltip", indices=indicesTooltip)

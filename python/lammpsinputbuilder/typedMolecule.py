@@ -10,7 +10,7 @@ from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileF
 from lammpsinputbuilder.utility.modelToData import moleculeToLammpsDataPBC, moleculeToLammpsInput
 from lammpsinputbuilder.quantities import LammpsUnitSystem
 
-class TypedMolecule:
+class TypedMolecularSystem:
     """
     Handler for a molecular system with a forcefield assigned to it. This class is responsible for 
     generating a LAMMPS data file for the system as well as the correspinding start of the input file.
@@ -68,7 +68,7 @@ class TypedMolecule:
         raise NotImplementedError(f"Method not implemented by class {__class__}")
     
 
-class ReaxTypedMolecule(TypedMolecule):
+class ReaxTypedMolecularSystem(TypedMolecularSystem):
     """
     Handler for a molecular system with a Reax forcefield assigned to it. This class is responsible for 
     generating a LAMMPS data file for the system as well as the correspinding start of the input file.

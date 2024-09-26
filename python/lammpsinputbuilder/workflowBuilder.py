@@ -1,4 +1,4 @@
-from lammpsinputbuilder.typedMolecule import TypedMolecule
+from lammpsinputbuilder.typedMolecule import TypedMolecularSystem
 from lammpsinputbuilder.section import Section
 
 from pathlib import Path
@@ -16,12 +16,12 @@ class WorkflowBuilder:
         self.molecule = None
         self.sections = []
 
-    def setTypedMolecule(self, molecule: TypedMolecule):
+    def setTypedMolecularSystem(self, molecule: TypedMolecularSystem):
         if not molecule.isModelLoaded():
             raise ValueError("The molecule must be loaded before it can be set.")
         self.molecule = molecule
 
-    def getTypedMolecule(self) -> TypedMolecule:
+    def getTypedMolecularSystem(self) -> TypedMolecularSystem:
         return self.molecule
     
     def addSection(self, section: Section):
@@ -30,7 +30,7 @@ class WorkflowBuilder:
     def generateInputs(self, jobFolderPrefix: Path = None) -> Path:
 
         if self.molecule is None:
-            raise ValueError("A molecule must be set before generating the input files. See setTypedMolecule().")
+            raise ValueError("A molecule must be set before generating the input files. See setTypedMolecularSystem().")
         
         jobID = str(uuid4())
 

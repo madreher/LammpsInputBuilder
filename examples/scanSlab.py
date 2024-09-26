@@ -9,7 +9,7 @@ import lammps_logfile
 import matplotlib.pyplot as plt
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
+from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
 from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle, RunZeroIntegrator
@@ -75,13 +75,13 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     else:
         raise ValueError(f"Unknown model {model}")
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
     typedMolecule.loadFromFile(modelData, forcefield)
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 
     # Selection of 1-based indices, extracted from scanSelections.json
     if model == "passivated":
@@ -155,7 +155,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
 
     # Load the model to get atom positions
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -217,7 +217,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
 
     # Now that we have the target positions, we can prepare the lammps script
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 
     # Create the groups 
     groupTooltip  = IndicesGroup(groupName="tooltip", indices=indicesTooltip)

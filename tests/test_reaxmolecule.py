@@ -7,12 +7,12 @@ import os
 import shutil
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod, Forcefield, MoleculeFileFormat
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
+from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
 
 
 def test_emptyReaxMolecule():
     # Create an empty molecule 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -37,7 +37,7 @@ def test_reaxMoleculeFromFile():
     moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -63,7 +63,7 @@ def test_reaxMoleculeFromStrings():
     moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -96,7 +96,7 @@ def test_moleculeToDict():
     moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -105,7 +105,7 @@ def test_moleculeToDict():
 
     result = typedMolecule.toDict()
 
-    assert result["class"] == "ReaxTypedMolecule"
+    assert result["class"] == "ReaxTypedMolecularSystem"
     assert result["electrostaticMethod"] == ElectrostaticMethod.QEQ.value
     assert result["forcefieldPath"] == Path(str(forcefieldPath))
     assert result["moleculePath"] == Path(str(moleculePath))
@@ -118,7 +118,7 @@ def test_moleculeToDictToMolecule():
     moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -127,7 +127,7 @@ def test_moleculeToDictToMolecule():
 
     dict1 = typedMolecule.toDict()
 
-    typedMolecule2 = ReaxTypedMolecule()
+    typedMolecule2 = ReaxTypedMolecularSystem()
     typedMolecule2.fromDict(dict1, 0)
 
     assert typedMolecule.toDict() == typedMolecule2.toDict()
@@ -137,7 +137,7 @@ def test_moleculeToJobFolder():
     moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )

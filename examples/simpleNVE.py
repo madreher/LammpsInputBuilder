@@ -7,7 +7,7 @@ import os
 import logging
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
+from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection
 from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeIntegrator, MinimizeStyle
@@ -26,7 +26,7 @@ def main():
     modelData = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -34,7 +34,7 @@ def main():
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 
     # Create a minimization Section 
     sectionMin = IntegratorSection(

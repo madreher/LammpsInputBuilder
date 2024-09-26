@@ -4,7 +4,7 @@ from pathlib import Path
 import shutil
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod, Forcefield, MoleculeFileFormat
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecule
+from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
 from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection 
 from lammpsinputbuilder.integrator import NVEIntegrator
@@ -16,7 +16,7 @@ def test_workflowBuilder():
     moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
-    typedMolecule = ReaxTypedMolecule(
+    typedMolecule = ReaxTypedMolecularSystem(
         bboxStyle=BoundingBoxStyle.PERIODIC,
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
@@ -25,7 +25,7 @@ def test_workflowBuilder():
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecule(typedMolecule)
+    workflow.setTypedMolecularSystem(typedMolecule)
 
     # Create a NVE Section
     section = IntegratorSection(integrator=NVEIntegrator())
