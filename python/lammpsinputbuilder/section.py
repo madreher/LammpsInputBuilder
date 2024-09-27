@@ -2,7 +2,6 @@ from typing import List
 
 from lammpsinputbuilder.integrator import Integrator, RunZeroIntegrator
 from lammpsinputbuilder.fileIO import FileIO
-from lammpsinputbuilder.quantities import LammpsUnitSystem
 from lammpsinputbuilder.instructions import Instruction
 from lammpsinputbuilder.extensions import Extension
 from lammpsinputbuilder.group import Group
@@ -75,7 +74,7 @@ class RecusiveSection(Section):
             loader = SectionLoader()
 
             for section in sections:
-                self.sections.append(loader.dictToSection(section))
+                self.sections.append(loader.dict_to_section(section))
 
         if "fileIOs" in d.keys() and len(d["fileIOs"]) > 0:
             ios = d["fileIOs"]
@@ -84,7 +83,7 @@ class RecusiveSection(Section):
             loader = FileIOLoader()
 
             for io in ios:
-                self.ios.append(loader.dictToFileIO(io))
+                self.ios.append(loader.dict_to_fileio(io))
 
         if "extensions" in d.keys() and len(d["extensions"]) > 0:
             exts = d["extensions"]
@@ -93,7 +92,7 @@ class RecusiveSection(Section):
             loader = ExtensionLoader()
 
             for ext in exts:
-                self.extensions.append(loader.dictToExtension(ext))
+                self.extensions.append(loader.dict_to_extension(ext))
 
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
@@ -102,7 +101,7 @@ class RecusiveSection(Section):
             loader = GroupLoader()
 
             for group in groups:
-                self.groups.append(loader.dictToGroup(group))
+                self.groups.append(loader.dict_to_group(group))
 
     def addAllCommands(self, globalInformation: GlobalInformation) -> str:
 
@@ -221,7 +220,7 @@ class IntegratorSection(Section):
             groupLoader = loader.GroupLoader()
 
             for group in groups:
-                self.groups.append(groupLoader.dictToGroup(group))
+                self.groups.append(groupLoader.dict_to_group(group))
 
     def addAllCommands(self, globalInformation: GlobalInformation) -> str:
         result = "################# START SECTION " + \
@@ -307,7 +306,7 @@ class InstructionsSection(Section):
 
             instructionLoader = loader.InstructionLoader()
             self.instructions = [
-                instructionLoader.dictToInstruction(
+                instructionLoader.dict_to_instruction(
                     c, version) for c in instructionsDict]
 
     def addAllCommands(self, globalInformation: GlobalInformation) -> str:

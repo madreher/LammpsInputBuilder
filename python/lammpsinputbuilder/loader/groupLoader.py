@@ -1,3 +1,5 @@
+"""Module faciliating the instanciation of Group classes."""
+
 import copy
 
 from lammpsinputbuilder.group import AllGroup, \
@@ -9,23 +11,23 @@ class GroupLoader:
     def __init__(self) -> None:
         pass
 
-    def dictToGroup(self, d: dict, version: int = 0):
-        groupTable = {}
-        groupTable[AllGroup.__name__] = AllGroup()
-        groupTable[EmptyGroup.__name__] = EmptyGroup()
-        groupTable[OperationGroup.__name__] = OperationGroup()
-        groupTable[IndicesGroup.__name__] = IndicesGroup()
-        groupTable[ReferenceGroup.__name__] = ReferenceGroup()
-        groupTable[ManualGroup.__name__] = ManualGroup()
+    def dict_to_group(self, d: dict, version: int = 0):
+        groupe_table = {}
+        groupe_table[AllGroup.__name__] = AllGroup()
+        groupe_table[EmptyGroup.__name__] = EmptyGroup()
+        groupe_table[OperationGroup.__name__] = OperationGroup()
+        groupe_table[IndicesGroup.__name__] = IndicesGroup()
+        groupe_table[ReferenceGroup.__name__] = ReferenceGroup()
+        groupe_table[ManualGroup.__name__] = ManualGroup()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")
-        className = d["class"]
-        if className not in groupTable.keys():
-            raise RuntimeError(f"Unknown Group class {className}.")
+        class_name = d["class"]
+        if class_name not in groupe_table.keys():
+            raise RuntimeError(f"Unknown Group class {class_name}.")
         # Create a copy of the base object, and we will update the settings
         # of the object from the dictionary
-        obj = copy.deepcopy(groupTable[className])
+        obj = copy.deepcopy(groupe_table[class_name])
         obj.fromDict(d, version)
 
         return obj

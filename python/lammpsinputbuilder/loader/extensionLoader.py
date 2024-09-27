@@ -1,3 +1,5 @@
+"""Module faciliating the instanciation of Extension classes."""
+
 import copy
 from lammpsinputbuilder.extensions import \
     SetForceExtension, LangevinExtension, \
@@ -8,21 +10,21 @@ class ExtensionLoader():
     def __init__(self) -> None:
         pass
 
-    def dictToExtension(self, d: dict, version: int = 0):
-        extensionTable = {}
-        extensionTable[SetForceExtension.__name__] = SetForceExtension()
-        extensionTable[LangevinExtension.__name__] = LangevinExtension()
-        extensionTable[MoveExtension.__name__] = MoveExtension()
-        extensionTable[ManualExtension.__name__] = ManualExtension()
+    def dict_to_extension(self, d: dict, version: int = 0):
+        extension_table = {}
+        extension_table[SetForceExtension.__name__] = SetForceExtension()
+        extension_table[LangevinExtension.__name__] = LangevinExtension()
+        extension_table[MoveExtension.__name__] = MoveExtension()
+        extension_table[ManualExtension.__name__] = ManualExtension()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")
-        className = d["class"]
-        if className not in extensionTable.keys():
-            raise RuntimeError(f"Unknown Extension class {className}.")
+        class_name = d["class"]
+        if class_name not in extension_table.keys():
+            raise RuntimeError(f"Unknown Extension class {class_name}.")
         # Create a copy of the base object, and we will update the settings
         # of the object from the dictionary
-        obj = copy.deepcopy(extensionTable[className])
+        obj = copy.deepcopy(extension_table[class_name])
         obj.fromDict(d, version)
 
         return obj

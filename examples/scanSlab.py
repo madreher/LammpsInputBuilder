@@ -122,7 +122,7 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     globalSection.addGroup(groupFree)
 
     # First section: Minimization 
-    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, useAnchors=True, anchorGroup=ReferenceGroup(groupName="refAnchor", reference=groupAnchors))
+    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, use_anchors=True, anchor_group=ReferenceGroup(groupName="refAnchor", reference=groupAnchors))
     globalSection.addSection(sectionMinimization)
 
     sectionFinalState = IntegratorSection(sectionName="FinalSection", integrator=RunZeroIntegrator())

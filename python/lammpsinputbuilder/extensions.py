@@ -198,7 +198,7 @@ class InstructionExtension(Extension):
 
         from lammpsinputbuilder.loader.instructionLoader import InstructionLoader
         loader = InstructionLoader()
-        self.instruction = loader.dictToInstruction(
+        self.instruction = loader.dict_to_instruction(
             d["instruction"], version=version)
 
     def addDoCommands(self, globalInformation: GlobalInformation) -> str:

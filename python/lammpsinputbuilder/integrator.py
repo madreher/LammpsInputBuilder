@@ -8,6 +8,7 @@ from lammpsinputbuilder.types import GlobalInformation
 
 class Integrator:
     """Base class for all integrators."""
+
     def __init__(self, integratorName: str = "defaultIntegrator") -> None:
         self.integratorName = integratorName
 

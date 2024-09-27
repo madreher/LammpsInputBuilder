@@ -1,26 +1,31 @@
-import copy 
+"""Module faciliating the instanciation of Integrator classes."""
 
-from lammpsinputbuilder.integrator import * 
+import copy
+
+from lammpsinputbuilder.integrator import NVEIntegrator, RunZeroIntegrator, \
+    MinimizeIntegrator, MultipassMinimizeIntegrator, ManualIntegrator
+
 
 class IntegratorLoader():
     def __init__(self) -> None:
-            pass
+        pass
 
-    def dictToIntegrator(self, d:dict, version:int=0):
-        integratorTable = {}
-        integratorTable[RunZeroIntegrator.__name__] = RunZeroIntegrator()
-        integratorTable[NVEIntegrator.__name__] = NVEIntegrator()
-        integratorTable[MinimizeIntegrator.__name__] = MinimizeIntegrator()
-        integratorTable[MultipassMinimizeIntegrator.__name__] = MultipassMinimizeIntegrator()
-        integratorTable[ManualIntegrator.__name__] = ManualIntegrator()
+    def dict_to_integrator(self, d: dict, version: int = 0):
+        integrator_table = {}
+        integrator_table[RunZeroIntegrator.__name__] = RunZeroIntegrator()
+        integrator_table[NVEIntegrator.__name__] = NVEIntegrator()
+        integrator_table[MinimizeIntegrator.__name__] = MinimizeIntegrator()
+        integrator_table[MultipassMinimizeIntegrator.__name__] = MultipassMinimizeIntegrator()
+        integrator_table[ManualIntegrator.__name__] = ManualIntegrator()
 
         if "class" not in d.keys():
             raise RuntimeError(f"Missing 'class' key in {d}.")
-        className = d["class"]
-        if className not in integratorTable.keys():
-            raise RuntimeError(f"Unknown Integrator class {className}.")
-        # Create a copy of the base object, and we will update the settings of the object from the dictionary
-        obj = copy.deepcopy(integratorTable[className])
+        class_name = d["class"]
+        if class_name not in integrator_table.keys():
+            raise RuntimeError(f"Unknown Integrator class {class_name}.")
+        # Create a copy of the base object, and we will update the settings of
+        # the object from the dictionary
+        obj = copy.deepcopy(integrator_table[class_name])
         obj.fromDict(d, version)
 
         return obj
