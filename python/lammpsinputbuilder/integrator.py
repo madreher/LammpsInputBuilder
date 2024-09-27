@@ -1,3 +1,5 @@
+"""Module for the integrator class."""
+
 from enum import Enum
 
 from lammpsinputbuilder.group import Group, AllGroup
@@ -5,6 +7,7 @@ from lammpsinputbuilder.types import GlobalInformation
 
 
 class Integrator:
+    """Base class for all integrators."""
     def __init__(self, integratorName: str = "defaultIntegrator") -> None:
         self.integratorName = integratorName
 
