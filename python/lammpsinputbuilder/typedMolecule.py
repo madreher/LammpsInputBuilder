@@ -9,7 +9,7 @@ from ase import Atoms
 from ase.io import read as ase_read
 from ase.io.lammpsrun import read_lammps_dump_text as ase_read_lammps_dump_text
 
-from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileFormat, GlobalInformation, ElectrostaticMethod, getMoleculeFileFormatFromExtension, getExtensionFromMoleculeFileFormat, getForcefieldFromExtension
+from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileFormat, GlobalInformation, ElectrostaticMethod, get_molecule_file_format_from_extension, get_extension_from_molecule_file_format, get_forcefield_from_extension
 from lammpsinputbuilder.utility.modelToData import molecule_to_lammps_data_pbc, molecule_to_lammps_input
 from lammpsinputbuilder.quantities import LammpsUnitSystem
 
@@ -118,11 +118,11 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             raise FileNotFoundError(f"File {molecule_path} not found.")
 
         # Check for supported molecule format
-        self.moleculeFormat = getMoleculeFileFormatFromExtension(
+        self.moleculeFormat = get_molecule_file_format_from_extension(
             molecule_path.suffix)
 
         # Check for supported forcefield format
-        forcefieldFormat = getForcefieldFromExtension(forcefieldPath.suffix)
+        forcefieldFormat = get_forcefield_from_extension(forcefieldPath.suffix)
         if forcefieldFormat != Forcefield.REAX:
             raise ValueError(
                 f"Forcefield file {forcefieldPath} is not a Reax forcefield, expecting .reax extension.")
@@ -176,7 +176,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             self.molecule_path = Path(moleculeFileName)
         else:
             self.molecule_path = Path(
-                "model." + getExtensionFromMoleculeFileFormat(moleculeFormat))
+                "model." + get_extension_from_molecule_file_format(moleculeFormat))
 
         self.forcefieldContent = forcefieldContent
         self.forcefieldPath = Path(forcefieldFileName)
@@ -184,7 +184,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         # Create a temporary file to be read by ase
         job_folder = Path(tempfile.mkdtemp())
         modelPath = job_folder / \
-            Path("model." + getExtensionFromMoleculeFileFormat(moleculeFormat))
+            Path("model." + get_extension_from_molecule_file_format(moleculeFormat))
 
         with open(modelPath, "w") as f:
             f.write(molecule_content)

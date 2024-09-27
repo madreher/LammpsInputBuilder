@@ -148,10 +148,10 @@ def test_moleculeToJobFolder():
     os.makedirs(job_folder)
 
     moleculeHolder = typedMolecule.generateLammpsDataFile(job_folder)
-    inputPath = typedMolecule.generateLammpsInputFile(job_folder, moleculeHolder)
+    input_path = typedMolecule.generateLammpsInputFile(job_folder, moleculeHolder)
 
     assert moleculeHolder is not None
-    assert inputPath == job_folder / "lammps.input"
+    assert input_path == job_folder / "lammps.input"
     assert (job_folder / "molecule.XYZ").is_file()
     assert (job_folder / typedMolecule.getLammpsDataFileName()).is_file()
     assert (job_folder / "model.data").is_file()

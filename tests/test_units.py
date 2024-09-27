@@ -7,13 +7,13 @@ def test_LengthQuantityDeclarations():
     assert lengthQuantity.getMagnitude() == 1.0
     assert lengthQuantity.getUnits() == "angstrom"
 
-    dictResult = lengthQuantity.to_dict()
-    assert dictResult["magnitude"] == 1.0
-    assert dictResult["units"] == "angstrom"
-    assert dictResult["class"] == "LengthQuantity"
+    dict_result = lengthQuantity.to_dict()
+    assert dict_result["magnitude"] == 1.0
+    assert dict_result["units"] == "angstrom"
+    assert dict_result["class"] == "LengthQuantity"
 
     loadBackQuantity = LengthQuantity()
-    loadBackQuantity.from_dict(dictResult, version=0)
+    loadBackQuantity.from_dict(dict_result, version=0)
 
     assert loadBackQuantity.getMagnitude() == 1.0
     assert loadBackQuantity.getUnits() == "angstrom"
@@ -42,13 +42,13 @@ def test_TimeQuantityDeclarations():
     assert timeQuantity.getMagnitude() == 1.0
     assert timeQuantity.getUnits() == "ps"
 
-    dictResult = timeQuantity.to_dict()
-    assert dictResult["magnitude"] == 1.0
-    assert dictResult["units"] == "ps"
-    assert dictResult["class"] == "TimeQuantity"
+    dict_result = timeQuantity.to_dict()
+    assert dict_result["magnitude"] == 1.0
+    assert dict_result["units"] == "ps"
+    assert dict_result["class"] == "TimeQuantity"
 
     loadBackQuantity = TimeQuantity()
-    loadBackQuantity.from_dict(dictResult, version=0)
+    loadBackQuantity.from_dict(dict_result, version=0)
 
     assert loadBackQuantity.getMagnitude() == 1.0
     assert loadBackQuantity.getUnits() == "ps"
@@ -75,13 +75,13 @@ def test_VelocityQuantityDeclarations():
     assert velocityQuantity.getMagnitude() == 1.0
     assert velocityQuantity.getUnits() == "m/s"
 
-    dictResult = velocityQuantity.to_dict()
-    assert dictResult["magnitude"] == 1.0
-    assert dictResult["units"] == "m/s"
-    assert dictResult["class"] == "VelocityQuantity"
+    dict_result = velocityQuantity.to_dict()
+    assert dict_result["magnitude"] == 1.0
+    assert dict_result["units"] == "m/s"
+    assert dict_result["class"] == "VelocityQuantity"
 
     loadBackQuantity = VelocityQuantity()
-    loadBackQuantity.from_dict(dictResult, version=0)
+    loadBackQuantity.from_dict(dict_result, version=0)
 
     assert loadBackQuantity.getMagnitude() == 1.0
     assert loadBackQuantity.getUnits() == "m/s"
@@ -108,13 +108,13 @@ def test_EnergyQuantityDeclarations():
     assert energyQuantity.getMagnitude() == 1.0
     assert energyQuantity.getUnits() == "kcal/mol"
 
-    dictResult = energyQuantity.to_dict()
-    assert dictResult["magnitude"] == 1.0
-    assert dictResult["units"] == "kcal/mol"
-    assert dictResult["class"] == "EnergyQuantity"
+    dict_result = energyQuantity.to_dict()
+    assert dict_result["magnitude"] == 1.0
+    assert dict_result["units"] == "kcal/mol"
+    assert dict_result["class"] == "EnergyQuantity"
 
     loadBackQuantity = EnergyQuantity()
-    loadBackQuantity.from_dict(dictResult, version=0)
+    loadBackQuantity.from_dict(dict_result, version=0)
 
     assert loadBackQuantity.getMagnitude() == 1.0
     assert loadBackQuantity.getUnits() == "kcal/mol"
@@ -142,13 +142,13 @@ def test_TemperatureQuantityDeclarations():
     assert temperatureQuantity.getMagnitude() == 1.0
     assert temperatureQuantity.getUnits() == "K"
 
-    dictResult = temperatureQuantity.to_dict()
-    assert dictResult["magnitude"] == 1.0
-    assert dictResult["units"] == "K"
-    assert dictResult["class"] == "TemperatureQuantity"
+    dict_result = temperatureQuantity.to_dict()
+    assert dict_result["magnitude"] == 1.0
+    assert dict_result["units"] == "K"
+    assert dict_result["class"] == "TemperatureQuantity"
 
     loadBackQuantity = TemperatureQuantity()
-    loadBackQuantity.from_dict(dictResult, version=0)
+    loadBackQuantity.from_dict(dict_result, version=0)
 
     assert loadBackQuantity.getMagnitude() == 1.0
     assert loadBackQuantity.getUnits() == "K"
@@ -175,13 +175,13 @@ def test_ForceQuantityDeclarations():
     assert forceQuantity.getMagnitude() == 1.0
     assert forceQuantity.getUnits() == "kcal/mol/angstrom"
 
-    dictResult = forceQuantity.to_dict()
-    assert dictResult["magnitude"] == 1.0
-    assert dictResult["units"] == "kcal/mol/angstrom"
-    assert dictResult["class"] == "ForceQuantity"
+    dict_result = forceQuantity.to_dict()
+    assert dict_result["magnitude"] == 1.0
+    assert dict_result["units"] == "kcal/mol/angstrom"
+    assert dict_result["class"] == "ForceQuantity"
 
     loadBackQuantity = ForceQuantity()
-    loadBackQuantity.from_dict(dictResult, version=0)
+    loadBackQuantity.from_dict(dict_result, version=0)
 
     assert loadBackQuantity.getMagnitude() == 1.0
     assert loadBackQuantity.getUnits() == "kcal/mol/angstrom"
@@ -208,13 +208,13 @@ def test_TorqueQuantityDeclarations():
     assert torqueQuantity.getMagnitude() == 1.0
     assert torqueQuantity.getUnits() == "kcal/mol"
 
-    dictResult = torqueQuantity.to_dict()
-    assert dictResult["magnitude"] == 1.0
-    assert dictResult["units"] == "kcal/mol"
-    assert dictResult["class"] == "TorqueQuantity"
+    dict_result = torqueQuantity.to_dict()
+    assert dict_result["magnitude"] == 1.0
+    assert dict_result["units"] == "kcal/mol"
+    assert dict_result["class"] == "TorqueQuantity"
 
     loadBackQuantity = TorqueQuantity()
-    loadBackQuantity.from_dict(dictResult, version=0)
+    loadBackQuantity.from_dict(dict_result, version=0)
 
     assert loadBackQuantity.getMagnitude() == 1.0
     assert loadBackQuantity.getUnits() == "kcal/mol"

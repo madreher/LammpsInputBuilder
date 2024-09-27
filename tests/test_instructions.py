@@ -30,11 +30,11 @@ def test_instructions_SetTimestep():
     assert instruction.getInstructionName() == "defaultSetTimestep"
 
     info_real = GlobalInformation()
-    info_real.setUnitStyle(LammpsUnitSystem.REAL)
+    info_real.set_unit_style(LammpsUnitSystem.REAL)
     assert instruction.write_instruction(info_real) == "timestep 20.0\n"
 
     info_metal = GlobalInformation()
-    info_metal.setUnitStyle(LammpsUnitSystem.METAL)
+    info_metal.set_unit_style(LammpsUnitSystem.METAL)
     assert instruction.write_instruction(info_metal) == "timestep 0.02\n"
 
     obj_dict = instruction.to_dict()
@@ -58,7 +58,7 @@ def test_instruction_VelocityCreate():
     assert instruction.getInstructionName() == "defaultVelocityCreate"
 
     info_real = GlobalInformation()
-    info_real.setUnitStyle(LammpsUnitSystem.REAL)
+    info_real.set_unit_style(LammpsUnitSystem.REAL)
     assert instruction.write_instruction(info_real) == "velocity all create 300.0 12335 dist gaussian\n"
 
     obj_dict = instruction.to_dict()
@@ -114,10 +114,10 @@ def test_instruction_DisplaceAtoms():
     assert instruction.getInstructionName() == "defaultDisplaceAtoms"
 
     info_real = GlobalInformation()
-    info_real.setUnitStyle(LammpsUnitSystem.REAL)
+    info_real.set_unit_style(LammpsUnitSystem.REAL)
     assert instruction.write_instruction(info_real) == "displace_atoms all move 1.0 2.0 3.0\n"
     info_metal = GlobalInformation()
-    info_metal.setUnitStyle(LammpsUnitSystem.METAL)
+    info_metal.set_unit_style(LammpsUnitSystem.METAL)
     assert instruction.write_instruction(info_metal) == "displace_atoms all move 1.0 2.0 3.0\n"
 
 def test_instruction_Manual():

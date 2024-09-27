@@ -2,45 +2,45 @@ from lammpsinputbuilder.fileIO import *
 from lammpsinputbuilder.types import GlobalInformation
 
 def test_DumpTrajectoryFileIO():
-    obj = DumpTrajectoryFileIO(fileio_name="testFile", userFields=["a", "b", "c", "element"], addDefaultFields=True, interval=10, group=AllGroup())
+    obj = DumpTrajectoryFileIO(fileio_name="testFile", user_fields=["a", "b", "c", "element"], add_default_fields=True, interval=10, group=AllGroup())
     assert obj.getFileIOName() == "testFile"
-    assert obj.getUserFields() == ["a", "b", "c", "element"]
-    assert obj.getAddDefaultFields() == True
-    assert obj.getDefaultFields() == ["id", "type", "x", "y", "z"]
-    assert obj.getInterval() == 10
+    assert obj.get_user_fields() == ["a", "b", "c", "element"]
+    assert obj.get_add_default_fields() == True
+    assert obj.get_default_fields() == ["id", "type", "x", "y", "z"]
+    assert obj.get_interval() == 10
     assert obj.get_group_name() == AllGroup().get_group_name()
 
     dictObj = obj.to_dict()
     assert dictObj["class"] == "DumpTrajectoryFileIO"
     assert dictObj["fileio_name"] == "testFile"
-    assert dictObj["userFields"] == ["a", "b", "c", "element"]
-    assert dictObj["addDefaultFields"] == True
+    assert dictObj["user_fields"] == ["a", "b", "c", "element"]
+    assert dictObj["add_default_fields"] == True
     assert dictObj["interval"] == 10
     assert dictObj["group_name"] == AllGroup().get_group_name()
 
     obj2 = DumpTrajectoryFileIO()
     obj2.from_dict(dictObj, version=0)
     assert obj2.getFileIOName() == "testFile"
-    assert obj2.getUserFields() == ["a", "b", "c", "element"]
-    assert obj2.getAddDefaultFields() == True
-    assert obj2.getDefaultFields() == ["id", "type", "x", "y", "z"]
-    assert obj2.getInterval() == 10
+    assert obj2.get_user_fields() == ["a", "b", "c", "element"]
+    assert obj2.get_add_default_fields() == True
+    assert obj2.get_default_fields() == ["id", "type", "x", "y", "z"]
+    assert obj2.get_interval() == 10
     assert obj2.get_group_name() == AllGroup().get_group_name()
 
     info = GlobalInformation()
-    info.setElementTable({1: "H"})
-    doCmd = obj.add_do_commands(info)
-    cmds = doCmd.splitlines()
+    info.set_element_table({1: "H"})
+    do_cmd = obj.add_do_commands(info)
+    cmds = do_cmd.splitlines()
     assert cmds[0] == "dump testFile all custom 10 dump.testFile.lammpstrj id type x y z a b c element"
     assert cmds[1] == "dump_modify testFile sort id"
     assert cmds[2] == "dump_modify testFile element H"
-    undoCmd = obj.add_undo_commands()
-    assert undoCmd == "undump testFile\n"
+    undo_cmd = obj.add_undo_commands()
+    assert undo_cmd == "undump testFile\n"
 
 def test_ReaxBondFileIO():
     obj = ReaxBondFileIO(fileio_name="testFile", interval=10, group=AllGroup())
     assert obj.getFileIOName() == "testFile"
-    assert obj.getInterval() == 10
+    assert obj.get_interval() == 10
     assert obj.get_group_name() == AllGroup().get_group_name()
 
     dictObj = obj.to_dict()
@@ -52,7 +52,7 @@ def test_ReaxBondFileIO():
     obj2 = ReaxBondFileIO()
     obj2.from_dict(dictObj, version=0)
     assert obj2.getFileIOName() == "testFile"
-    assert obj2.getInterval() == 10
+    assert obj2.get_interval() == 10
     assert obj2.get_group_name() == AllGroup().get_group_name()
 
     info = GlobalInformation()
@@ -60,27 +60,27 @@ def test_ReaxBondFileIO():
     assert obj.add_undo_commands() == "unfix testFile\n"
 
 def test_ThermoFileIO():
-    obj = ThermoFileIO(fileio_name="testFile", addDefaultFields=True, interval=10, userFields=["a", "b", "c"])
+    obj = ThermoFileIO(fileio_name="testFile", add_default_fields=True, interval=10, user_fields=["a", "b", "c"])
     assert obj.getFileIOName() == "testFile"
-    assert obj.getAddDefaultFields() == True
-    assert obj.getDefaultFields() == ["step", "temp", "pe", "ke", "etotal", "press"]
-    assert obj.getInterval() == 10
-    assert obj.getUserFields() == ["a", "b", "c"]
+    assert obj.get_add_default_fields() == True
+    assert obj.get_default_fields() == ["step", "temp", "pe", "ke", "etotal", "press"]
+    assert obj.get_interval() == 10
+    assert obj.get_user_fields() == ["a", "b", "c"]
 
     dictObj = obj.to_dict()
     assert dictObj["class"] == "ThermoFileIO"
     assert dictObj["fileio_name"] == "testFile"
-    assert dictObj["addDefaultFields"] == True
+    assert dictObj["add_default_fields"] == True
     assert dictObj["interval"] == 10
-    assert dictObj["userFields"] == ["a", "b", "c"]
+    assert dictObj["user_fields"] == ["a", "b", "c"]
 
     obj2 = ThermoFileIO()
     obj2.from_dict(dictObj, version=0)
     assert obj2.getFileIOName() == "testFile"
-    assert obj2.getAddDefaultFields() == True
-    assert obj2.getDefaultFields() == ["step", "temp", "pe", "ke", "etotal", "press"]
-    assert obj2.getInterval() == 10
-    assert obj2.getUserFields() == ["a", "b", "c"]
+    assert obj2.get_add_default_fields() == True
+    assert obj2.get_default_fields() == ["step", "temp", "pe", "ke", "etotal", "press"]
+    assert obj2.get_interval() == 10
+    assert obj2.get_user_fields() == ["a", "b", "c"]
 
     info = GlobalInformation()
     cmds = obj.add_do_commands(info).splitlines()
@@ -89,25 +89,25 @@ def test_ThermoFileIO():
     assert obj.add_undo_commands() == ""
 
 def test_ManualFileIO():
-    obj = ManualFileIO(fileio_name="testFile", doCmd="startFile", undoCmd="endFile", associatedFilePath="testfile")
+    obj = ManualFileIO(fileio_name="testFile", do_cmd="startFile", undo_cmd="endFile", associated_file_path="testfile")
     assert obj.getFileIOName() == "testFile"
-    assert obj.getDoCmd() == "startFile"
-    assert obj.getUndoCmd() == "endFile"
-    assert obj.getAssociatedFilePath() == Path("testfile")
+    assert obj.get_do_cmd() == "startFile"
+    assert obj.get_undo_cmd() == "endFile"
+    assert obj.get_associated_file_path() == Path("testfile")
 
     dictObj = obj.to_dict()
     assert dictObj["class"] == "ManualFileIO"
     assert dictObj["fileio_name"] == "testFile"
-    assert dictObj["doCmd"] == "startFile"
-    assert dictObj["undoCmd"] == "endFile"
-    assert dictObj["associatedFilePath"] == "testfile"
+    assert dictObj["do_cmd"] == "startFile"
+    assert dictObj["undo_cmd"] == "endFile"
+    assert dictObj["associated_file_path"] == "testfile"
 
     obj2 = ManualFileIO()
     obj2.from_dict(dictObj, version=0)
     assert obj2.getFileIOName() == "testFile"
-    assert obj2.getDoCmd() == "startFile"
-    assert obj2.getUndoCmd() == "endFile"
-    assert obj2.getAssociatedFilePath() == Path("testfile")
+    assert obj2.get_do_cmd() == "startFile"
+    assert obj2.get_undo_cmd() == "endFile"
+    assert obj2.get_associated_file_path() == Path("testfile")
 
     info = GlobalInformation()
     assert obj.add_do_commands(info) == "startFile\n"

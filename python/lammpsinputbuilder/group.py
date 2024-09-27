@@ -243,29 +243,29 @@ class ManualGroup(Group):
     def __init__(
             self,
             group_name: str = "defaultManualGroup",
-            doCmd: str = "",
-            undoCmd: str = "") -> None:
+            do_cmd: str = "",
+            undo_cmd: str = "") -> None:
         super().__init__(group_name)
-        self.doCmd = doCmd
-        self.undoCmd = undoCmd
+        self.do_cmd = do_cmd
+        self.undo_cmd = undo_cmd
 
-    def getDoCmd(self) -> str:
-        return self.doCmd
+    def get_do_cmd(self) -> str:
+        return self.do_cmd
 
-    def setDoCmd(self, doCmd: str):
-        self.doCmd = doCmd
+    def set_do_cmd(self, do_cmd: str):
+        self.do_cmd = do_cmd
 
-    def getUndoCmd(self) -> str:
-        return self.undoCmd
+    def get_undo_cmd(self) -> str:
+        return self.undo_cmd
 
-    def setUndoCmd(self, undoCmd: str):
-        self.undoCmd = undoCmd
+    def set_undo_cmd(self, undo_cmd: str):
+        self.undo_cmd = undo_cmd
 
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["doCmd"] = self.doCmd
-        result["undoCmd"] = self.undoCmd
+        result["do_cmd"] = self.do_cmd
+        result["undo_cmd"] = self.undo_cmd
         return result
 
     def from_dict(self, d: dict, version: int):
@@ -274,17 +274,17 @@ class ManualGroup(Group):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().from_dict(d, version=version)
-        self.doCmd = d.get("doCmd", "")
-        self.undoCmd = d.get("undoCmd", "")
+        self.do_cmd = d.get("do_cmd", "")
+        self.undo_cmd = d.get("undo_cmd", "")
 
     def add_do_commands(self) -> str:
-        if self.doCmd.endswith("\n"):
-            return self.doCmd
+        if self.do_cmd.endswith("\n"):
+            return self.do_cmd
 
-        return self.doCmd + "\n"
+        return self.do_cmd + "\n"
 
     def add_undo_commands(self) -> str:
-        if self.undoCmd.endswith("\n"):
-            return self.undoCmd
+        if self.undo_cmd.endswith("\n"):
+            return self.undo_cmd
 
-        return self.undoCmd + "\n"
+        return self.undo_cmd + "\n"

@@ -67,7 +67,7 @@ def molecule_to_lammps_data_pbc(
     # Default cell, will be overwritten when rewritting the data file.
     atoms.set_cell([500, 500, 500])
 
-    global_information.setAtoms(atoms)
+    global_information.set_atoms(atoms)
 
     # Write a temporary data file which doesn't contain mass information yet
     temp_data_path = job_folder / (str(data_filename) + '.temp')
@@ -148,7 +148,7 @@ def molecule_to_lammps_data_pbc(
                 offset += 1
         if offset > len(lines) - 1:
             raise RuntimeError("Could not find zhi in LAMMPS data file")
-        global_information.setBBoxCoords(bbox_coords)
+        global_information.set_bbox_coords(bbox_coords)
 
         # Insert the masses in the data file so it doesn't have to be added
         # separatly in the script file
@@ -162,7 +162,7 @@ def molecule_to_lammps_data_pbc(
         f.write('\n')
         f.write('Atoms # full\n')
         f.write('\n')
-        global_information.setElementTable(element_map)
+        global_information.set_element_table(element_map)
 
         # Find the offset of the Atoms section
         for i in range(offset, len(lines)):
@@ -187,11 +187,11 @@ def molecule_to_lammps_input(
         forcefieldName: str,
         global_information: GlobalInformation,
         electrostaticMethod: ElectrostaticMethod) -> Path:
-    lammpsScriptFilePath = job_folder / lammpsScriptFileName
-    with open(lammpsScriptFilePath, "w") as f:
+    lammps_script_file_path = job_folder / lammpsScriptFileName
+    with open(lammps_script_file_path, "w") as f:
 
         # Extract the simulation box
-        cellDims = global_information.getBboxDims()
+        cellDims = global_information.get_bbox_dims()
         minCellDim = min([cellDims[0], cellDims[1], cellDims[2]])
 
         # Get back the list of elements
@@ -200,10 +200,10 @@ def molecule_to_lammps_input(
         script_content = "# -*- mode: lammps -*-\n"
         if ffType == Forcefield.REAX:
             script_content += 'units          real\n'
-            global_information.setUnitStyle(LammpsUnitSystem.REAL)
+            global_information.set_unit_style(LammpsUnitSystem.REAL)
         elif ffType in [Forcefield.AIREBO, Forcefield.REBO, Forcefield.AIREBOM]:
             script_content += 'units          metal\n'
-            global_information.setUnitStyle(LammpsUnitSystem.METAL)
+            global_information.set_unit_style(LammpsUnitSystem.METAL)
         else:
             raise NotImplementedError(f"Forcefield {ffType} not supported")
         script_content += 'atom_style     full\n'
@@ -260,4 +260,4 @@ def molecule_to_lammps_input(
 
         f.write(script_content)
 
-        return lammpsScriptFilePath
+        return lammps_script_file_path

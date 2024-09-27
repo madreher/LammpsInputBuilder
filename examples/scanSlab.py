@@ -81,7 +81,7 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     )
     typedMolecule.loadFromFile(modelData, forcefield)
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Selection of 1-based indices, extracted from scanSelections.json
     if model == "passivated":
@@ -126,7 +126,7 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     globalSection.add_section(sectionMinimization)
 
     sectionFinalState = IntegratorSection(section_name="FinalSection", integrator=RunZeroIntegrator())
-    finalDump = DumpTrajectoryFileIO(fileio_name="finalState", style=DumpStyle.CUSTOM, interval=1, group=AllGroup(), userFields=["id", "type", "element", "x", "y", "z"])
+    finalDump = DumpTrajectoryFileIO(fileio_name="finalState", style=DumpStyle.CUSTOM, interval=1, group=AllGroup(), user_fields=["id", "type", "element", "x", "y", "z"])
     finalBond = ReaxBondFileIO(fileio_name="finalState", interval=1, group=AllGroup())
     sectionFinalState.add_fileio(finalDump)
     sectionFinalState.add_fileio(finalBond)
@@ -136,20 +136,20 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     workflow.add_section(globalSection)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
     logger.info(f"Minimization inputs generated in the job folder: {job_folder}")
 
     # Run the workflow
     subprocess.run("mpirun -np 1 " + str(lmpExecPath) + " -in " + str(job_folder / "workflow.input"), shell=True, check=True, capture_output=True, cwd=job_folder)
 
     # Check that the final position state exists
-    if not (job_folder / finalDump.getAssociatedFilePath()).exists():
-        raise FileNotFoundError(f"Could not find the final dump file at {job_folder / finalDump.getAssociatedFilePath()}")
+    if not (job_folder / finalDump.get_associated_file_path()).exists():
+        raise FileNotFoundError(f"Could not find the final dump file at {job_folder / finalDump.get_associated_file_path()}")
 
-    if not (job_folder / finalBond.getAssociatedFilePath()).exists():
-        raise FileNotFoundError(f"Could not find the final bond file at {job_folder / finalBond.getAssociatedFilePath()}")
+    if not (job_folder / finalBond.get_associated_file_path()).exists():
+        raise FileNotFoundError(f"Could not find the final bond file at {job_folder / finalBond.get_associated_file_path()}")
     
-    return job_folder / finalDump.getAssociatedFilePath()
+    return job_folder / finalDump.get_associated_file_path()
 
 def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xydelta:float):
 
@@ -217,7 +217,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
 
     # Now that we have the target positions, we can prepare the lammps script
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Create the groups 
     groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
@@ -251,11 +251,11 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
                                                                         dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="angstrom"),
                                                                         dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="angstrom")))
         speSection = IntegratorSection(section_name="SPESection", integrator=RunZeroIntegrator())
-        dumpIO = DumpTrajectoryFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, userFields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
-        trajectoryFiles.append(dumpIO.getAssociatedFilePath())
+        dumpIO = DumpTrajectoryFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, user_fields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
+        trajectoryFiles.append(dumpIO.get_associated_file_path())
         bondIO = ReaxBondFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
-        bondFiles.append(bondIO.getAssociatedFilePath())
-        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, userFields=typedMolecule.getDefaultThermoVariables())
+        bondFiles.append(bondIO.get_associated_file_path())
+        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.getDefaultThermoVariables())
         speSection.add_fileio(dumpIO)
         speSection.add_fileio(bondIO)
         speSection.add_fileio(thermoIO)
@@ -273,7 +273,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
     workflow.add_section(globalSection)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
     logger.info(f"Scan inputs generated in the job folder: {job_folder}")
 
     # Run the workflow

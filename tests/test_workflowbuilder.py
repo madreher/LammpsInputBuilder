@@ -25,21 +25,21 @@ def test_workflowBuilder():
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Create a NVE Section
     section = IntegratorSection(integrator=NVEIntegrator())
-    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
+    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", add_default_fields=True, interval=10, group=AllGroup())
     section.add_fileio(pos)
     bonds = ReaxBondFileIO(fileio_name="bonds", interval=10, group=AllGroup())
     section.add_fileio(bonds)
-    thermo = ThermoFileIO(fileio_name="thermo", addDefaultFields=True, interval=10)
+    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=10)
     section.add_fileio(thermo)
 
     workflow.add_section(section)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
 
     assert job_folder is not None
     assert (job_folder / "molecule.XYZ").is_file()

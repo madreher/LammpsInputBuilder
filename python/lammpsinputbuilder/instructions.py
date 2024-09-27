@@ -96,7 +96,7 @@ class SetTimestepInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
-        return f"timestep {self.timestep.convertTo(global_information.getUnitStyle())}\n"
+        return f"timestep {self.timestep.convertTo(global_information.get_unit_style())}\n"
 
 
 class VelocityCreateInstruction(Instruction):
@@ -147,7 +147,7 @@ class VelocityCreateInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
-        return f"velocity {self.group} create {self.temp.convertTo(global_information.getUnitStyle())} {self.seed} dist gaussian\n"
+        return f"velocity {self.group} create {self.temp.convertTo(global_information.get_unit_style())} {self.seed} dist gaussian\n"
 
 
 class VariableStyle(Enum):
@@ -303,7 +303,7 @@ class DisplaceAtomsInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
-        return f"displace_atoms {self.group} move {self.dx.convertTo(global_information.getUnitStyle())} {self.dy.convertTo(global_information.getUnitStyle())} {self.dz.convertTo(global_information.getUnitStyle())}\n"
+        return f"displace_atoms {self.group} move {self.dx.convertTo(global_information.get_unit_style())} {self.dy.convertTo(global_information.get_unit_style())} {self.dz.convertTo(global_information.get_unit_style())}\n"
 
 
 class ManualInstruction(Instruction):

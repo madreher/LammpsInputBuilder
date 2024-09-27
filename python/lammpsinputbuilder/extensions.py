@@ -59,10 +59,10 @@ class LangevinExtension(Extension):
         return result
 
     def from_dict(self, d: dict, version: int):
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
         self.group = d.get("group", AllGroup().get_group_name())
         self.startTemp = TemperatureQuantity()
@@ -74,7 +74,7 @@ class LangevinExtension(Extension):
         self.seed = d.get("seed", 122345)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return f"fix {self.extension_name} {self.group} langevin {self.startTemp.convertTo(global_information.getUnitStyle())} {self.endTemp.convertTo(global_information.getUnitStyle())} {self.damp.convertTo(global_information.getUnitStyle())} {self.seed}\n"
+        return f"fix {self.extension_name} {self.group} langevin {self.startTemp.convertTo(global_information.get_unit_style())} {self.endTemp.convertTo(global_information.get_unit_style())} {self.damp.convertTo(global_information.get_unit_style())} {self.seed}\n"
 
     def add_undo_commands(self) -> str:
         return f"unfix {self.extension_name}\n"
@@ -110,10 +110,10 @@ class SetForceExtension(Extension):
         return result
 
     def from_dict(self, d: dict, version: int):
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
         self.group = d.get("group", AllGroup().get_group_name())
         self.fx = ForceQuantity()
@@ -124,7 +124,7 @@ class SetForceExtension(Extension):
         self.fz.from_dict(d["fz"], version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return f"fix {self.extension_name} {self.group} setforce {self.fx.convertTo(global_information.getUnitStyle())} {self.fy.convertTo(global_information.getUnitStyle())} {self.fz.convertTo(global_information.getUnitStyle())}\n"
+        return f"fix {self.extension_name} {self.group} setforce {self.fx.convertTo(global_information.get_unit_style())} {self.fy.convertTo(global_information.get_unit_style())} {self.fz.convertTo(global_information.get_unit_style())}\n"
 
     def add_undo_commands(self) -> str:
         return f"unfix {self.extension_name}\n"
@@ -160,10 +160,10 @@ class MoveExtension(Extension):
         return result
 
     def from_dict(self, d: dict, version: int):
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
         self.group = d.get("group", AllGroup().get_group_name())
         self.vx = VelocityQuantity()
@@ -174,7 +174,7 @@ class MoveExtension(Extension):
         self.vz.from_dict(d["vz"], version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return f"fix {self.extension_name} {self.group} move linear {self.vx.convertTo(global_information.getUnitStyle())} {self.vy.convertTo(global_information.getUnitStyle())} {self.vz.convertTo(global_information.getUnitStyle())}\n"
+        return f"fix {self.extension_name} {self.group} move linear {self.vx.convertTo(global_information.get_unit_style())} {self.vy.convertTo(global_information.get_unit_style())} {self.vz.convertTo(global_information.get_unit_style())}\n"
 
     def add_undo_commands(self) -> str:
         return f"unfix {self.extension_name}\n"
@@ -192,10 +192,10 @@ class InstructionExtension(Extension):
         return result
 
     def from_dict(self, d: dict, version: int):
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
 
         from lammpsinputbuilder.loader.instructionLoader import InstructionLoader
@@ -215,36 +215,36 @@ class ManualExtension(Extension):
     def __init__(
             self,
             extension_name: str = "defaultManualExtension",
-            doCmd: str = "",
-            undoCmd: str = "") -> None:
+            do_cmd: str = "",
+            undo_cmd: str = "") -> None:
         super().__init__(extension_name=extension_name)
-        self.doCmd = doCmd
-        self.undoCmd = undoCmd
+        self.do_cmd = do_cmd
+        self.undo_cmd = undo_cmd
 
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["doCmd"] = self.doCmd
-        result["undoCmd"] = self.undoCmd
+        result["do_cmd"] = self.do_cmd
+        result["undo_cmd"] = self.undo_cmd
         return result
 
     def from_dict(self, d: dict, version: int):
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
-        self.doCmd = d.get("doCmd", "")
-        self.undoCmd = d.get("undoCmd", "")
+        self.do_cmd = d.get("do_cmd", "")
+        self.undo_cmd = d.get("undo_cmd", "")
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        if self.doCmd.endswith("\n"):
-            return self.doCmd
+        if self.do_cmd.endswith("\n"):
+            return self.do_cmd
         else:
-            return self.doCmd + "\n"
+            return self.do_cmd + "\n"
 
     def add_undo_commands(self) -> str:
-        if self.undoCmd.endswith("\n"):
-            return self.undoCmd
+        if self.undo_cmd.endswith("\n"):
+            return self.undo_cmd
         else:
-            return self.undoCmd + "\n"
+            return self.undo_cmd + "\n"

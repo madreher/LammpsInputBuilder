@@ -35,7 +35,7 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Create a minimization Section 
     sectionMin = IntegratorSection(
@@ -49,7 +49,7 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
     workflow.add_section(sectionMin)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
 ```
 
 ## How does a Workflow work?
@@ -190,7 +190,7 @@ from lammpsinputbuilder.quantities import TimeQuantity, LammpsUnitSystem
 
 instruction = SetTimestepInstruction(instruction_name="defaultSetTimestep", timestep=TimeQuantity(20, "fs"))
 info_real = GlobalInformation()
-info_real.setUnitStyle(LammpsUnitSystem.REAL)
+info_real.set_unit_style(LammpsUnitSystem.REAL)
 print(instruction.write_instruction(info_real))
 ```
 
@@ -293,7 +293,7 @@ The first step is to declare a model and assign a forcefield to it. In this exam
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 ```
 
 The `ReaxTypedMolecularSystem` object represents the molecular system with its settings. Currently, we only need to setup the periodic condition style and the partial charges method. Additional settings may become available in the future. Once the `TypedMolecularSystem` object is created and initialized, it can be added to a `WorkflowBuilder` object. With this base, we can start to add `Section` objects to the workflow.
@@ -359,11 +359,11 @@ To complete this example, we are going to run an equilibration phase at 300K wit
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
-    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
+    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", add_default_fields=True, interval=10, group=AllGroup())
     sectionNVE.add_fileio(pos)
     bonds = ReaxBondFileIO(fileio_name="bonds", interval=10, group=AllGroup())
     sectionNVE.add_fileio(bonds)
-    thermo = ThermoFileIO(fileio_name="thermo", addDefaultFields=True, interval=10)
+    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=10)
     sectionNVE.add_fileio(thermo)
 
     workflow.add_section(sectionNVE)
@@ -373,7 +373,7 @@ Just like `Extension` objects, the `FileIO` objects are added to their respectiv
 Now that all the phases are declared and added to the workflow, the Lammps inputs can be generated as follow:
 ```
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
 
     logger.info(f"Inputs generated in the job folder: {job_folder}")
 
@@ -409,7 +409,7 @@ With this being done, we can start to load the molecular model with LammpsInputG
     )
     typedMolecule.loadFromFile(xyzPath, forcefield)
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 ```
 
 #### Phase 1: Minimization
@@ -447,7 +447,7 @@ The molecular system XYZ coordinates need to be adjusted to lower the initial en
     globalSection.add_section(sectionMinimization)
 
     sectionFinalState = IntegratorSection(section_name="FinalSection", integrator=RunZeroIntegrator())
-    finalDump = DumpTrajectoryFileIO(fileio_name="finalState", style=DumpStyle.CUSTOM, interval=1, group=AllGroup(), userFields=["id", "type", "element", "x", "y", "z"])
+    finalDump = DumpTrajectoryFileIO(fileio_name="finalState", style=DumpStyle.CUSTOM, interval=1, group=AllGroup(), user_fields=["id", "type", "element", "x", "y", "z"])
     finalBond = ReaxBondFileIO(fileio_name="finalState", interval=1, group=AllGroup())
     sectionFinalState.add_fileio(finalDump)
     sectionFinalState.add_fileio(finalBond)
@@ -457,10 +457,10 @@ The molecular system XYZ coordinates need to be adjusted to lower the initial en
     workflow.add_section(globalSection)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
 
     # Get the final XYZ state
-    finalXYZ = finalDump.getAssociatedFilePath()
+    finalXYZ = finalDump.get_associated_file_path()
 ```
 Setting up the minimization is done in several phases:
 - Define the different list of indices corresponding to our selections
@@ -527,7 +527,7 @@ During the generation of the grid, we save the corresponding tooltip positions f
 ```
     # Now that we have the target positions, we can prepare the lammps script
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Create the groups 
     groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
@@ -559,11 +559,11 @@ During the generation of the grid, we save the corresponding tooltip positions f
                                                                         dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="lmp_real_length"),
                                                                         dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="lmp_real_length")))
         speSection = IntegratorSection(section_name="SPESection", integrator=RunZeroIntegrator())
-        dumpIO = DumpTrajectoryFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, userFields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
-        trajectoryFiles.append(dumpIO.getAssociatedFilePath())
+        dumpIO = DumpTrajectoryFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, user_fields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
+        trajectoryFiles.append(dumpIO.get_associated_file_path())
         bondIO = ReaxBondFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
-        bondFiles.append(bondIO.getAssociatedFilePath())
-        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, userFields=typedMolecule.getDefaultThermoVariables())
+        bondFiles.append(bondIO.get_associated_file_path())
+        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.getDefaultThermoVariables())
         speSection.add_fileio(dumpIO)
         speSection.add_fileio(bondIO)
         speSection.add_fileio(thermoIO)
@@ -581,7 +581,7 @@ During the generation of the grid, we save the corresponding tooltip positions f
     workflow.add_section(globalSection)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
     logger.info(f"Scan inputs generated in the job folder: {job_folder}")
 ```
 The important part of this workflow is within the for loop. For each coordinate, we create a `Section` which will displace the tooltip to the right position, perform a single point energy calculation to calculate the potential energy of the system as well as get the bond pairs from reax. Once this is done, we displace back the tooltip to its original position. 

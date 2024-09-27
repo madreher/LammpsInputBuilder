@@ -99,23 +99,23 @@ def test_OperationGroup():
         grp5 = OperationGroup( group_name="myOperationGroup", op = OperationGroupEnum.UNION, otherGroups=[])
 
 def test_ManualGroup():
-    grp = ManualGroup( group_name="myManualGroup", doCmd="myDoCmd", undoCmd="myUndoCmd")
+    grp = ManualGroup( group_name="myManualGroup", do_cmd="my_do_cmd", undo_cmd="my_undo_cmd")
 
     assert grp.get_group_name() == "myManualGroup"
-    assert grp.getDoCmd() == "myDoCmd"
-    assert grp.getUndoCmd() == "myUndoCmd"
+    assert grp.get_do_cmd() == "my_do_cmd"
+    assert grp.get_undo_cmd() == "my_undo_cmd"
 
-    assert grp.add_do_commands() == "myDoCmd\n"
-    assert grp.add_undo_commands() == "myUndoCmd\n"
+    assert grp.add_do_commands() == "my_do_cmd\n"
+    assert grp.add_undo_commands() == "my_undo_cmd\n"
 
     obj_dict = grp.to_dict()
     assert obj_dict["group_name"] == "myManualGroup"
-    assert obj_dict["doCmd"] == "myDoCmd"
-    assert obj_dict["undoCmd"] == "myUndoCmd"
+    assert obj_dict["do_cmd"] == "my_do_cmd"
+    assert obj_dict["undo_cmd"] == "my_undo_cmd"
     assert obj_dict["class"] == "ManualGroup"
 
     grp2 = ManualGroup()
     grp2.from_dict(obj_dict, version=0)
     assert grp2.get_group_name() == "myManualGroup"
-    assert grp2.getDoCmd() == "myDoCmd"
-    assert grp2.getUndoCmd() == "myUndoCmd"
+    assert grp2.get_do_cmd() == "my_do_cmd"
+    assert grp2.get_undo_cmd() == "my_undo_cmd"

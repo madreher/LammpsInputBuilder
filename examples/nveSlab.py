@@ -32,7 +32,7 @@ def main():
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Selection of 1-based indices, extracted from scanSelections.json
     indicesTooltip = [312, 313, 314, 315, 316, 317,
@@ -86,10 +86,10 @@ def main():
         integrator_name="NVE", group=groupFree, nbSteps=1000))
     # Declare the IOs for the entire workflow, will split into 2 trajectory later
     thermoTrajectory = ThermoFileIO(
-        fileio_name="nve", addDefaultFields=True, interval=50)
-    thermoTrajectory.setUserFields(typedMolecule.getDefaultThermoVariables())
+        fileio_name="nve", add_default_fields=True, interval=50)
+    thermoTrajectory.set_user_fields(typedMolecule.getDefaultThermoVariables())
     dumpTrajectory = DumpTrajectoryFileIO(
-        fileio_name="nve", addDefaultFields=True, interval=50, group=AllGroup())
+        fileio_name="nve", add_default_fields=True, interval=50, group=AllGroup())
     reaxBond = ReaxBondFileIO(fileio_name="nve", interval=50, group=AllGroup())
     sectionNVE.add_fileio(dumpTrajectory)
     sectionNVE.add_fileio(reaxBond)
@@ -113,7 +113,7 @@ def main():
     workflow.add_section(globalSection)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
     print(f"Inputs generated in the job folder: {job_folder}")
 
     return

@@ -34,7 +34,7 @@ def main():
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Create a minimization Section 
     sectionMin = IntegratorSection(
@@ -80,18 +80,18 @@ def main():
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
-    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
+    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", add_default_fields=True, interval=10, group=AllGroup())
     sectionNVE.add_fileio(pos)
     bonds = ReaxBondFileIO(fileio_name="bonds", interval=10, group=AllGroup())
     sectionNVE.add_fileio(bonds)
-    thermo = ThermoFileIO(fileio_name="thermo", addDefaultFields=True, interval=10, userFields=typedMolecule.getDefaultThermoVariables())
+    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=10, user_fields=typedMolecule.getDefaultThermoVariables())
     sectionNVE.add_fileio(thermo)
 
     workflow.add_section(sectionNVE)
 
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
 
     logger.info(f"Inputs generated in the job folder: {job_folder}")
 

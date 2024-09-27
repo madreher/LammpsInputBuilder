@@ -97,10 +97,10 @@ class ForceQuantity(LIBQuantity):
         self.validateDimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version=version)
         self.validateDimensionality()
 
@@ -125,10 +125,10 @@ class TemperatureQuantity(LIBQuantity):
         self.validateDimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version=version)
         self.validateDimensionality()
 
@@ -156,10 +156,10 @@ class TorqueQuantity(LIBQuantity):
         self.validateDimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version=version)
         self.validateDimensionality()
 
@@ -184,10 +184,10 @@ class TimeQuantity(LIBQuantity):
         self.validateDimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version=version)
         self.validateDimensionality()
 
@@ -215,10 +215,10 @@ class EnergyQuantity(LIBQuantity):
         self.validateDimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version=version)
         self.validateDimensionality()
 
@@ -242,10 +242,10 @@ class LengthQuantity(LIBQuantity):
         self.validateDimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version=version)
         self.validateDimensionality()
 
@@ -270,10 +270,10 @@ class VelocityQuantity(LIBQuantity):
         self.validateDimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        className = d.get("class", "")
-        if className != self.__class__.__name__:
+        class_name = d.get("class", "")
+        if class_name != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {className}.")
+                f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version=version)
         self.validateDimensionality()
 

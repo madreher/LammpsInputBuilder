@@ -29,10 +29,10 @@ def main():
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Generate the inputs
-    job_folder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
 
     logger.info(f"Inputs generated in the job folder: {job_folder}")
 

@@ -7,13 +7,13 @@ from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 
 class Forcefield(Enum):
-    REAX = 1,
-    AIREBO = 2,
-    REBO = 3,
+    REAX = 1
+    AIREBO = 2
+    REBO = 3
     AIREBOM = 4
 
 
-def getForcefieldFromExtension(extension: str) -> Forcefield:
+def get_forcefield_from_extension(extension: str) -> Forcefield:
     if extension.lower() == ".reax":
         return Forcefield.REAX
     elif extension.lower() == ".airebo":
@@ -26,7 +26,7 @@ def getForcefieldFromExtension(extension: str) -> Forcefield:
         raise NotImplementedError(f"Forcefield {extension} not supported.")
 
 
-def getExtensionFromForcefield(forcefield: Forcefield) -> str:
+def get_extension_from_forcefield(forcefield: Forcefield) -> str:
     if forcefield == Forcefield.REAX:
         return ".reax"
     elif forcefield == Forcefield.AIREBO:
@@ -40,17 +40,17 @@ def getExtensionFromForcefield(forcefield: Forcefield) -> str:
 
 
 class BoundingBoxStyle(Enum):
-    PERIODIC = 1,
+    PERIODIC = 1
     SHRINK = 2
 
 
 class MoleculeFileFormat(Enum):
-    XYZ = 1,
-    MOL2 = 2,
+    XYZ = 1
+    MOL2 = 2
     LAMMPS_DUMP_TEXT = 3
 
 
-def getMoleculeFileFormatFromExtension(extension: str) -> MoleculeFileFormat:
+def get_molecule_file_format_from_extension(extension: str) -> MoleculeFileFormat:
     if extension.lower() == ".xyz":
         return MoleculeFileFormat.XYZ
     elif extension.lower() == ".mol2":
@@ -62,7 +62,7 @@ def getMoleculeFileFormatFromExtension(extension: str) -> MoleculeFileFormat:
             f"Molecule format {extension} not supported.")
 
 
-def getExtensionFromMoleculeFileFormat(
+def get_extension_from_molecule_file_format(
         molecule_file_format: MoleculeFileFormat) -> str:
     if molecule_file_format == MoleculeFileFormat.XYZ:
         return ".xyz"
@@ -74,7 +74,7 @@ def getExtensionFromMoleculeFileFormat(
 
 
 class ElectrostaticMethod(Enum):
-    ACKS2 = 1,
+    ACKS2 = 1
     QEQ = 2
 
 
@@ -87,9 +87,10 @@ class MoleculeHolder():
         self.atoms = atoms
         if len(bbox_coords) != 6:
             raise ValueError(
-                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bbox_coords)) + ")")
+                "Invalid number of bounding box coordinates (6 expected, received " + 
+                str(len(bbox_coords)) + ")")
         self.bbox_coords = bbox_coords
-        self.bboxDims = [
+        self.bbox_dims = [
             bbox_coords[1] -
             bbox_coords[0],
             bbox_coords[3] -
@@ -97,36 +98,37 @@ class MoleculeHolder():
             bbox_coords[5] -
             bbox_coords[4]]
 
-    def getAtoms(self) -> Atoms:
+    def get_atoms(self) -> Atoms:
         return self.atoms
 
-    def getBboxCoords(self) -> List:
+    def get_bbox_coords(self) -> List:
         return self.bbox_coords
 
-    def getBboxDims(self) -> List:
-        return self.bboxDims
+    def get_bbox_dims(self) -> List:
+        return self.bbox_dims
 
 
 class GlobalInformation:
     def __init__(self) -> None:
-        self.unitStyle = None
-        self.elementTable = {}
+        self.unit_style = None
+        self.element_table = {}
         self.atoms = None
         self.bbox_coords = None
-        self.bboxDims = None
+        self.bbox_dims = None
 
-    def setAtoms(self, atoms: Atoms):
+    def set_atoms(self, atoms: Atoms):
         self.atoms = atoms
 
-    def getAtoms(self) -> Atoms:
+    def get_atoms(self) -> Atoms:
         return self.atoms
 
-    def setBBoxCoords(self, bbox_coords: List):
+    def set_bbox_coords(self, bbox_coords: List[float]):
         if len(bbox_coords) != 6:
             raise ValueError(
-                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bbox_coords)) + ")")
+                "Invalid number of bounding box coordinates (6 expected, received " + 
+                str(len(bbox_coords)) + ")")
         self.bbox_coords = bbox_coords
-        self.bboxDims = [
+        self.bbox_dims = [
             bbox_coords[1] -
             bbox_coords[0],
             bbox_coords[3] -
@@ -134,20 +136,20 @@ class GlobalInformation:
             bbox_coords[5] -
             bbox_coords[4]]
 
-    def getBBoxCoords(self) -> List:
+    def get_bbox_coords(self) -> List:
         return self.bbox_coords
 
-    def getBboxDims(self) -> List:
-        return self.bboxDims
+    def get_bbox_dims(self) -> List:
+        return self.bbox_dims
 
-    def setUnitStyle(self, unitStyle: LammpsUnitSystem):
-        self.unitStyle = unitStyle
+    def set_unit_style(self, unit_style: LammpsUnitSystem):
+        self.unit_style = unit_style
 
-    def getUnitStyle(self) -> LammpsUnitSystem:
-        return self.unitStyle
+    def get_unit_style(self) -> LammpsUnitSystem:
+        return self.unit_style
 
-    def setElementTable(self, elementTable: dict):
-        self.elementTable = elementTable
+    def set_element_table(self, element_table: dict):
+        self.element_table = element_table
 
-    def getElementTable(self) -> dict:
-        return self.elementTable
+    def get_element_table(self) -> dict:
+        return self.element_table

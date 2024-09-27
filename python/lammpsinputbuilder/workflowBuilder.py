@@ -18,23 +18,23 @@ class WorkflowBuilder:
         self.molecule = None
         self.sections = []
 
-    def setTypedMolecularSystem(self, molecule: TypedMolecularSystem):
+    def set_typed_molecular_system(self, molecule: TypedMolecularSystem):
         if not molecule.isModelLoaded():
             raise ValueError(
                 "The molecule must be loaded before it can be set.")
         self.molecule = molecule
 
-    def getTypedMolecularSystem(self) -> TypedMolecularSystem:
+    def get_typed_molecular_system(self) -> TypedMolecularSystem:
         return self.molecule
 
     def add_section(self, section: Section):
         self.sections.append(section)
 
-    def generateInputs(self, job_folder_prefix: Path = None) -> Path:
+    def generate_inputs(self, job_folder_prefix: Path = None) -> Path:
 
         if self.molecule is None:
             raise ValueError(
-                "A molecule must be set before generating the input files. See setTypedMolecularSystem().")
+                "A molecule must be set before generating the input files. See set_typed_molecular_system().")
 
         job_id = str(uuid4())
 
@@ -48,7 +48,7 @@ class WorkflowBuilder:
 
         # Write the initial Lammps files
         global_information = self.molecule.generateLammpsDataFile(job_folder)
-        inputPath = self.molecule.generateLammpsInputFile(
+        input_path = self.molecule.generateLammpsInputFile(
             job_folder, global_information)
 
         # System is now declared, we can add sections to the input file
@@ -56,15 +56,15 @@ class WorkflowBuilder:
         # First, we are going to copy the initial input file to a new file
         # This is to preserve the input file with the system declaration only
         # to help with debugging or additional manual analysis from the user
-        workflowInputPath = job_folder / "workflow.input"
-        shutil.copy(inputPath, workflowInputPath)
+        workflow_input_path = job_folder / "workflow.input"
+        shutil.copy(input_path, workflow_input_path)
 
         # Now we can add the sections
-        sectionContent = ""
+        section_content = ""
         for section in self.sections:
-            sectionContent += section.add_all_commands(global_information)
+            section_content += section.add_all_commands(global_information)
 
-        with open(workflowInputPath, "a") as f:
-            f.write(sectionContent)
+        with open(workflow_input_path, "a") as f:
+            f.write(section_content)
 
         return job_folder
