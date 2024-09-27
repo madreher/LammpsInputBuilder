@@ -8,7 +8,7 @@ import logging
 import tempfile
 
 logger = logging.getLogger(__name__)
-    
+
 
 class WorkflowBuilder:
 
@@ -18,20 +18,22 @@ class WorkflowBuilder:
 
     def setTypedMolecularSystem(self, molecule: TypedMolecularSystem):
         if not molecule.isModelLoaded():
-            raise ValueError("The molecule must be loaded before it can be set.")
+            raise ValueError(
+                "The molecule must be loaded before it can be set.")
         self.molecule = molecule
 
     def getTypedMolecularSystem(self) -> TypedMolecularSystem:
         return self.molecule
-    
+
     def addSection(self, section: Section):
         self.sections.append(section)
-    
+
     def generateInputs(self, jobFolderPrefix: Path = None) -> Path:
 
         if self.molecule is None:
-            raise ValueError("A molecule must be set before generating the input files. See setTypedMolecularSystem().")
-        
+            raise ValueError(
+                "A molecule must be set before generating the input files. See setTypedMolecularSystem().")
+
         jobID = str(uuid4())
 
         prefix = jobFolderPrefix
@@ -44,12 +46,13 @@ class WorkflowBuilder:
 
         # Write the initial Lammps files
         globalInformation = self.molecule.generateLammpsDataFile(jobFolder)
-        inputPath = self.molecule.generateLammpsInputFile(jobFolder, globalInformation)
+        inputPath = self.molecule.generateLammpsInputFile(
+            jobFolder, globalInformation)
 
         # System is now declared, we can add sections to the input file
 
         # First, we are going to copy the initial input file to a new file
-        # This is to preserve the input file with the system declaration only 
+        # This is to preserve the input file with the system declaration only
         # to help with debugging or additional manual analysis from the user
         workflowInputPath = jobFolder / "workflow.input"
         shutil.copy(inputPath, workflowInputPath)

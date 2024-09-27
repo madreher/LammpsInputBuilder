@@ -1,13 +1,15 @@
 from enum import Enum
-from typing import List 
+from typing import List
 from ase import Atoms
 from lammpsinputbuilder.quantities import LammpsUnitSystem
+
 
 class Forcefield(Enum):
     REAX = 1,
     AIREBO = 2,
     REBO = 3,
     AIREBOM = 4
+
 
 def getForcefieldFromExtension(extension: str) -> Forcefield:
     if extension.lower() == ".reax":
@@ -20,7 +22,8 @@ def getForcefieldFromExtension(extension: str) -> Forcefield:
         return Forcefield.AIREBOM
     else:
         raise NotImplementedError(f"Forcefield {extension} not supported.")
-    
+
+
 def getExtensionFromForcefield(forcefield: Forcefield) -> str:
     if forcefield == Forcefield.REAX:
         return ".reax"
@@ -33,14 +36,17 @@ def getExtensionFromForcefield(forcefield: Forcefield) -> str:
     else:
         raise NotImplementedError(f"Forcefield {forcefield} not supported.")
 
+
 class BoundingBoxStyle(Enum):
     PERIODIC = 1,
     SHRINK = 2
 
+
 class MoleculeFileFormat(Enum):
     XYZ = 1,
-    MOL2 = 2, 
+    MOL2 = 2,
     LAMMPS_DUMP_TEXT = 3
+
 
 def getMoleculeFileFormatFromExtension(extension: str) -> MoleculeFileFormat:
     if extension.lower() == ".xyz":
@@ -50,30 +56,44 @@ def getMoleculeFileFormatFromExtension(extension: str) -> MoleculeFileFormat:
     elif extension.lower() == ".lammpstrj":
         return MoleculeFileFormat.LAMMPS_DUMP_TEXT
     else:
-        raise NotImplementedError(f"Molecule format {extension} not supported.")
-    
-def getExtensionFromMoleculeFileFormat(moleculeFileFormat: MoleculeFileFormat) -> str:
+        raise NotImplementedError(
+            f"Molecule format {extension} not supported.")
+
+
+def getExtensionFromMoleculeFileFormat(
+        moleculeFileFormat: MoleculeFileFormat) -> str:
     if moleculeFileFormat == MoleculeFileFormat.XYZ:
         return ".xyz"
     elif moleculeFileFormat == MoleculeFileFormat.MOL2:
         return ".mol2"
     else:
-        raise NotImplementedError(f"Molecule format {moleculeFileFormat} not supported.")
+        raise NotImplementedError(
+            f"Molecule format {moleculeFileFormat} not supported.")
+
 
 class ElectrostaticMethod(Enum):
     ACKS2 = 1,
     QEQ = 2
 
+
 class MoleculeHolder():
     """
     Class used to store the molecule information
     """
+
     def __init__(self, atoms: Atoms, bboxCoords: List) -> None:
         self.atoms = atoms
         if len(bboxCoords) != 6:
-            raise ValueError("Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
+            raise ValueError(
+                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
         self.bboxCoords = bboxCoords
-        self.bboxDims = [bboxCoords[1] - bboxCoords[0], bboxCoords[3] - bboxCoords[2], bboxCoords[5] - bboxCoords[4]]
+        self.bboxDims = [
+            bboxCoords[1] -
+            bboxCoords[0],
+            bboxCoords[3] -
+            bboxCoords[2],
+            bboxCoords[5] -
+            bboxCoords[4]]
 
     def getAtoms(self) -> Atoms:
         return self.atoms
@@ -83,7 +103,8 @@ class MoleculeHolder():
 
     def getBboxDims(self) -> List:
         return self.bboxDims
-    
+
+
 class GlobalInformation:
     def __init__(self) -> None:
         self.unitStyle = None
@@ -97,25 +118,32 @@ class GlobalInformation:
 
     def getAtoms(self) -> Atoms:
         return self.atoms
-    
+
     def setBBoxCoords(self, bboxCoords: List):
         if len(bboxCoords) != 6:
-            raise ValueError("Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
+            raise ValueError(
+                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
         self.bboxCoords = bboxCoords
-        self.bboxDims = [bboxCoords[1] - bboxCoords[0], bboxCoords[3] - bboxCoords[2], bboxCoords[5] - bboxCoords[4]]
+        self.bboxDims = [
+            bboxCoords[1] -
+            bboxCoords[0],
+            bboxCoords[3] -
+            bboxCoords[2],
+            bboxCoords[5] -
+            bboxCoords[4]]
 
     def getBBoxCoords(self) -> List:
         return self.bboxCoords
 
     def getBboxDims(self) -> List:
         return self.bboxDims
-    
+
     def setUnitStyle(self, unitStyle: LammpsUnitSystem):
         self.unitStyle = unitStyle
 
     def getUnitStyle(self) -> LammpsUnitSystem:
         return self.unitStyle
-    
+
     def setElementTable(self, elementTable: dict):
         self.elementTable = elementTable
 

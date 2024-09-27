@@ -4,6 +4,7 @@ from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.types import GlobalInformation
 from enum import Enum
 
+
 class FileIO:
 
     def __init__(self, fileIOName: str = "defaultFileIO") -> None:
@@ -21,27 +22,28 @@ class FileIO:
     def fromDict(self, d: dict, version: int):
         self.fileIOName = d.get("fileIOName", "defaultFileIO")
 
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+    def addDoCommands(self, globalInformation: GlobalInformation) -> str:
         return ""
-    
+
     def addUndoCommands(self) -> str:
         return ""
-    
+
     def getAssociatedFilePath(self) -> Path:
         return Path()
-    
+
+
 class XYZTrajectoryFileIO(FileIO):
 
     def __init__(self):
         super().__init__()
 
     def toDict(self) -> dict:
-        pass    
+        pass
 
     def fromDict(self, d: dict, version: int):
-        pass    
+        pass
 
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+    def addDoCommands(self, globalInformation: GlobalInformation) -> str:
         return ""
 
     def addUndoCommands(self) -> str:
@@ -49,14 +51,23 @@ class XYZTrajectoryFileIO(FileIO):
 
     def getAssociatedFilePath(self) -> Path:
         return Path()
-    
+
+
 class DumpStyle(Enum):
     CUSTOM = 1,
     XYZ = 2
 
+
 class DumpTrajectoryFileIO(FileIO):
 
-    def __init__(self, fileIOName: str = "defaultDumpTrajectoryFileIO", style: DumpStyle = DumpStyle.CUSTOM, userFields: List[str] = [], addDefaultFields: bool = True, interval: int = 100, group: Group = AllGroup()) -> None:
+    def __init__(
+            self,
+            fileIOName: str = "defaultDumpTrajectoryFileIO",
+            style: DumpStyle = DumpStyle.CUSTOM,
+            userFields: List[str] = [],
+            addDefaultFields: bool = True,
+            interval: int = 100,
+            group: Group = AllGroup()) -> None:
         super().__init__(fileIOName=fileIOName)
         self.userFields = userFields
         self.addDefaultFields = addDefaultFields
@@ -70,19 +81,19 @@ class DumpTrajectoryFileIO(FileIO):
 
     def getAddDefaultFields(self) -> bool:
         return self.addDefaultFields
-    
+
     def getDefaultFields(self) -> List[str]:
         return self.defaultFields
 
     def getInterval(self) -> int:
         return self.interval
-    
+
     def getGroupName(self) -> str:
         return self.groupName
 
     def toDict(self) -> dict:
-        result  = super().toDict()
-        result["class"] = self.__class__.__name__ 
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
         result["userFields"] = self.userFields
         result["addDefaultFields"] = self.addDefaultFields
         result["interval"] = self.interval
@@ -92,16 +103,17 @@ class DumpTrajectoryFileIO(FileIO):
 
     def fromDict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().fromDict(d, version=version)
         self.userFields = d.get("userFields", [])
         self.addDefaultFields = d.get("addDefaultFields", True)
         self.interval = d.get("interval", 100)
         self.groupName = d.get("groupName", AllGroup().getGroupName())
         self.style = DumpStyle(d.get("style", DumpStyle.CUSTOM.value))
-        pass    
+        pass
 
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+    def addDoCommands(self, globalInformation: GlobalInformation) -> str:
         result = ""
         if self.style == DumpStyle.CUSTOM:
             result += f"dump {self.fileIOName} {self.groupName} custom {self.interval} {self.getAssociatedFilePath()}"
@@ -123,7 +135,8 @@ class DumpTrajectoryFileIO(FileIO):
             result += f"dump_modify {self.fileIOName} sort id\n"
             if "element" in fields:
                 if len(globalInformation.getElementTable()) == 0:
-                    raise RuntimeError("\'element\' is part of the dump file custom fields, but the element table is empty. Unable to produce to correct trajectory file.")
+                    raise RuntimeError(
+                        "\'element\' is part of the dump file custom fields, but the element table is empty. Unable to produce to correct trajectory file.")
                 result += f"dump_modify {self.fileIOName} element"
                 for elem in globalInformation.getElementTable().values():
                     result += f" {elem}"
@@ -132,7 +145,7 @@ class DumpTrajectoryFileIO(FileIO):
             result += f"dump {self.fileIOName} {self.groupName} xyz {self.interval} {self.getAssociatedFilePath()}\n"
         else:
             raise ValueError(f"Invalid dump style {self.style}.")
-        
+
         return result
 
     def addUndoCommands(self) -> str:
@@ -145,24 +158,28 @@ class DumpTrajectoryFileIO(FileIO):
             return Path("dump." + self.fileIOName + ".xyz")
         else:
             raise ValueError(f"Invalid dump style {self.style}.")
-    
+
 
 class ReaxBondFileIO(FileIO):
 
-    def __init__(self, fileIOName: str = "defaultReaxBondFileIO", group: Group = AllGroup(), interval: int = 100) -> None:
+    def __init__(
+            self,
+            fileIOName: str = "defaultReaxBondFileIO",
+            group: Group = AllGroup(),
+            interval: int = 100) -> None:
         super().__init__(fileIOName=fileIOName)
         self.groupName = group.getGroupName()
         self.interval = interval
 
     def getGroupName(self) -> str:
         return self.groupName
-    
+
     def getInterval(self) -> int:
         return self.interval
 
     def toDict(self) -> dict:
-        result  = super().toDict()
-        result["class"] = self.__class__.__name__ 
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
         result["fileIOName"] = self.fileIOName
         result["groupName"] = self.groupName
         result["interval"] = self.interval
@@ -170,13 +187,14 @@ class ReaxBondFileIO(FileIO):
 
     def fromDict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().fromDict(d, version=version)
         self.fileIOName = d.get("fileIOName", "defaultReaxBondFileIO")
         self.groupName = d.get("groupName", AllGroup().getGroupName())
-        self.interval = d.get("interval", 100)   
+        self.interval = d.get("interval", 100)
 
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+    def addDoCommands(self, globalInformation: GlobalInformation) -> str:
         return f"fix {self.fileIOName} {self.groupName} reaxff/bonds {self.interval} bonds.{self.fileIOName}.txt\n"
 
     def addUndoCommands(self) -> str:
@@ -184,10 +202,16 @@ class ReaxBondFileIO(FileIO):
 
     def getAssociatedFilePath(self) -> Path:
         return Path(f"bonds.{self.fileIOName}.txt")
-    
+
+
 class ThermoFileIO(FileIO):
 
-    def __init__(self, fileIOName: str = "defaultThermoFileIO", interval: int = 10, addDefaultFields: bool = True, userFields: List[str] = []) -> None: # ) -> None:
+    def __init__(
+            self,
+            fileIOName: str = "defaultThermoFileIO",
+            interval: int = 10,
+            addDefaultFields: bool = True,
+            userFields: List[str] = []) -> None:  # ) -> None:
         super().__init__(fileIOName=fileIOName)
         self.interval = interval
         self.userFields = userFields
@@ -199,10 +223,10 @@ class ThermoFileIO(FileIO):
 
     def getUserFields(self) -> List[str]:
         return self.userFields
-    
+
     def getAddDefaultFields(self) -> bool:
         return self.addDefaultFields
-    
+
     def setAddDefaultFields(self, addDefaultFields: bool):
         self.addDefaultFields = addDefaultFields
 
@@ -213,8 +237,8 @@ class ThermoFileIO(FileIO):
         return self.interval
 
     def toDict(self) -> dict:
-        result  = super().toDict()
-        result["class"] = self.__class__.__name__ 
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
         result["userFields"] = self.userFields
         result["addDefaultFields"] = self.addDefaultFields
         result["interval"] = self.interval
@@ -222,13 +246,14 @@ class ThermoFileIO(FileIO):
 
     def fromDict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().fromDict(d, version=version)
         self.userFields = d.get("userFields", [])
         self.addDefaultFields = d.get("addDefaultFields", True)
         self.interval = d.get("interval", 10)
 
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+    def addDoCommands(self, globalInformation: GlobalInformation) -> str:
         result = ""
         result += f"thermo {self.interval}\n"
         fields = []
@@ -249,10 +274,16 @@ class ThermoFileIO(FileIO):
 
     def getAssociatedFilePath(self) -> Path:
         return Path("lammps.log")
-    
+
+
 class ManualFileIO(FileIO):
 
-    def __init__(self, fileIOName: str = "defaultManualFileIO", doCmd:str = "", undoCmd: str = "", associatedFilePath:str = "") -> None: # ) -> None: # ) -> None:
+    def __init__(
+            self,
+            fileIOName: str = "defaultManualFileIO",
+            doCmd: str = "",
+            undoCmd: str = "",
+            associatedFilePath: str = "") -> None:  # ) -> None: # ) -> None:
         super().__init__(fileIOName=fileIOName)
         self.doCmd = doCmd
         self.undoCmd = undoCmd
@@ -268,8 +299,8 @@ class ManualFileIO(FileIO):
         return Path(self.associatedFilePath)
 
     def toDict(self) -> dict:
-        result  = super().toDict()
-        result["class"] = self.__class__.__name__ 
+        result = super().toDict()
+        result["class"] = self.__class__.__name__
         result["doCmd"] = self.doCmd
         result["undoCmd"] = self.undoCmd
         result["associatedFilePath"] = self.associatedFilePath
@@ -277,13 +308,14 @@ class ManualFileIO(FileIO):
 
     def fromDict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().fromDict(d, version=version)
         self.doCmd = d.get("doCmd", "")
         self.undoCmd = d.get("undoCmd", "")
         self.associatedFilePath = d.get("associatedFilePath", "")
 
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+    def addDoCommands(self, globalInformation: GlobalInformation) -> str:
         if self.doCmd.endswith("\n"):
             return self.doCmd
         else:
@@ -294,7 +326,6 @@ class ManualFileIO(FileIO):
             return self.undoCmd
         else:
             return self.undoCmd + "\n"
-    
+
     def getAssociatedFilePath(self) -> Path:
         return Path(self.associatedFilePath)
-
