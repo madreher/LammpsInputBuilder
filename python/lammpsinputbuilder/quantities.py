@@ -1,3 +1,5 @@
+"""Module implementing the quantity mecanics to convert units."""
+
 from __future__ import annotations
 from enum import Enum
 
@@ -61,14 +63,14 @@ class LIBQuantity():
                 f"Expected dimensionality of {self.expectedDimensionality }, got {self.quantity.dimensionality}.")
         return True
 
-    def toDict(self) -> dict:
+    def to_dict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
         result["magnitude"] = self.magnitude
         result["units"] = self.units
         return result
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         self.magnitude = d["magnitude"]
         self.units = d["units"]
         self.quantity = self.magnitude * ureg(self.units)
@@ -94,12 +96,12 @@ class ForceQuantity(LIBQuantity):
         ]
         self.validateDimensionality()
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
         if className != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.validateDimensionality()
 
     def convertTo(self, lmpUnit: LammpsUnitSystem) -> float:
@@ -122,12 +124,12 @@ class TemperatureQuantity(LIBQuantity):
         self.expectedDimensionality = ["[temperature]"]
         self.validateDimensionality()
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
         if className != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.validateDimensionality()
 
     def convertTo(self, lmpUnit: LammpsUnitSystem) -> float:
@@ -153,12 +155,12 @@ class TorqueQuantity(LIBQuantity):
         ]
         self.validateDimensionality()
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
         if className != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.validateDimensionality()
 
     def convertTo(self, lmpUnit: LammpsUnitSystem) -> float:
@@ -181,12 +183,12 @@ class TimeQuantity(LIBQuantity):
         self.expectedDimensionality = ["[time]"]
         self.validateDimensionality()
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
         if className != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.validateDimensionality()
 
     def convertTo(self, lmpUnit: LammpsUnitSystem) -> float:
@@ -212,12 +214,12 @@ class EnergyQuantity(LIBQuantity):
         ]
         self.validateDimensionality()
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
         if className != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.validateDimensionality()
 
     def convertTo(self, lmpUnit: LammpsUnitSystem) -> float:
@@ -239,12 +241,12 @@ class LengthQuantity(LIBQuantity):
         self.expectedDimensionality = ["[length]"]
         self.validateDimensionality()
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
         if className != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.validateDimensionality()
 
     def convertTo(self, lmpUnit: LammpsUnitSystem) -> float:
@@ -267,12 +269,12 @@ class VelocityQuantity(LIBQuantity):
         self.expectedDimensionality = ["[length] / [time]"]
         self.validateDimensionality()
 
-    def fromDict(self, d: dict, version: int) -> None:
+    def from_dict(self, d: dict, version: int) -> None:
         className = d.get("class", "")
         if className != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {className}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.validateDimensionality()
 
     def convertTo(self, lmpUnit: LammpsUnitSystem) -> float:

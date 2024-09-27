@@ -26,6 +26,6 @@ class IntegratorLoader():
         # Create a copy of the base object, and we will update the settings of
         # the object from the dictionary
         obj = copy.deepcopy(integrator_table[class_name])
-        obj.fromDict(d, version)
+        obj.from_dict(d, version)
 
         return obj

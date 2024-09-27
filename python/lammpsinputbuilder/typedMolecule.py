@@ -1,13 +1,16 @@
+"""Module containing the TypedMolecularSystem class."""
+
 from typing import List
 from pathlib import Path
-from ase import Atoms
-from ase.io import read as ase_read
-from ase.io.lammpsrun import read_lammps_dump_text as ase_read_lammps_dump_text
 import shutil
 import tempfile
 
+from ase import Atoms
+from ase.io import read as ase_read
+from ase.io.lammpsrun import read_lammps_dump_text as ase_read_lammps_dump_text
+
 from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, MoleculeFileFormat, GlobalInformation, ElectrostaticMethod, getMoleculeFileFormatFromExtension, getExtensionFromMoleculeFileFormat, getForcefieldFromExtension
-from lammpsinputbuilder.utility.modelToData import moleculeToLammpsDataPBC, moleculeToLammpsInput
+from lammpsinputbuilder.utility.modelToData import molecule_to_lammps_data_pbc, molecule_to_lammps_input
 from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 
@@ -43,14 +46,14 @@ class TypedMolecularSystem:
     def setBoundingBoxStyle(self, bboxStyle: BoundingBoxStyle):
         self.bboxStyle = bboxStyle
 
-    def toDict(self) -> dict:
+    def to_dict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
         result["forcefield"] = self.getForcefieldType().value
         result["bboxStyle"] = self.getBoundingBoxStyle().value
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # We're not checking the class name here, it's up to the inheriting
         # class
         self.setForcefieldType(Forcefield(d["forcefield"]))
@@ -63,14 +66,14 @@ class TypedMolecularSystem:
         raise NotImplementedError(
             f"Method not implemented by class {__class__}")
 
-    def generateLammpsDataFile(self, jobFolder: Path) -> GlobalInformation:
+    def generateLammpsDataFile(self, job_folder: Path) -> GlobalInformation:
         raise NotImplementedError(
             f"Method not implemented by class {__class__}")
 
     def generateLammpsInputFile(
             self,
-            jobFolder: Path,
-            globalInformation: GlobalInformation) -> Path:
+            job_folder: Path,
+            global_information: GlobalInformation) -> Path:
         raise NotImplementedError(
             f"Method not implemented by class {__class__}")
 
@@ -93,10 +96,10 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         self.electrostaticMethod = electrostaticMethod
 
         self.modelLoaded = False
-        self.moleculeContent = ""
+        self.molecule_content = ""
         self.forcefieldContent = ""
         self.forcefieldPath = None
-        self.moleculePath = None
+        self.molecule_path = None
         self.moleculeFormat = None
         self.atoms = None
 
@@ -105,18 +108,18 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
 
     def loadFromFile(
             self,
-            moleculePath: Path,
+            molecule_path: Path,
             forcefieldPath: Path,
             formatHint: MoleculeFileFormat = None):
         # Check for file exist
         if not forcefieldPath.is_file():
             raise FileNotFoundError(f"File {forcefieldPath} not found.")
-        if not moleculePath.is_file():
-            raise FileNotFoundError(f"File {moleculePath} not found.")
+        if not molecule_path.is_file():
+            raise FileNotFoundError(f"File {molecule_path} not found.")
 
         # Check for supported molecule format
         self.moleculeFormat = getMoleculeFileFormatFromExtension(
-            moleculePath.suffix)
+            molecule_path.suffix)
 
         # Check for supported forcefield format
         forcefieldFormat = getForcefieldFromExtension(forcefieldPath.suffix)
@@ -125,39 +128,39 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
                 f"Forcefield file {forcefieldPath} is not a Reax forcefield, expecting .reax extension.")
 
         # Set paths
-        self.moleculePath = moleculePath
+        self.molecule_path = molecule_path
         self.forcefieldPath = forcefieldPath
 
         # Read molecule
-        with open(self.moleculePath, "r") as f:
-            self.moleculeContent = f.read()
+        with open(self.molecule_path, "r") as f:
+            self.molecule_content = f.read()
             if formatHint is not None:
                 self.moleculeFormat = formatHint
-            elif self.moleculePath.suffix.lower() == ".xyz":
+            elif self.molecule_path.suffix.lower() == ".xyz":
                 self.moleculeFormat = MoleculeFileFormat.XYZ
-            elif self.moleculePath.suffix.lower() == ".mol2":
+            elif self.molecule_path.suffix.lower() == ".mol2":
                 self.moleculeFormat = MoleculeFileFormat.MOL2
-            elif self.moleculePath.suffix.lower() == ".lammpstrj":
+            elif self.molecule_path.suffix.lower() == ".lammpstrj":
                 self.moleculeFormat = MoleculeFileFormat.LAMMPS_DUMP_TEXT
             else:  # Should never happen with after the format check above
                 raise NotImplementedError(
-                    f"Molecule format {self.moleculePath.suffix} not supported.")
+                    f"Molecule format {self.molecule_path.suffix} not supported.")
 
         # Read forcefield
         with open(self.forcefieldPath, "r") as f:
             self.forcefieldContent = f.read()
 
         if self.moleculeFormat == MoleculeFileFormat.LAMMPS_DUMP_TEXT:
-            with open(self.moleculePath, "r") as f:
+            with open(self.molecule_path, "r") as f:
                 self.atoms = ase_read_lammps_dump_text(f)
         else:
-            self.atoms = ase_read(self.moleculePath)
+            self.atoms = ase_read(self.molecule_path)
 
         self.modelLoaded = True
 
     def loadFromStrings(
             self,
-            moleculeContent: str,
+            molecule_content: str,
             moleculeFormat: MoleculeFileFormat,
             forcefieldContent: str,
             forcefieldFileName: Path,
@@ -167,29 +170,29 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             raise ValueError(
                 f"Forcefield file {forcefieldFileName} is not a Reax forcefield, expecting .reax extension.")
 
-        self.moleculeContent = moleculeContent
+        self.molecule_content = molecule_content
         self.moleculeFormat = moleculeFormat
         if moleculeFileName != "":
-            self.moleculePath = Path(moleculeFileName)
+            self.molecule_path = Path(moleculeFileName)
         else:
-            self.moleculePath = Path(
+            self.molecule_path = Path(
                 "model." + getExtensionFromMoleculeFileFormat(moleculeFormat))
 
         self.forcefieldContent = forcefieldContent
         self.forcefieldPath = Path(forcefieldFileName)
 
         # Create a temporary file to be read by ase
-        jobFolder = Path(tempfile.mkdtemp())
-        modelPath = jobFolder / \
+        job_folder = Path(tempfile.mkdtemp())
+        modelPath = job_folder / \
             Path("model." + getExtensionFromMoleculeFileFormat(moleculeFormat))
 
         with open(modelPath, "w") as f:
-            f.write(moleculeContent)
+            f.write(molecule_content)
 
         self.atoms = ase_read(modelPath)
 
         # Remove temporary folder
-        shutil.rmtree(jobFolder)
+        shutil.rmtree(job_folder)
 
         self.modelLoaded = True
 
@@ -203,13 +206,13 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         return self.atoms
 
     def getMoleculeContent(self) -> str:
-        return self.moleculeContent
+        return self.molecule_content
 
     def getMoleculeFormat(self) -> MoleculeFileFormat:
         return self.moleculeFormat
 
     def getMoleculePath(self) -> Path:
-        return self.moleculePath
+        return self.molecule_path
 
     def getForcefieldContent(self) -> str:
         return self.forcefieldContent
@@ -223,44 +226,44 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
     def setElectrostaticMethod(self, electrostaticMethod: ElectrostaticMethod):
         self.electrostaticMethod = electrostaticMethod
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["electrostaticMethod"] = self.electrostaticMethod.value
         result["isModelLoaded"] = self.modelLoaded
         result["forcefieldPath"] = Path(str(self.forcefieldPath))
-        result["moleculePath"] = Path(str(self.moleculePath))
+        result["molecule_path"] = Path(str(self.molecule_path))
         result["moleculeFormat"] = self.moleculeFormat.value
         result["forcefieldContent"] = self.forcefieldContent
-        result["moleculeContent"] = self.moleculeContent
+        result["molecule_content"] = self.molecule_content
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         moleculeType = d["class"]
         if moleculeType != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {moleculeType}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.electrostaticMethod = ElectrostaticMethod(
             d["electrostaticMethod"])
         self.modelLoaded = d["isModelLoaded"]
         self.forcefieldPath = Path(d["forcefieldPath"])
-        self.moleculePath = Path(d["moleculePath"])
+        self.molecule_path = Path(d["molecule_path"])
         self.moleculeFormat = MoleculeFileFormat(d["moleculeFormat"])
         self.forcefieldContent = d["forcefieldContent"]
-        self.moleculeContent = d["moleculeContent"]
+        self.molecule_content = d["molecule_content"]
 
-    def generateLammpsDataFile(self, jobFolder: Path) -> GlobalInformation:
+    def generateLammpsDataFile(self, job_folder: Path) -> GlobalInformation:
         # TODO: Adjust code to handle the different bbox styles
-        globalInfo = moleculeToLammpsDataPBC(
-            self.moleculeContent,
+        globalInfo = molecule_to_lammps_data_pbc(
+            self.molecule_content,
             self.moleculeFormat,
-            jobFolder,
+            job_folder,
             self.getLammpsDataFileName())
 
         # Copy the forcefield to the job folder
-        forcefieldPath = jobFolder / self.forcefieldPath.name
+        forcefieldPath = job_folder / self.forcefieldPath.name
         with open(forcefieldPath, 'w') as f:
             f.write(self.forcefieldContent)
 
@@ -268,16 +271,16 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
 
     def generateLammpsInputFile(
             self,
-            jobFolder: Path,
-            globalInformation: GlobalInformation) -> Path:
-        return moleculeToLammpsInput(
+            job_folder: Path,
+            global_information: GlobalInformation) -> Path:
+        return molecule_to_lammps_input(
             "lammps.input",
-            jobFolder /
+            job_folder /
             self.getLammpsDataFileName(),
-            jobFolder,
+            job_folder,
             Forcefield.REAX,
             self.forcefieldPath.name,
-            globalInformation,
+            global_information,
             electrostaticMethod=self.electrostaticMethod)
 
     def getLammpsDataFileName(self) -> str:

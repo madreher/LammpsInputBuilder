@@ -34,7 +34,7 @@ def test_emptyReaxMolecule():
 
 def test_reaxMoleculeFromFile():
     # Create a molecule
-    moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+    molecule_path = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
@@ -42,7 +42,7 @@ def test_reaxMoleculeFromFile():
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
 
-    typedMolecule.loadFromFile(moleculePath, forcefieldPath)
+    typedMolecule.loadFromFile(molecule_path, forcefieldPath)
 
     assert typedMolecule.getForcefieldType() == Forcefield.REAX
     assert typedMolecule.getBoundingBoxStyle() == BoundingBoxStyle.PERIODIC
@@ -52,7 +52,7 @@ def test_reaxMoleculeFromFile():
 
     assert typedMolecule.getMoleculeContent() != ""
     assert typedMolecule.getMoleculeFormat() == MoleculeFileFormat.XYZ
-    assert typedMolecule.getMoleculePath()  == moleculePath
+    assert typedMolecule.getMoleculePath()  == molecule_path
 
     assert typedMolecule.getForcefieldContent() != ""
     assert typedMolecule.getForcefieldPath() == forcefieldPath
@@ -60,7 +60,7 @@ def test_reaxMoleculeFromFile():
 
 def test_reaxMoleculeFromStrings():
     # Create a molecule
-    moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+    molecule_path = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
@@ -68,14 +68,14 @@ def test_reaxMoleculeFromStrings():
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
 
-    moleculeContent = ""
+    molecule_content = ""
     potentialContent = ""
-    with open(moleculePath, 'r') as f:
-        moleculeContent = f.read()
+    with open(molecule_path, 'r') as f:
+        molecule_content = f.read()
     with open(forcefieldPath, 'r') as f:
         potentialContent = f.read()
 
-    typedMolecule.loadFromStrings(moleculeContent, MoleculeFileFormat.XYZ, potentialContent, forcefieldPath, moleculePath)
+    typedMolecule.loadFromStrings(molecule_content, MoleculeFileFormat.XYZ, potentialContent, forcefieldPath, molecule_path)
 
     assert typedMolecule.getForcefieldType() == Forcefield.REAX
     assert typedMolecule.getBoundingBoxStyle() == BoundingBoxStyle.PERIODIC
@@ -83,9 +83,9 @@ def test_reaxMoleculeFromStrings():
     
     assert typedMolecule.isModelLoaded()
 
-    assert typedMolecule.getMoleculeContent() == moleculeContent
+    assert typedMolecule.getMoleculeContent() == molecule_content
     assert typedMolecule.getMoleculeFormat() == MoleculeFileFormat.XYZ
-    assert typedMolecule.getMoleculePath()  == moleculePath
+    assert typedMolecule.getMoleculePath()  == molecule_path
 
     assert typedMolecule.getForcefieldContent() == potentialContent
     assert typedMolecule.getForcefieldPath() == forcefieldPath
@@ -93,7 +93,7 @@ def test_reaxMoleculeFromStrings():
 
 def test_moleculeToDict():
     # Create a molecule
-    moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+    molecule_path = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
@@ -101,21 +101,21 @@ def test_moleculeToDict():
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
 
-    typedMolecule.loadFromFile(moleculePath, forcefieldPath)
+    typedMolecule.loadFromFile(molecule_path, forcefieldPath)
 
-    result = typedMolecule.toDict()
+    result = typedMolecule.to_dict()
 
     assert result["class"] == "ReaxTypedMolecularSystem"
     assert result["electrostaticMethod"] == ElectrostaticMethod.QEQ.value
     assert result["forcefieldPath"] == Path(str(forcefieldPath))
-    assert result["moleculePath"] == Path(str(moleculePath))
+    assert result["molecule_path"] == Path(str(molecule_path))
     assert result["moleculeFormat"] == MoleculeFileFormat.XYZ.value
     assert result["forcefieldContent"] == typedMolecule.getForcefieldContent()
-    assert result["moleculeContent"] == typedMolecule.getMoleculeContent()
+    assert result["molecule_content"] == typedMolecule.getMoleculeContent()
 
 def test_moleculeToDictToMolecule():
     # Create a molecule
-    moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+    molecule_path = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
@@ -123,18 +123,18 @@ def test_moleculeToDictToMolecule():
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
 
-    typedMolecule.loadFromFile(moleculePath, forcefieldPath)
+    typedMolecule.loadFromFile(molecule_path, forcefieldPath)
 
-    dict1 = typedMolecule.toDict()
+    dict1 = typedMolecule.to_dict()
 
     typedMolecule2 = ReaxTypedMolecularSystem()
-    typedMolecule2.fromDict(dict1, 0)
+    typedMolecule2.from_dict(dict1, 0)
 
-    assert typedMolecule.toDict() == typedMolecule2.toDict()
+    assert typedMolecule.to_dict() == typedMolecule2.to_dict()
 
 def test_moleculeToJobFolder():
     # Create a molecule
-    moleculePath = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+    molecule_path = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
     forcefieldPath=Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
@@ -142,19 +142,19 @@ def test_moleculeToJobFolder():
         electrostaticMethod=ElectrostaticMethod.QEQ
     )
 
-    typedMolecule.loadFromFile(moleculePath, forcefieldPath)
+    typedMolecule.loadFromFile(molecule_path, forcefieldPath)
 
-    jobFolder = Path(tempfile.gettempdir()) / str(uuid4())
-    os.makedirs(jobFolder)
+    job_folder = Path(tempfile.gettempdir()) / str(uuid4())
+    os.makedirs(job_folder)
 
-    moleculeHolder = typedMolecule.generateLammpsDataFile(jobFolder)
-    inputPath = typedMolecule.generateLammpsInputFile(jobFolder, moleculeHolder)
+    moleculeHolder = typedMolecule.generateLammpsDataFile(job_folder)
+    inputPath = typedMolecule.generateLammpsInputFile(job_folder, moleculeHolder)
 
     assert moleculeHolder is not None
-    assert inputPath == jobFolder / "lammps.input"
-    assert (jobFolder / "molecule.XYZ").is_file()
-    assert (jobFolder / typedMolecule.getLammpsDataFileName()).is_file()
-    assert (jobFolder / "model.data").is_file()
-    assert (jobFolder / "model.data.temp").is_file()
+    assert inputPath == job_folder / "lammps.input"
+    assert (job_folder / "molecule.XYZ").is_file()
+    assert (job_folder / typedMolecule.getLammpsDataFileName()).is_file()
+    assert (job_folder / "model.data").is_file()
+    assert (job_folder / "model.data.temp").is_file()
 
-    shutil.rmtree(jobFolder, ignore_errors=True)
+    shutil.rmtree(job_folder, ignore_errors=True)

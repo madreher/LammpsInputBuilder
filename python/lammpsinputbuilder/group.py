@@ -1,36 +1,38 @@
+"""Module implementing the Group class and its subclasses."""
+
 from typing import List
 from enum import Enum
 
 
 class Group:
-    def __init__(self, groupName: str) -> None:
-        self.groupName = groupName
+    def __init__(self, group_name: str) -> None:
+        self.group_name = group_name
 
-    def getGroupName(self) -> str:
-        return self.groupName
+    def get_group_name(self) -> str:
+        return self.group_name
 
-    def toDict(self) -> dict:
+    def to_dict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
-        result["groupName"] = self.groupName
+        result["group_name"] = self.group_name
         return result
 
-    def fromDict(self, d: dict, version: int):
-        self.groupName = d.get("groupName", "defaultGroupName")
+    def from_dict(self, d: dict, version: int):
+        self.group_name = d.get("group_name", "defaultGroupName")
 
-    def addDoCommands(self) -> str:
+    def add_do_commands(self) -> str:
         return ""
 
-    def addUndoCommands(self) -> str:
+    def add_undo_commands(self) -> str:
         return ""
 
 
 class IndicesGroup(Group):
     def __init__(
             self,
-            groupName: str = "defaultIndiceGroupName",
+            group_name: str = "defaultIndiceGroupName",
             indices: List[int] = []) -> None:
-        super().__init__(groupName)
+        super().__init__(group_name)
         self.indices = indices
 
         self.validateIndices()
@@ -40,7 +42,7 @@ class IndicesGroup(Group):
         for index in self.indices:
             if index <= 0:
                 raise ValueError(
-                    f"Indices {index} declared in group {self.groupName}. Indices must be greater than 0 when creating an IndicesGroup.")
+                    f"Indices {index} declared in group {self.group_name}. Indices must be greater than 0 when creating an IndicesGroup.")
 
     def getIndices(self) -> List[int]:
         return self.indices
@@ -48,55 +50,55 @@ class IndicesGroup(Group):
     def setIndices(self, indices: List[int]):
         self.indices = indices
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["indices"] = self.indices
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.indices = d.get("indices", [])
         self.validateIndices()
 
-    def addDoCommands(self) -> str:
+    def add_do_commands(self) -> str:
         if len(self.indices) == 0:
-            return f"group {self.groupName} empty\n"
+            return f"group {self.group_name} empty\n"
         else:
-            commands = f"group {self.groupName} id"
+            commands = f"group {self.group_name} id"
             for index in self.indices:
                 commands += f" {index}"
             commands += "\n"
             return commands
 
-    def addUndoCommands(self) -> str:
-        return f"group {self.groupName} delete\n"
+    def add_undo_commands(self) -> str:
+        return f"group {self.group_name} delete\n"
 
 
 class AllGroup(Group):
     def __init__(self) -> None:
         super().__init__("all")
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
 
-    def addDoCommands(self) -> str:
+    def add_do_commands(self) -> str:
         return ""
 
-    def addUndoCommands(self) -> str:
+    def add_undo_commands(self) -> str:
         return ""
 
 
@@ -104,22 +106,22 @@ class EmptyGroup(Group):
     def __init__(self) -> None:
         super().__init__("empty")
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
 
-    def addDoCommands(self) -> str:
+    def add_do_commands(self) -> str:
         return ""
 
-    def addUndoCommands(self) -> str:
+    def add_undo_commands(self) -> str:
         return ""
 
 
@@ -139,13 +141,13 @@ class OperationGroup(Group):
 
     def __init__(
             self,
-            groupName: str = "defaultOperationGroupName",
+            group_name: str = "defaultOperationGroupName",
             op: OperationGroupEnum = OperationGroupEnum.UNION,
             otherGroups: List[Group] = [
             EmptyGroup()]) -> None:
-        super().__init__(groupName)
+        super().__init__(group_name)
         self.op = op
-        self.otherGroups = [g.getGroupName() for g in otherGroups]
+        self.otherGroups = [g.get_group_name() for g in otherGroups]
 
         self.validateConfiguration()
 
@@ -170,80 +172,80 @@ class OperationGroup(Group):
         return self.otherGroups
 
     def setOtherGroups(self, otherGroups: List[Group]):
-        self.otherGroups = [g.getGroupName() for g in otherGroups]
+        self.otherGroups = [g.get_group_name() for g in otherGroups]
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["op"] = self.op.value
         result["otherGroups"] = self.otherGroups
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.otherGroups = d.get("otherGroups", [])
 
         self.validateConfiguration()
 
-    def addDoCommands(self) -> str:
+    def add_do_commands(self) -> str:
         self.validateConfiguration()
-        commands = f"group {self.groupName} {OperationGroup.operationToStr[self.op]}"
+        commands = f"group {self.group_name} {OperationGroup.operationToStr[self.op]}"
         for grp in self.otherGroups:
             commands += f" {grp}"
         commands += "\n"
         return commands
 
-    def addUndoCommands(self) -> str:
-        return f"group {self.groupName} delete\n"
+    def add_undo_commands(self) -> str:
+        return f"group {self.group_name} delete\n"
 
 
 class ReferenceGroup(Group):
-    def __init__(self, groupName: str = "defaultReferenceGroup",
+    def __init__(self, group_name: str = "defaultReferenceGroup",
                  reference: Group = AllGroup()) -> None:
-        super().__init__(groupName)
-        self.reference = reference.getGroupName()
+        super().__init__(group_name)
+        self.reference = reference.get_group_name()
 
-    def getGroupName(self) -> str:
+    def get_group_name(self) -> str:
         return self.reference
 
     def getReferenceName(self) -> str:
         return self.reference
 
     def setReference(self, reference: Group):
-        self.reference = reference.getGroupName()
+        self.reference = reference.get_group_name()
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["reference"] = self.reference
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.reference = d.get("reference", "all")
 
-    def addDoCommands(self) -> str:
+    def add_do_commands(self) -> str:
         return ""
 
-    def addUndoCommands(self) -> str:
+    def add_undo_commands(self) -> str:
         return ""
 
 
 class ManualGroup(Group):
     def __init__(
             self,
-            groupName: str = "defaultManualGroup",
+            group_name: str = "defaultManualGroup",
             doCmd: str = "",
             undoCmd: str = "") -> None:
-        super().__init__(groupName)
+        super().__init__(group_name)
         self.doCmd = doCmd
         self.undoCmd = undoCmd
 
@@ -259,30 +261,30 @@ class ManualGroup(Group):
     def setUndoCmd(self, undoCmd: str):
         self.undoCmd = undoCmd
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["doCmd"] = self.doCmd
         result["undoCmd"] = self.undoCmd
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
         if d["class"] != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.doCmd = d.get("doCmd", "")
         self.undoCmd = d.get("undoCmd", "")
 
-    def addDoCommands(self) -> str:
+    def add_do_commands(self) -> str:
         if self.doCmd.endswith("\n"):
             return self.doCmd
-        else:
-            return self.doCmd + "\n"
 
-    def addUndoCommands(self) -> str:
+        return self.doCmd + "\n"
+
+    def add_undo_commands(self) -> str:
         if self.undoCmd.endswith("\n"):
             return self.undoCmd
-        else:
-            return self.undoCmd + "\n"
+
+        return self.undoCmd + "\n"

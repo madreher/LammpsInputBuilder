@@ -1,3 +1,5 @@
+"""Module containing types for lammpsinputbuilder."""
+
 from enum import Enum
 from typing import List
 from ase import Atoms
@@ -61,14 +63,14 @@ def getMoleculeFileFormatFromExtension(extension: str) -> MoleculeFileFormat:
 
 
 def getExtensionFromMoleculeFileFormat(
-        moleculeFileFormat: MoleculeFileFormat) -> str:
-    if moleculeFileFormat == MoleculeFileFormat.XYZ:
+        molecule_file_format: MoleculeFileFormat) -> str:
+    if molecule_file_format == MoleculeFileFormat.XYZ:
         return ".xyz"
-    elif moleculeFileFormat == MoleculeFileFormat.MOL2:
+    elif molecule_file_format == MoleculeFileFormat.MOL2:
         return ".mol2"
     else:
         raise NotImplementedError(
-            f"Molecule format {moleculeFileFormat} not supported.")
+            f"Molecule format {molecule_file_format} not supported.")
 
 
 class ElectrostaticMethod(Enum):
@@ -81,25 +83,25 @@ class MoleculeHolder():
     Class used to store the molecule information
     """
 
-    def __init__(self, atoms: Atoms, bboxCoords: List) -> None:
+    def __init__(self, atoms: Atoms, bbox_coords: List) -> None:
         self.atoms = atoms
-        if len(bboxCoords) != 6:
+        if len(bbox_coords) != 6:
             raise ValueError(
-                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
-        self.bboxCoords = bboxCoords
+                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bbox_coords)) + ")")
+        self.bbox_coords = bbox_coords
         self.bboxDims = [
-            bboxCoords[1] -
-            bboxCoords[0],
-            bboxCoords[3] -
-            bboxCoords[2],
-            bboxCoords[5] -
-            bboxCoords[4]]
+            bbox_coords[1] -
+            bbox_coords[0],
+            bbox_coords[3] -
+            bbox_coords[2],
+            bbox_coords[5] -
+            bbox_coords[4]]
 
     def getAtoms(self) -> Atoms:
         return self.atoms
 
     def getBboxCoords(self) -> List:
-        return self.bboxCoords
+        return self.bbox_coords
 
     def getBboxDims(self) -> List:
         return self.bboxDims
@@ -110,7 +112,7 @@ class GlobalInformation:
         self.unitStyle = None
         self.elementTable = {}
         self.atoms = None
-        self.bboxCoords = None
+        self.bbox_coords = None
         self.bboxDims = None
 
     def setAtoms(self, atoms: Atoms):
@@ -119,21 +121,21 @@ class GlobalInformation:
     def getAtoms(self) -> Atoms:
         return self.atoms
 
-    def setBBoxCoords(self, bboxCoords: List):
-        if len(bboxCoords) != 6:
+    def setBBoxCoords(self, bbox_coords: List):
+        if len(bbox_coords) != 6:
             raise ValueError(
-                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
-        self.bboxCoords = bboxCoords
+                "Invalid number of bounding box coordinates (6 expected, received " + str(len(bbox_coords)) + ")")
+        self.bbox_coords = bbox_coords
         self.bboxDims = [
-            bboxCoords[1] -
-            bboxCoords[0],
-            bboxCoords[3] -
-            bboxCoords[2],
-            bboxCoords[5] -
-            bboxCoords[4]]
+            bbox_coords[1] -
+            bbox_coords[0],
+            bbox_coords[3] -
+            bbox_coords[2],
+            bbox_coords[5] -
+            bbox_coords[4]]
 
     def getBBoxCoords(self) -> List:
-        return self.bboxCoords
+        return self.bbox_coords
 
     def getBboxDims(self) -> List:
         return self.bboxDims

@@ -107,49 +107,49 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
 
     # Create the groups 
-    groupTooltip  = IndicesGroup(groupName="tooltip", indices=indicesTooltip)
-    groupAnchorTooltip = IndicesGroup(groupName="anchorTooltip", indices=indiceAnchorTooltip)
-    groupAnchorSlab = IndicesGroup(groupName="anchorSlab", indices=indiceAnchorSlab)
-    groupAnchors = OperationGroup(groupName="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
-    groupFree = OperationGroup(groupName="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+    groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
+    groupAnchorTooltip = IndicesGroup(group_name="anchorTooltip", indices=indiceAnchorTooltip)
+    groupAnchorSlab = IndicesGroup(group_name="anchorSlab", indices=indiceAnchorSlab)
+    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(sectionName="GlobalSection")
-    globalSection.addGroup(groupTooltip)
-    globalSection.addGroup(groupAnchorSlab)
-    globalSection.addGroup(groupAnchorTooltip)
-    globalSection.addGroup(groupAnchors)
-    globalSection.addGroup(groupFree)
+    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection.add_group(groupTooltip)
+    globalSection.add_group(groupAnchorSlab)
+    globalSection.add_group(groupAnchorTooltip)
+    globalSection.add_group(groupAnchors)
+    globalSection.add_group(groupFree)
 
     # First section: Minimization 
-    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, use_anchors=True, anchor_group=ReferenceGroup(groupName="refAnchor", reference=groupAnchors))
-    globalSection.addSection(sectionMinimization)
+    sectionMinimization = MinimizeTemplate(section_name="MinimizeSection", style=MinimizeStyle.CG, etol = 0.01, ftol = 0.01, maxiter = 100, maxeval = 10000, use_anchors=True, anchor_group=ReferenceGroup(group_name="refAnchor", reference=groupAnchors))
+    globalSection.add_section(sectionMinimization)
 
-    sectionFinalState = IntegratorSection(sectionName="FinalSection", integrator=RunZeroIntegrator())
-    finalDump = DumpTrajectoryFileIO(fileIOName="finalState", style=DumpStyle.CUSTOM, interval=1, group=AllGroup(), userFields=["id", "type", "element", "x", "y", "z"])
-    finalBond = ReaxBondFileIO(fileIOName="finalState", interval=1, group=AllGroup())
-    sectionFinalState.addFileIO(finalDump)
-    sectionFinalState.addFileIO(finalBond)
-    globalSection.addSection(sectionFinalState)
+    sectionFinalState = IntegratorSection(section_name="FinalSection", integrator=RunZeroIntegrator())
+    finalDump = DumpTrajectoryFileIO(fileio_name="finalState", style=DumpStyle.CUSTOM, interval=1, group=AllGroup(), userFields=["id", "type", "element", "x", "y", "z"])
+    finalBond = ReaxBondFileIO(fileio_name="finalState", interval=1, group=AllGroup())
+    sectionFinalState.add_fileio(finalDump)
+    sectionFinalState.add_fileio(finalBond)
+    globalSection.add_section(sectionFinalState)
 
     # Add the section to the workflow
-    workflow.addSection(globalSection)
+    workflow.add_section(globalSection)
 
     # Generate the inputs
-    jobFolder = workflow.generateInputs()
-    logger.info(f"Minimization inputs generated in the job folder: {jobFolder}")
+    job_folder = workflow.generateInputs()
+    logger.info(f"Minimization inputs generated in the job folder: {job_folder}")
 
     # Run the workflow
-    subprocess.run("mpirun -np 1 " + str(lmpExecPath) + " -in " + str(jobFolder / "workflow.input"), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    subprocess.run("mpirun -np 1 " + str(lmpExecPath) + " -in " + str(job_folder / "workflow.input"), shell=True, check=True, capture_output=True, cwd=job_folder)
 
     # Check that the final position state exists
-    if not (jobFolder / finalDump.getAssociatedFilePath()).exists():
-        raise FileNotFoundError(f"Could not find the final dump file at {jobFolder / finalDump.getAssociatedFilePath()}")
+    if not (job_folder / finalDump.getAssociatedFilePath()).exists():
+        raise FileNotFoundError(f"Could not find the final dump file at {job_folder / finalDump.getAssociatedFilePath()}")
 
-    if not (jobFolder / finalBond.getAssociatedFilePath()).exists():
-        raise FileNotFoundError(f"Could not find the final bond file at {jobFolder / finalBond.getAssociatedFilePath()}")
+    if not (job_folder / finalBond.getAssociatedFilePath()).exists():
+        raise FileNotFoundError(f"Could not find the final bond file at {job_folder / finalBond.getAssociatedFilePath()}")
     
-    return jobFolder / finalDump.getAssociatedFilePath()
+    return job_folder / finalDump.getAssociatedFilePath()
 
 def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xydelta:float):
 
@@ -220,19 +220,19 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
     workflow.setTypedMolecularSystem(typedMolecule)
 
     # Create the groups 
-    groupTooltip  = IndicesGroup(groupName="tooltip", indices=indicesTooltip)
-    groupAnchorTooltip = IndicesGroup(groupName="anchorTooltip", indices=indiceAnchorTooltip)
-    groupAnchorSlab = IndicesGroup(groupName="anchorSlab", indices=indiceAnchorSlab)
-    groupAnchors = OperationGroup(groupName="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
-    groupFree = OperationGroup(groupName="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+    groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
+    groupAnchorTooltip = IndicesGroup(group_name="anchorTooltip", indices=indiceAnchorTooltip)
+    groupAnchorSlab = IndicesGroup(group_name="anchorSlab", indices=indiceAnchorSlab)
+    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(sectionName="GlobalSection")
-    globalSection.addGroup(groupTooltip)
-    globalSection.addGroup(groupAnchorSlab)
-    globalSection.addGroup(groupAnchorTooltip)
-    globalSection.addGroup(groupAnchors)
-    globalSection.addGroup(groupFree)
+    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection.add_group(groupTooltip)
+    globalSection.add_group(groupAnchorSlab)
+    globalSection.add_group(groupAnchorTooltip)
+    globalSection.add_group(groupAnchors)
+    globalSection.add_group(groupFree)
 
     for i, headTargetPosition in enumerate(headTargetPositions):
 
@@ -242,76 +242,76 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
         # 4. Write the positions and bonds
         # 3. Move the head back to the initial position
 
-        stepSection = RecusiveSection(sectionName=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
-        moveForwardSection = InstructionsSection(sectionName="MoveForwardSection")
+        stepSection = RecusiveSection(section_name=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
+        moveForwardSection = InstructionsSection(section_name="MoveForwardSection")
 
         # Unit note: ASE positions are in Angstroms
-        moveForwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instructionName="moveforward", group=ReferenceGroup(groupName="tooltip", reference=groupTooltip), 
+        moveForwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instruction_name="moveforward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
                                                                         dx=LengthQuantity(value=headTargetPosition[0] - headInitialPosition[0], units="angstrom"),
                                                                         dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="angstrom"),
                                                                         dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="angstrom")))
-        speSection = IntegratorSection(sectionName="SPESection", integrator=RunZeroIntegrator())
-        dumpIO = DumpTrajectoryFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, userFields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
+        speSection = IntegratorSection(section_name="SPESection", integrator=RunZeroIntegrator())
+        dumpIO = DumpTrajectoryFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, userFields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
         trajectoryFiles.append(dumpIO.getAssociatedFilePath())
-        bondIO = ReaxBondFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
+        bondIO = ReaxBondFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
         bondFiles.append(bondIO.getAssociatedFilePath())
-        thermoIO = ThermoFileIO(fileIOName=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, userFields=typedMolecule.getDefaultThermoVariables())
-        speSection.addFileIO(dumpIO)
-        speSection.addFileIO(bondIO)
-        speSection.addFileIO(thermoIO)
-        moveBackwardSection = InstructionsSection(sectionName="MoveBackwardSection")
-        moveBackwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instructionName="movebackward", group=ReferenceGroup(groupName="tooltip", reference=groupTooltip), 
+        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, userFields=typedMolecule.getDefaultThermoVariables())
+        speSection.add_fileio(dumpIO)
+        speSection.add_fileio(bondIO)
+        speSection.add_fileio(thermoIO)
+        moveBackwardSection = InstructionsSection(section_name="MoveBackwardSection")
+        moveBackwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instruction_name="movebackward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
                                                                         dx=LengthQuantity(value=headInitialPosition[0] - headTargetPosition[0], units="angstrom"),
                                                                         dy=LengthQuantity(value=headInitialPosition[1] - headTargetPosition[1], units="angstrom"),
                                                                         dz=LengthQuantity(value=headInitialPosition[2] - headTargetPosition[2], units="angstrom")))
-        stepSection.addSection(moveForwardSection)
-        stepSection.addSection(speSection)
-        stepSection.addSection(moveBackwardSection)
-        globalSection.addSection(stepSection)
+        stepSection.add_section(moveForwardSection)
+        stepSection.add_section(speSection)
+        stepSection.add_section(moveBackwardSection)
+        globalSection.add_section(stepSection)
 
 
-    workflow.addSection(globalSection)
+    workflow.add_section(globalSection)
 
     # Generate the inputs
-    jobFolder = workflow.generateInputs()
-    logger.info(f"Scan inputs generated in the job folder: {jobFolder}")
+    job_folder = workflow.generateInputs()
+    logger.info(f"Scan inputs generated in the job folder: {job_folder}")
 
     # Run the workflow
     logger.info(f"Starting the scan process...")
-    subprocess.run("mpirun -np 1 " + str(lmpExecPath) + " -in " + str(jobFolder / "workflow.input"), shell=True, check=True, capture_output=True, cwd=jobFolder)
-    logger.info(f"Scan completed in the job folder: {jobFolder}")
+    subprocess.run("mpirun -np 1 " + str(lmpExecPath) + " -in " + str(job_folder / "workflow.input"), shell=True, check=True, capture_output=True, cwd=job_folder)
+    logger.info(f"Scan completed in the job folder: {job_folder}")
 
     # Concatenate the trajectories
     logger.info("Concatenating trajectories...")
     
-    concatTrajectoryFile = jobFolder / "positions.fulltrajectory.lammpstrj"
-    concatBondFile = jobFolder / "reaxbonds.fulltrajectory.txt"
+    concatTrajectoryFile = job_folder / "positions.fulltrajectory.lammpstrj"
+    concatBondFile = job_folder / "reaxbonds.fulltrajectory.txt"
     for i in range(len(trajectoryFiles)):
-        trajectoryFiles[i] = str(jobFolder / trajectoryFiles[i])
-        bondFiles[i] = str(jobFolder / bondFiles[i])
+        trajectoryFiles[i] = str(job_folder / trajectoryFiles[i])
+        bondFiles[i] = str(job_folder / bondFiles[i])
 
     # Not using a single command with join because it leads to a command line too long when many files are concatenated
-    #subprocess.run("cat " + " ".join(trajectoryFiles) + " > " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
-    #subprocess.run("cat " + " ".join(bondFiles) + " >> " + str(concatBondFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    #subprocess.run("cat " + " ".join(trajectoryFiles) + " > " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=job_folder)
+    #subprocess.run("cat " + " ".join(bondFiles) + " >> " + str(concatBondFile), shell=True, check=True, capture_output=True, cwd=job_folder)
     for file in trajectoryFiles:
-        subprocess.run("cat " + str(file) + " >> " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
+        subprocess.run("cat " + str(file) + " >> " + str(concatTrajectoryFile), shell=True, check=True, capture_output=True, cwd=job_folder)
     for file in bondFiles:
-        subprocess.run("cat " + str(file) + " >> " + str(concatBondFile), shell=True, check=True, capture_output=True, cwd=jobFolder)
+        subprocess.run("cat " + str(file) + " >> " + str(concatBondFile), shell=True, check=True, capture_output=True, cwd=job_folder)
 
     
     logger.info("Concatenated position trajectories saved in: " + str(concatTrajectoryFile))
     logger.info("Concatenated bonds trajectories saved in: " + str(concatBondFile))
 
     # Move all the files from trajectory files to the new folder
-    frameFolder = jobFolder / "frames"
+    frameFolder = job_folder / "frames"
     frameFolder.mkdir()
-    subprocess.run("mv dump.* " + str(frameFolder), shell=True, check=True, capture_output=True, cwd=jobFolder)
-    subprocess.run("mv bonds.* " + str(frameFolder), shell=True, check=True, capture_output=True, cwd=jobFolder)
+    subprocess.run("mv dump.* " + str(frameFolder), shell=True, check=True, capture_output=True, cwd=job_folder)
+    subprocess.run("mv bonds.* " + str(frameFolder), shell=True, check=True, capture_output=True, cwd=job_folder)
     logger.info("Frames saved in: " + str(frameFolder))
 
-    return jobFolder, headPixel
+    return job_folder, headPixel
 
-def drawPotentialEnergyMap(jobFolder: Path, headPixel: list):
+def drawPotentialEnergyMap(job_folder: Path, headPixel: list):
 
     # We are going to create an imaage with a color map corresponding to the potential energy of each pixel
 
@@ -319,7 +319,7 @@ def drawPotentialEnergyMap(jobFolder: Path, headPixel: list):
     data = np.zeros((headPixel[-1][0] + 1, headPixel[-1][1] + 1), dtype=np.float64)
 
     # Get the log file 
-    logFile = jobFolder / "log.lammps"
+    logFile = job_folder / "log.lammps"
     log = lammps_logfile.File(logFile)
 
     # Loop over the frames
@@ -334,12 +334,12 @@ def drawPotentialEnergyMap(jobFolder: Path, headPixel: list):
     cmap = plt.get_cmap('inferno')
     plt.imshow(data, cmap=cmap, origin='lower')
     plt.colorbar()
-    plt.savefig(jobFolder / "potentialEnergyMap.png")
+    plt.savefig(job_folder / "potentialEnergyMap.png")
     plt.clf()
 
-    logger.info("Potential energy map saved in: " + str(jobFolder / "potentialEnergyMap.png"))
+    logger.info("Potential energy map saved in: " + str(job_folder / "potentialEnergyMap.png"))
 
-def drawBondConfigurationMap(jobFolder: Path, headPixel: list, minbondOrder:float):
+def drawBondConfigurationMap(job_folder: Path, headPixel: list, minbondOrder:float):
 
     # We create an image where each pixel corresponds to a bond configuration, i.e an set of bond pairs
     # Currently, we only consider bond pairs, regardless of the type. Should probably be refined in the next iteration
@@ -347,7 +347,7 @@ def drawBondConfigurationMap(jobFolder: Path, headPixel: list, minbondOrder:floa
     colorMap = {}
     data = np.zeros((headPixel[-1][0] + 1, headPixel[-1][1] + 1), dtype=np.int32)
 
-    frameFolder = jobFolder / "frames"
+    frameFolder = job_folder / "frames"
     currentID = 0
     totalIgnoredBondPaired = 0
     logger.info("Start computing bond configurations with a minimum bond order of " + str(minbondOrder))
@@ -381,7 +381,7 @@ def drawBondConfigurationMap(jobFolder: Path, headPixel: list, minbondOrder:floa
     cmap = plt.get_cmap('tab20')
     plt.imshow(data, cmap=cmap, origin='lower', interpolation='none')
     plt.colorbar()
-    plt.savefig(jobFolder / "bondConfigurationMap.png")
+    plt.savefig(job_folder / "bondConfigurationMap.png")
     plt.clf()
 
     logger.info("Number of configurations found: " + str(len(colorMap)))
@@ -390,7 +390,7 @@ def drawBondConfigurationMap(jobFolder: Path, headPixel: list, minbondOrder:floa
     else:
         logger.info("No bond pairs ignored.")
 
-    logger.info("Bonds configuration map saved in: " + str(jobFolder / "bondConfigurationMap.png"))
+    logger.info("Bonds configuration map saved in: " + str(job_folder / "bondConfigurationMap.png"))
 
 
 
@@ -430,11 +430,11 @@ def main():
     minimizedModelPath = runMinimizationSlab(lmpexec, args.model)
     logger.info(f"Minimized model path: {minimizedModelPath}")
 
-    jobFolder, headPixel = scanSurface(lmpexec, minimizedModelPath, args.model, zplane, xydelta)
+    job_folder, headPixel = scanSurface(lmpexec, minimizedModelPath, args.model, zplane, xydelta)
 
-    drawPotentialEnergyMap(jobFolder, headPixel)
+    drawPotentialEnergyMap(job_folder, headPixel)
 
-    drawBondConfigurationMap(jobFolder, headPixel, minBondOrder)
+    drawBondConfigurationMap(job_folder, headPixel, minBondOrder)
 
         
 

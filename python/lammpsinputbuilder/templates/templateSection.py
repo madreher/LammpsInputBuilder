@@ -13,34 +13,34 @@ from lammpsinputbuilder.types import GlobalInformation
 
 
 class TemplateSection(Section):
-    def __init__(self, sectionName: str = "defaultSection") -> None:
-        super().__init__(sectionName=sectionName)
+    def __init__(self, section_name: str = "defaultSection") -> None:
+        super().__init__(section_name=section_name)
         self.ios: List[FileIO] = []
         self.extensions: List[Extension] = []
         self.groups: List[Group] = []
 
-    def addFileIO(self, fileIO: FileIO):
-        self.ios.append(fileIO)
+    def add_fileio(self, fileio: FileIO):
+        self.ios.append(fileio)
 
-    def addExtension(self, extension: Extension):
+    def add_extension(self, extension: Extension):
         self.extensions.append(extension)
 
-    def addGroup(self, group: Group):
+    def add_group(self, group: Group):
         self.groups.append(group)
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["fileIOs"] = [s.toDict() for s in self.ios]
-        result["extensions"] = [s.toDict() for s in self.extensions]
-        result["groups"] = [s.toDict() for s in self.groups]
+        result["fileios"] = [s.to_dict() for s in self.ios]
+        result["extensions"] = [s.to_dict() for s in self.extensions]
+        result["groups"] = [s.to_dict() for s in self.groups]
         return result
 
-    def fromDict(self, d: dict, version: int):
-        super().fromDict(d, version=version)
+    def from_dict(self, d: dict, version: int):
+        super().from_dict(d, version=version)
 
-        if "fileIOs" in d.keys() and len(d["fileIOs"]) > 0:
-            ios = d["fileIOs"]
+        if "fileios" in d.keys() and len(d["fileios"]) > 0:
+            ios = d["fileios"]
 
             from lammpsinputbuilder.loader.fileIOLoader import FileIOLoader
             loader = FileIOLoader()
@@ -66,51 +66,51 @@ class TemplateSection(Section):
             for group in groups:
                 self.groups.append(loader.dict_to_group(group))
 
-    def addAllCommands(self, globalInformation: GlobalInformation) -> str:
+    def add_all_commands(self, global_information: GlobalInformation) -> str:
         # Declare all the objects which are going to live during the entire
         # duractions of the sections
-        result = f"################# START Section {self.sectionName} #################\n"
+        result = f"################# START Section {self.section_name} #################\n"
         result += "################# START Groups DECLARATION #################\n"
         for grp in self.groups:
-            result += grp.addDoCommands()
+            result += grp.add_do_commands()
         result += "################# END Groups DECLARATION #################\n"
 
         result += "################# START Extensions DECLARATION #################\n"
         for ext in self.extensions:
-            result += ext.addDoCommands(globalInformation=globalInformation)
+            result += ext.add_do_commands(global_information=global_information)
         result += "################# END Extensions DECLARATION #################\n"
 
         result += "################# START IOs DECLARATION #################\n"
         for io in self.ios:
-            result += io.addDoCommands(globalInformation=globalInformation)
+            result += io.add_do_commands(global_information=global_information)
         result += "################# END IOs DECLARATION #################\n"
 
         # Everything is declared, now we can execute the differente sections
-        sections = self.generateSections()
+        sections = self.generate_sections()
         for section in sections:
-            result += section.addAllCommands(
-                globalInformation=globalInformation)
+            result += section.add_all_commands(
+                global_information=global_information)
 
         # Everything is executed, now we can undo the differente sections
         result += "################# START IO REMOVAL #################\n"
         for io in reversed(self.ios):
-            result += io.addUndoCommands()
+            result += io.add_undo_commands()
         result += "################# END IOs DECLARATION #################\n"
 
         result += "################# START Extensions REMOVAL #################\n"
         for ext in reversed(self.extensions):
-            result += ext.addUndoCommands()
+            result += ext.add_undo_commands()
         result += "################# END Extensions DECLARATION #################\n"
 
         result += "################# START Groups REMOVAL #################\n"
         for grp in reversed(self.groups):
-            result += grp.addUndoCommands()
+            result += grp.add_undo_commands()
         result += "################# END Groups DECLARATION #################\n"
 
-        result += f"################# END Section {self.sectionName} #################\n"
+        result += f"################# END Section {self.section_name} #################\n"
 
         return result
 
-    def generateSections(self) -> List[Section]:
+    def generate_sections(self) -> List[Section]:
         raise NotImplementedError(
-            "The class {self.__class__.__name__} cannot be used directly. Please use a subclass and implement the function generateSections() or override the function addAllCommands().")
+            "The class {self.__class__.__name__} cannot be used directly. Please use a subclass and implement the function generate_sections() or override the function add_all_commands().")

@@ -46,75 +46,75 @@ def main():
                         32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 100, 107, 125, 192, 193, 200, 207, 208, 217, 240, 244, 251]
 
     # Create the groups
-    groupTooltip = IndicesGroup(groupName="tooltip", indices=indicesTooltip)
+    groupTooltip = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
     groupAnchorTooltip = IndicesGroup(
-        groupName="anchorTooltip", indices=indiceAnchorTooltip)
+        group_name="anchorTooltip", indices=indiceAnchorTooltip)
     groupAnchorSlab = IndicesGroup(
-        groupName="anchorSlab", indices=indiceAnchorSlab)
+        group_name="anchorSlab", indices=indiceAnchorSlab)
     groupAnchors = OperationGroup(
-        groupName="anchors",
+        group_name="anchors",
         op=OperationGroupEnum.UNION, 
         otherGroups=[groupAnchorSlab, groupAnchorTooltip])
     groupFree = OperationGroup(
-        groupName="free",
+        group_name="free",
         op=OperationGroupEnum.SUBTRACT, 
         otherGroups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(sectionName="GlobalSection")
-    globalSection.addGroup(groupTooltip)
-    globalSection.addGroup(groupAnchorSlab)
-    globalSection.addGroup(groupAnchorTooltip)
-    globalSection.addGroup(groupAnchors)
-    globalSection.addGroup(groupFree)
+    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection.add_group(groupTooltip)
+    globalSection.add_group(groupAnchorSlab)
+    globalSection.add_group(groupAnchorTooltip)
+    globalSection.add_group(groupAnchors)
+    globalSection.add_group(groupFree)
 
     # First section: Minimization
-    sectionMinimization = MinimizeTemplate(sectionName="MinimizeSection", style=MinimizeStyle.CG, etol=0.01, ftol=0.01,
-                                           maxiter=100, maxeval=10000, useAnchors=True, anchorGroup=ReferenceGroup(groupName="refAnchor", reference=groupAnchors))
-    globalSection.addSection(sectionMinimization)
+    sectionMinimization = MinimizeTemplate(section_name="MinimizeSection", style=MinimizeStyle.CG, etol=0.01, ftol=0.01,
+                                           maxiter=100, maxeval=10000, useAnchors=True, anchorGroup=ReferenceGroup(group_name="refAnchor", reference=groupAnchors))
+    globalSection.add_section(sectionMinimization)
 
     # Second section: reset timestep
-    sectionReset = InstructionsSection(sectionName="ResetSection")
+    sectionReset = InstructionsSection(section_name="ResetSection")
     sectionReset.addInstruction(ResetTimestepInstruction(
-        instructionName="resetTS", timestep=0))
+        instruction_name="resetTS", timestep=0))
     sectionReset.addInstruction(SetTimestepInstruction(
-        instructionName="setDT", timestep=TimeQuantity(value=1.0, units="fs")))
-    globalSection.addSection(sectionReset)
+        instruction_name="setDT", timestep=TimeQuantity(value=1.0, units="fs")))
+    globalSection.add_section(sectionReset)
 
     # Third section: NVE
-    sectionNVE = IntegratorSection(sectionName="NVESection", integrator=NVEIntegrator(
-        integratorName="NVE", group=groupFree, nbSteps=1000))
+    sectionNVE = IntegratorSection(section_name="NVESection", integrator=NVEIntegrator(
+        integrator_name="NVE", group=groupFree, nbSteps=1000))
     # Declare the IOs for the entire workflow, will split into 2 trajectory later
     thermoTrajectory = ThermoFileIO(
-        fileIOName="nve", addDefaultFields=True, interval=50)
+        fileio_name="nve", addDefaultFields=True, interval=50)
     thermoTrajectory.setUserFields(typedMolecule.getDefaultThermoVariables())
     dumpTrajectory = DumpTrajectoryFileIO(
-        fileIOName="nve", addDefaultFields=True, interval=50, group=AllGroup())
-    reaxBond = ReaxBondFileIO(fileIOName="nve", interval=50, group=AllGroup())
-    sectionNVE.addFileIO(dumpTrajectory)
-    sectionNVE.addFileIO(reaxBond)
-    sectionNVE.addFileIO(thermoTrajectory)
-    globalSection.addSection(sectionNVE)
+        fileio_name="nve", addDefaultFields=True, interval=50, group=AllGroup())
+    reaxBond = ReaxBondFileIO(fileio_name="nve", interval=50, group=AllGroup())
+    sectionNVE.add_fileio(dumpTrajectory)
+    sectionNVE.add_fileio(reaxBond)
+    sectionNVE.add_fileio(thermoTrajectory)
+    globalSection.add_section(sectionNVE)
 
     # Fourth section: write final state
     # We use a RunZero section instead of a InstructionSection because reax bonds
     # can only be written by a fix, not a single instruction
     sectionFinalState = IntegratorSection(
-        sectionName="FinalSection", integrator=RunZeroIntegrator())
+        section_name="FinalSection", integrator=RunZeroIntegrator())
     finalDump = DumpTrajectoryFileIO(
-        fileIOName="finalState", style=DumpStyle.XYZ, interval=1, group=AllGroup())
+        fileio_name="finalState", style=DumpStyle.XYZ, interval=1, group=AllGroup())
     finalBond = ReaxBondFileIO(
-        fileIOName="finalState", interval=1, group=AllGroup())
-    sectionFinalState.addFileIO(finalDump)
-    sectionFinalState.addFileIO(finalBond)
-    globalSection.addSection(sectionFinalState)
+        fileio_name="finalState", interval=1, group=AllGroup())
+    sectionFinalState.add_fileio(finalDump)
+    sectionFinalState.add_fileio(finalBond)
+    globalSection.add_section(sectionFinalState)
 
     # Add the section to the workflow
-    workflow.addSection(globalSection)
+    workflow.add_section(globalSection)
 
     # Generate the inputs
-    jobFolder = workflow.generateInputs()
-    print(f"Inputs generated in the job folder: {jobFolder}")
+    job_folder = workflow.generateInputs()
+    print(f"Inputs generated in the job folder: {job_folder}")
 
     return
 

@@ -32,9 +32,9 @@ def main():
     workflow.setTypedMolecularSystem(typedMolecule)
 
     # Generate the inputs
-    jobFolder = workflow.generateInputs()
+    job_folder = workflow.generateInputs()
 
-    logger.info(f"Inputs generated in the job folder: {jobFolder}")
+    logger.info(f"Inputs generated in the job folder: {job_folder}")
 
 
 if __name__ == "__main__":

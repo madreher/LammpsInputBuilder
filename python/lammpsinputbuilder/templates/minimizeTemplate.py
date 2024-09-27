@@ -12,7 +12,7 @@ from lammpsinputbuilder.quantities import ForceQuantity
 class MinimizeTemplate(TemplateSection):
     def __init__(
             self,
-            sectionName: str = "minimizeSection",
+            section_name: str = "minimizeSection",
             style: MinimizeStyle = MinimizeStyle.CG,
             etol: float = 0.01,
             ftol: float = 0.01,
@@ -20,7 +20,7 @@ class MinimizeTemplate(TemplateSection):
             maxeval: int = 10000,
             use_anchors: bool = False,
             anchor_group: Group = AllGroup()) -> None:
-        super().__init__(sectionName=sectionName)
+        super().__init__(section_name=section_name)
         self.style = style
         self.etol = etol
         self.ftol = ftol
@@ -31,8 +31,8 @@ class MinimizeTemplate(TemplateSection):
         # is needed when unrolling the template into base sections
         self.anchor_group = anchor_group
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["style"] = self.style.value
         result["etol"] = self.etol
@@ -40,14 +40,14 @@ class MinimizeTemplate(TemplateSection):
         result["maxiter"] = self.maxiter
         result["maxeval"] = self.maxeval
         result["use_anchors"] = self.use_anchors
-        result["anchor_group"] = self.anchor_group.toDict()
+        result["anchor_group"] = self.anchor_group.to_dict()
         return result
 
-    def fromDict(self, d: dict, version: int):
+    def from_dict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version=version)
+        super().from_dict(d, version=version)
         self.style = MinimizeStyle(d["style"])
         self.etol = d["etol"]
         self.ftol = d["ftol"]
@@ -60,7 +60,7 @@ class MinimizeTemplate(TemplateSection):
 
             self.anchor_group = loader.dict_to_group(d["anchor_group"])
 
-    def generateSections(self) -> List[Section]:
+    def generate_sections(self) -> List[Section]:
         section = IntegratorSection(
             "minimizationTemplate",
             integrator=MinimizeIntegrator(
@@ -74,10 +74,10 @@ class MinimizeTemplate(TemplateSection):
             # Minimization is always done on all the atoms.
             # To create anchors during the minimization, we need to set the
             # force to 0 on the anchor group
-            section.addGroup(self.anchor_group)
-            section.addExtension(
+            section.add_group(self.anchor_group)
+            section.add_extension(
                 SetForceExtension(
-                    extensionName="zeroForceAnchor",
+                    extension_name="zeroForceAnchor",
                     group=self.anchor_group,
                     fx=ForceQuantity(0.0),
                     fy=ForceQuantity(0.0),
