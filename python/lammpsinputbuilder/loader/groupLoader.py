@@ -1,12 +1,15 @@
-import copy 
+import copy
 
-from lammpsinputbuilder.group import * 
+from lammpsinputbuilder.group import AllGroup, \
+    EmptyGroup, OperationGroup, IndicesGroup, \
+    ReferenceGroup, ManualGroup
+
 
 class GroupLoader:
     def __init__(self) -> None:
         pass
 
-    def dictToGroup(self, d:dict, version:int=0):
+    def dictToGroup(self, d: dict, version: int = 0):
         groupTable = {}
         groupTable[AllGroup.__name__] = AllGroup()
         groupTable[EmptyGroup.__name__] = EmptyGroup()
@@ -20,7 +23,8 @@ class GroupLoader:
         className = d["class"]
         if className not in groupTable.keys():
             raise RuntimeError(f"Unknown Group class {className}.")
-        # Create a copy of the base object, and we will update the settings of the object from the dictionary
+        # Create a copy of the base object, and we will update the settings
+        # of the object from the dictionary
         obj = copy.deepcopy(groupTable[className])
         obj.fromDict(d, version)
 

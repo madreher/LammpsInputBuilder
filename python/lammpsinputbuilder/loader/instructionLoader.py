@@ -1,17 +1,23 @@
-import copy 
+import copy
 
-from lammpsinputbuilder.instructions import * 
+from lammpsinputbuilder.instructions import ResetTimestepInstruction, \
+    SetTimestepInstruction, VelocityCreateInstruction, \
+    DisplaceAtomsInstruction, ManualInstruction
+
 
 class InstructionLoader():
     def __init__(self) -> None:
-            pass
+        pass
 
-    def dictToInstruction(self, d:dict, version:int=0):
+    def dictToInstruction(self, d: dict, version: int = 0):
         instructionTable = {}
-        instructionTable[ResetTimestepInstruction.__name__] = ResetTimestepInstruction()
+        instructionTable[ResetTimestepInstruction.__name__] = ResetTimestepInstruction(
+        )
         instructionTable[SetTimestepInstruction.__name__] = SetTimestepInstruction()
-        instructionTable[VelocityCreateInstruction.__name__] = VelocityCreateInstruction()
-        instructionTable[DisplaceAtomsInstruction.__name__] = DisplaceAtomsInstruction()
+        instructionTable[VelocityCreateInstruction.__name__] = VelocityCreateInstruction(
+        )
+        instructionTable[DisplaceAtomsInstruction.__name__] = DisplaceAtomsInstruction(
+        )
         instructionTable[ManualInstruction.__name__] = ManualInstruction()
 
         if "class" not in d.keys():
@@ -19,7 +25,8 @@ class InstructionLoader():
         className = d["class"]
         if className not in instructionTable.keys():
             raise RuntimeError(f"Unknown Instruction class {className}.")
-        # Create a copy of the base object, and we will update the settings of the object from the dictionary
+        # Create a copy of the base object, and we will update the settings of
+        # the object from the dictionary
         obj = copy.deepcopy(instructionTable[className])
         obj.fromDict(d, version)
 
