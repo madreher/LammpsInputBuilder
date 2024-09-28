@@ -38,10 +38,21 @@ jobs:
     - name: Analyze code with Pylint
       run: |
         source venv/bin/activate
-        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --exit-zero | tee pylint_report.txt
+        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --fail-under=7.0 | tee pylint_report.txt
         score=$(sed -n 's/Your code has been rated at \(.*\)/\1/p' pylint_report.txt)
         echo "PyLint score is: $score"
         anybadge --label "Pylint" --value $score --file=public/pylint_badge.svg
         deactivate
       working-directory: ${{ github.workspace }} 
+
+    - name: Create badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GIST_TOKEN }}
+        gistID: bc29e267d35fad12ca2de2bd7138ecfc
+        filename: test.json
+        label: "Pylint"
+        message: ${{ env.score }}
+        color: green
+
 
