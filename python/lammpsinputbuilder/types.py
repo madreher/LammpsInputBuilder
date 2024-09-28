@@ -1,123 +1,153 @@
+"""Module containing types for lammpsinputbuilder."""
+
 from enum import Enum
-from typing import List 
+from typing import List
 from ase import Atoms
 from lammpsinputbuilder.quantities import LammpsUnitSystem
 
+
 class Forcefield(Enum):
-    REAX = 1,
-    AIREBO = 2,
-    REBO = 3,
+    REAX = 1
+    AIREBO = 2
+    REBO = 3
     AIREBOM = 4
 
-def getForcefieldFromExtension(extension: str) -> Forcefield:
+
+def get_forcefield_from_extension(extension: str) -> Forcefield:
     if extension.lower() == ".reax":
         return Forcefield.REAX
-    elif extension.lower() == ".airebo":
+    if extension.lower() == ".airebo":
         return Forcefield.AIREBO
-    elif extension.lower() == ".rebo":
+    if extension.lower() == ".rebo":
         return Forcefield.REBO
-    elif extension.lower() == ".airebo-m":
+    if extension.lower() == ".airebo-m":
         return Forcefield.AIREBOM
-    else:
-        raise NotImplementedError(f"Forcefield {extension} not supported.")
-    
-def getExtensionFromForcefield(forcefield: Forcefield) -> str:
+
+    raise NotImplementedError(f"Forcefield {extension} not supported.")
+
+
+def get_extension_from_forcefield(forcefield: Forcefield) -> str:
     if forcefield == Forcefield.REAX:
         return ".reax"
-    elif forcefield == Forcefield.AIREBO:
+    if forcefield == Forcefield.AIREBO:
         return ".airebo"
-    elif forcefield == Forcefield.REBO:
+    if forcefield == Forcefield.REBO:
         return ".rebo"
-    elif forcefield == Forcefield.AIREBOM:
+    if forcefield == Forcefield.AIREBOM:
         return ".airebo-m"
-    else:
-        raise NotImplementedError(f"Forcefield {forcefield} not supported.")
+
+    raise NotImplementedError(f"Forcefield {forcefield} not supported.")
+
 
 class BoundingBoxStyle(Enum):
-    PERIODIC = 1,
+    PERIODIC = 1
     SHRINK = 2
 
+
 class MoleculeFileFormat(Enum):
-    XYZ = 1,
-    MOL2 = 2, 
+    XYZ = 1
+    MOL2 = 2
     LAMMPS_DUMP_TEXT = 3
 
-def getMoleculeFileFormatFromExtension(extension: str) -> MoleculeFileFormat:
+
+def get_molecule_file_format_from_extension(extension: str) -> MoleculeFileFormat:
     if extension.lower() == ".xyz":
         return MoleculeFileFormat.XYZ
-    elif extension.lower() == ".mol2":
+    if extension.lower() == ".mol2":
         return MoleculeFileFormat.MOL2
-    elif extension.lower() == ".lammpstrj":
+    if extension.lower() == ".lammpstrj":
         return MoleculeFileFormat.LAMMPS_DUMP_TEXT
-    else:
-        raise NotImplementedError(f"Molecule format {extension} not supported.")
-    
-def getExtensionFromMoleculeFileFormat(moleculeFileFormat: MoleculeFileFormat) -> str:
-    if moleculeFileFormat == MoleculeFileFormat.XYZ:
+
+    raise NotImplementedError(f"Molecule format {extension} not supported.")
+
+
+def get_extension_from_molecule_file_format(
+        molecule_file_format: MoleculeFileFormat) -> str:
+    if molecule_file_format == MoleculeFileFormat.XYZ:
         return ".xyz"
-    elif moleculeFileFormat == MoleculeFileFormat.MOL2:
+    if molecule_file_format == MoleculeFileFormat.MOL2:
         return ".mol2"
-    else:
-        raise NotImplementedError(f"Molecule format {moleculeFileFormat} not supported.")
+
+    raise NotImplementedError(f"Molecule format {molecule_file_format} not supported.")
+
 
 class ElectrostaticMethod(Enum):
-    ACKS2 = 1,
+    ACKS2 = 1
     QEQ = 2
+
 
 class MoleculeHolder():
     """
     Class used to store the molecule information
     """
-    def __init__(self, atoms: Atoms, bboxCoords: List) -> None:
-        self.atoms = atoms
-        if len(bboxCoords) != 6:
-            raise ValueError("Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
-        self.bboxCoords = bboxCoords
-        self.bboxDims = [bboxCoords[1] - bboxCoords[0], bboxCoords[3] - bboxCoords[2], bboxCoords[5] - bboxCoords[4]]
 
-    def getAtoms(self) -> Atoms:
+    def __init__(self, atoms: Atoms, bbox_coords: List) -> None:
+        self.atoms = atoms
+        if len(bbox_coords) != 6:
+            raise ValueError(
+                "Invalid number of bounding box coordinates (6 expected, received " + 
+                str(len(bbox_coords)) + ")")
+        self.bbox_coords = bbox_coords
+        self.bbox_dims = [
+            bbox_coords[1] -
+            bbox_coords[0],
+            bbox_coords[3] -
+            bbox_coords[2],
+            bbox_coords[5] -
+            bbox_coords[4]]
+
+    def get_atoms(self) -> Atoms:
         return self.atoms
 
-    def getBboxCoords(self) -> List:
-        return self.bboxCoords
+    def get_bbox_coords(self) -> List:
+        return self.bbox_coords
 
-    def getBboxDims(self) -> List:
-        return self.bboxDims
-    
+    def get_bbox_dims(self) -> List:
+        return self.bbox_dims
+
+
 class GlobalInformation:
     def __init__(self) -> None:
-        self.unitStyle = None
-        self.elementTable = {}
+        self.unit_style = None
+        self.element_table = {}
         self.atoms = None
-        self.bboxCoords = None
-        self.bboxDims = None
+        self.bbox_coords = None
+        self.bbox_dims = None
 
-    def setAtoms(self, atoms: Atoms):
+    def set_atoms(self, atoms: Atoms):
         self.atoms = atoms
 
-    def getAtoms(self) -> Atoms:
+    def get_atoms(self) -> Atoms:
         return self.atoms
-    
-    def setBBoxCoords(self, bboxCoords: List):
-        if len(bboxCoords) != 6:
-            raise ValueError("Invalid number of bounding box coordinates (6 expected, received " + str(len(bboxCoords)) + ")")
-        self.bboxCoords = bboxCoords
-        self.bboxDims = [bboxCoords[1] - bboxCoords[0], bboxCoords[3] - bboxCoords[2], bboxCoords[5] - bboxCoords[4]]
 
-    def getBBoxCoords(self) -> List:
-        return self.bboxCoords
+    def set_bbox_coords(self, bbox_coords: List[float]):
+        if len(bbox_coords) != 6:
+            raise ValueError(
+                "Invalid number of bounding box coordinates (6 expected, received " + 
+                str(len(bbox_coords)) + ")")
+        self.bbox_coords = bbox_coords
+        self.bbox_dims = [
+            bbox_coords[1] -
+            bbox_coords[0],
+            bbox_coords[3] -
+            bbox_coords[2],
+            bbox_coords[5] -
+            bbox_coords[4]]
 
-    def getBboxDims(self) -> List:
-        return self.bboxDims
-    
-    def setUnitStyle(self, unitStyle: LammpsUnitSystem):
-        self.unitStyle = unitStyle
+    def get_bbox_coords(self) -> List:
+        return self.bbox_coords
 
-    def getUnitStyle(self) -> LammpsUnitSystem:
-        return self.unitStyle
-    
-    def setElementTable(self, elementTable: dict):
-        self.elementTable = elementTable
+    def get_bbox_dims(self) -> List:
+        return self.bbox_dims
 
-    def getElementTable(self) -> dict:
-        return self.elementTable
+    def set_unit_style(self, unit_style: LammpsUnitSystem):
+        self.unit_style = unit_style
+
+    def get_unit_style(self) -> LammpsUnitSystem:
+        return self.unit_style
+
+    def set_element_table(self, element_table: dict):
+        self.element_table = element_table
+
+    def get_element_table(self) -> dict:
+        return self.element_table

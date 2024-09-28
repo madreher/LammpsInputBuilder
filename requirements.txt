@@ -2,4 +2,5 @@ ase
 pint >= 0.17
 lammps-logfile
 matplotlib
+pylint
 -r tests/requirements.test.txt

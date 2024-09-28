@@ -1,131 +1,136 @@
-from lammpsinputbuilder.instructions import *
+from lammpsinputbuilder.instructions import ResetTimestepInstruction, SetTimestepInstruction, \
+    VelocityCreateInstruction, DisplaceAtomsInstruction, ManualInstruction, \
+    VariableStyle, VariableInstruction
+from lammpsinputbuilder.types import LammpsUnitSystem, GlobalInformation
+from lammpsinputbuilder.quantities import TimeQuantity, TemperatureQuantity, LengthQuantity
+from lammpsinputbuilder.group import AllGroup
 
-def test_instructionsResetTimestep():
-    instruction = ResetTimestepInstruction(instructionName="defaultResetTimestep", timestep=20)
-    assert instruction.getTimestep() == 20
-    assert instruction.getInstructionName() == "defaultResetTimestep"
+def test_instructions_ResetTimestep():
+    instruction = ResetTimestepInstruction(instruction_name="defaultResetTimestep", timestep=20)
+    assert instruction.get_timestep() == 20
+    assert instruction.get_instruction_name() == "defaultResetTimestep"
 
     info = GlobalInformation()
-    assert instruction.writeInstruction(info) == "reset_timestep 20\n"
+    assert instruction.write_instruction(info) == "reset_timestep 20\n"
 
-    objDict = instruction.toDict()
-    assert objDict["class"] == "ResetTimestepInstruction"
-    assert objDict["timestep"] == 20
-    assert objDict["instructionName"] == "defaultResetTimestep"
+    obj_dict = instruction.to_dict()
+    assert obj_dict["class"] == "ResetTimestepInstruction"
+    assert obj_dict["timestep"] == 20
+    assert obj_dict["instruction_name"] == "defaultResetTimestep"
 
     instruction2 = ResetTimestepInstruction()
-    instruction2.fromDict(objDict, version=0)
-    assert instruction2.getTimestep() == 20
-    assert instruction2.getInstructionName() == "defaultResetTimestep"
+    instruction2.from_dict(obj_dict, version=0)
+    assert instruction2.get_timestep() == 20
+    assert instruction2.get_instruction_name() == "defaultResetTimestep"
 
-def test_instructionsSetTimestep():
-    instruction = SetTimestepInstruction(instructionName="defaultSetTimestep", timestep=TimeQuantity(20, "fs"))
-    assert instruction.getTimestep().getMagnitude() == 20
-    assert instruction.getTimestep().getUnits() == "fs"
-    assert instruction.getInstructionName() == "defaultSetTimestep"
+def test_instructions_SetTimestep():
+    instruction = SetTimestepInstruction(instruction_name="defaultSetTimestep", timestep=TimeQuantity(20, "fs"))
+    assert instruction.get_timestep().get_magnitude() == 20
+    assert instruction.get_timestep().get_units() == "fs"
+    assert instruction.get_instruction_name() == "defaultSetTimestep"
 
-    infoReal = GlobalInformation()
-    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
-    assert instruction.writeInstruction(infoReal) == "timestep 20.0\n"
+    info_real = GlobalInformation()
+    info_real.set_unit_style(LammpsUnitSystem.REAL)
+    assert instruction.write_instruction(info_real) == "timestep 20.0\n"
 
-    infoMetal = GlobalInformation()
-    infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
-    assert instruction.writeInstruction(infoMetal) == "timestep 0.02\n"
+    info_metal = GlobalInformation()
+    info_metal.set_unit_style(LammpsUnitSystem.METAL)
+    assert instruction.write_instruction(info_metal) == "timestep 0.02\n"
 
-    objDict = instruction.toDict()
-    assert objDict["class"] == "SetTimestepInstruction"
-    assert objDict["timestep"]["magnitude"] == 20
-    assert objDict["timestep"]["units"] == "fs"
-    assert objDict["instructionName"] == "defaultSetTimestep"
+    obj_dict = instruction.to_dict()
+    assert obj_dict["class"] == "SetTimestepInstruction"
+    assert obj_dict["timestep"]["magnitude"] == 20
+    assert obj_dict["timestep"]["units"] == "fs"
+    assert obj_dict["instruction_name"] == "defaultSetTimestep"
 
     instruction2 = SetTimestepInstruction()
-    instruction2.fromDict(objDict, version=0)
-    assert instruction2.getTimestep().getMagnitude() == 20
-    assert instruction2.getTimestep().getUnits() == "fs"
-    assert instruction2.getInstructionName() == "defaultSetTimestep"
+    instruction2.from_dict(obj_dict, version=0)
+    assert instruction2.get_timestep().get_magnitude() == 20
+    assert instruction2.get_timestep().get_units() == "fs"
+    assert instruction2.get_instruction_name() == "defaultSetTimestep"
 
-def test_instructionVelocityCreate():
-    instruction = VelocityCreateInstruction(instructionName="defaultVelocityCreate", group=AllGroup(), temp=TemperatureQuantity(300, "kelvin"), seed=12335)
-    assert instruction.getGroupName() == "all"
-    assert instruction.getTemp().getMagnitude() == 300
-    assert instruction.getTemp().getUnits() == "kelvin"
-    assert instruction.getSeed() == 12335
-    assert instruction.getInstructionName() == "defaultVelocityCreate"
+def test_instruction_VelocityCreate():
+    instruction = VelocityCreateInstruction(instruction_name="defaultVelocityCreate", group=AllGroup(), temp=TemperatureQuantity(300, "kelvin"), seed=12335)
+    assert instruction.get_group_name() == "all"
+    assert instruction.get_temp().get_magnitude() == 300
+    assert instruction.get_temp().get_units() == "kelvin"
+    assert instruction.get_seed() == 12335
+    assert instruction.get_instruction_name() == "defaultVelocityCreate"
 
-    infoReal = GlobalInformation()
-    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
-    assert instruction.writeInstruction(infoReal) == "velocity all create 300.0 12335 dist gaussian\n"
+    info_real = GlobalInformation()
+    info_real.set_unit_style(LammpsUnitSystem.REAL)
+    assert instruction.write_instruction(info_real) == "velocity all create 300.0 12335 dist gaussian\n"
 
-    objDict = instruction.toDict()
-    assert objDict["class"] == "VelocityCreateInstruction"
-    assert objDict["groupName"] == "all"
-    assert objDict["temp"]["magnitude"] == 300
-    assert objDict["temp"]["units"] == "kelvin"
-    assert objDict["seed"] == 12335
-    assert objDict["instructionName"] == "defaultVelocityCreate"
+    obj_dict = instruction.to_dict()
+    assert obj_dict["class"] == "VelocityCreateInstruction"
+    assert obj_dict["group_name"] == "all"
+    assert obj_dict["temp"]["magnitude"] == 300
+    assert obj_dict["temp"]["units"] == "kelvin"
+    assert obj_dict["seed"] == 12335
+    assert obj_dict["instruction_name"] == "defaultVelocityCreate"
 
     instruction2 = VelocityCreateInstruction()
-    instruction2.fromDict(objDict, version=0)
-    assert instruction2.getGroupName() == "all"
-    assert instruction2.getTemp().getMagnitude() == 300
-    assert instruction2.getTemp().getUnits() == "kelvin"
-    assert instruction2.getSeed() == 12335
-    assert instruction2.getInstructionName() == "defaultVelocityCreate"
+    instruction2.from_dict(obj_dict, version=0)
+    assert instruction2.get_group_name() == "all"
+    assert instruction2.get_temp().get_magnitude() == 300
+    assert instruction2.get_temp().get_units() == "kelvin"
+    assert instruction2.get_seed() == 12335
+    assert instruction2.get_instruction_name() == "defaultVelocityCreate"
 
-def test_instructionVariable():
-    instruction = VariableInstruction(instructionName="defaultVariable", variableName="defaultVariable", style=VariableStyle.EQUAL, args="{dt}")
-    assert instruction.getVariableName() == "defaultVariable"
-    assert instruction.getVariableStyle() == VariableStyle.EQUAL
-    assert instruction.getArgs() == "{dt}"
-    assert instruction.getInstructionName() == "defaultVariable"
+def test_instruction_Variable():
+    instruction = VariableInstruction(instruction_name="defaultVariable", variable_name="defaultVariable", style=VariableStyle.EQUAL, args="{dt}")
+    assert instruction.get_variable_name() == "defaultVariable"
+    assert instruction.get_variable_style() == VariableStyle.EQUAL
+    assert instruction.get_args() == "{dt}"
+    assert instruction.get_instruction_name() == "defaultVariable"
 
     info = GlobalInformation()
-    assert instruction.writeInstruction(info) == "variable defaultVariable equal {dt}\n"
+    assert instruction.write_instruction(info) == "variable defaultVariable equal {dt}\n"
 
-    objDict = instruction.toDict()
-    assert objDict["class"] == "VariableInstruction"
-    assert objDict["variableName"] == "defaultVariable"
-    assert objDict["style"] == VariableStyle.EQUAL.value
-    assert objDict["args"] == "{dt}"
-    assert objDict["instructionName"] == "defaultVariable"
+    obj_dict = instruction.to_dict()
+    assert obj_dict["class"] == "VariableInstruction"
+    assert obj_dict["variable_name"] == "defaultVariable"
+    assert obj_dict["style"] == VariableStyle.EQUAL.value
+    assert obj_dict["args"] == "{dt}"
+    assert obj_dict["instruction_name"] == "defaultVariable"
 
     instruction2 = VariableInstruction()
-    instruction2.fromDict(objDict, version=0)
-    assert instruction2.getVariableName() == "defaultVariable"
-    assert instruction2.getVariableStyle() == VariableStyle.EQUAL
-    assert instruction2.getArgs() == "{dt}"
-    assert instruction2.getInstructionName() == "defaultVariable"
+    instruction2.from_dict(obj_dict, version=0)
+    assert instruction2.get_variable_name() == "defaultVariable"
+    assert instruction2.get_variable_style() == VariableStyle.EQUAL
+    assert instruction2.get_args() == "{dt}"
+    assert instruction2.get_instruction_name() == "defaultVariable"
 
-def test_DisplaceAtomsInstruction():
-    instruction = DisplaceAtomsInstruction(instructionName="defaultDisplaceAtoms", group=AllGroup(), dx=LengthQuantity(1.0, "lmp_real_length"), dy=LengthQuantity(2.0, "lmp_real_length"), dz=LengthQuantity(3.0, "lmp_real_length"))
-    assert instruction.getGroupName() == "all"
-    displacementVector =  instruction.getDisplacement()
-    assert displacementVector[0].getMagnitude() == 1.0
-    assert displacementVector[0].getUnits() == "lmp_real_length"
-    assert displacementVector[1].getMagnitude() == 2.0
-    assert displacementVector[1].getUnits() == "lmp_real_length"
-    assert displacementVector[2].getMagnitude() == 3.0
-    assert displacementVector[2].getUnits() == "lmp_real_length"
-    assert instruction.getInstructionName() == "defaultDisplaceAtoms"
+def test_instruction_DisplaceAtoms():
+    instruction = DisplaceAtomsInstruction(instruction_name="defaultDisplaceAtoms", group=AllGroup(), dx=LengthQuantity(1.0, "lmp_real_length"), dy=LengthQuantity(2.0, "lmp_real_length"), dz=LengthQuantity(3.0, "lmp_real_length"))
+    assert instruction.get_group_name() == "all"
+    displacement_vector =  instruction.get_displacement()
+    assert displacement_vector[0].get_magnitude() == 1.0
+    assert displacement_vector[0].get_units() == "lmp_real_length"
+    assert displacement_vector[1].get_magnitude() == 2.0
+    assert displacement_vector[1].get_units() == "lmp_real_length"
+    assert displacement_vector[2].get_magnitude() == 3.0
+    assert displacement_vector[2].get_units() == "lmp_real_length"
+    assert instruction.get_instruction_name() == "defaultDisplaceAtoms"
 
-    infoReal = GlobalInformation()
-    infoReal.setUnitStyle(LammpsUnitSystem.REAL)
-    assert instruction.writeInstruction(infoReal) == "displace_atoms all move 1.0 2.0 3.0\n"
-    infoMetal = GlobalInformation()
-    infoMetal.setUnitStyle(LammpsUnitSystem.METAL)
-    assert instruction.writeInstruction(infoMetal) == "displace_atoms all move 1.0 2.0 3.0\n"
+    info_real = GlobalInformation()
+    info_real.set_unit_style(LammpsUnitSystem.REAL)
+    assert instruction.write_instruction(info_real) == "displace_atoms all move 1.0 2.0 3.0\n"
+    info_metal = GlobalInformation()
+    info_metal.set_unit_style(LammpsUnitSystem.METAL)
+    assert instruction.write_instruction(info_metal) == "displace_atoms all move 1.0 2.0 3.0\n"
 
-def test_ManualInstruction():
-    instruction = ManualInstruction(instructionName="defaultManual", cmd="manual")
-    assert instruction.getInstructionName() == "defaultManual"
-    assert instruction.writeInstruction(GlobalInformation()) == "manual\n"
+def test_instruction_Manual():
+    instruction = ManualInstruction(instruction_name="defaultManual", cmd="manual")
+    assert instruction.get_instruction_name() == "defaultManual"
+    assert instruction.write_instruction(GlobalInformation()) == "manual\n"
 
-    objDict = instruction.toDict()
-    assert objDict["class"] == "ManualInstruction"
-    assert objDict["instructionName"] == "defaultManual"
-    assert objDict["cmd"] == "manual"
+    obj_dict = instruction.to_dict()
+    assert obj_dict["class"] == "ManualInstruction"
+    assert obj_dict["instruction_name"] == "defaultManual"
+    assert obj_dict["cmd"] == "manual"
 
     instruction2 = ManualInstruction()
-    instruction2.fromDict(objDict, version=0)
-    assert instruction2.getInstructionName() == "defaultManual"
-    assert instruction2.writeInstruction(GlobalInformation()) == "manual\n"
+    instruction2.from_dict(obj_dict, version=0)
+    assert instruction2.get_instruction_name() == "defaultManual"
+    assert instruction2.write_instruction(GlobalInformation()) == "manual\n"

@@ -1,306 +1,323 @@
+"""Module implementing the Section class and its subclasses."""
+
 from typing import List
 
 from lammpsinputbuilder.integrator import Integrator, RunZeroIntegrator
-from lammpsinputbuilder.fileIO import FileIO
-from lammpsinputbuilder.quantities import LammpsUnitSystem
+from lammpsinputbuilder.fileio import FileIO
 from lammpsinputbuilder.instructions import Instruction
 from lammpsinputbuilder.extensions import Extension
 from lammpsinputbuilder.group import Group
 from lammpsinputbuilder.types import GlobalInformation
 
-class Section:
-    def __init__(self, sectionName: str = "defaultSection") -> None:
-        self.sectionName = sectionName
 
-    def toDict(self) -> dict:
+class Section:
+    def __init__(self, section_name: str = "defaultSection") -> None:
+        self.section_name = section_name
+
+    def to_dict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
-        result["sectionName"] = self.sectionName
+        result["section_name"] = self.section_name
         return result
 
-    def fromDict(self, d: dict):
-        self.sectionName = d.get("sectionName", "defaultSection")
-        return
-    
-    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
+    def from_dict(self, d: dict, version: int):
+        del version  # unused
+        self.section_name = d.get("section_name", "defaultSection")
+
+    def add_all_commands(self, global_information: GlobalInformation) -> str:
         result = ""
-        result += self.addDoCommands(globalInformation=globalInformation)
-        result += self.addUndoCommands()
+        result += self.add_do_commands(global_information=global_information)
+        result += self.add_undo_commands()
         return result
-    
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+
+    def add_do_commands(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return ""
-    
-    def addUndoCommands(self) -> str:
+
+    def add_undo_commands(self) -> str:
         return ""
-    
 
 
 class RecusiveSection(Section):
-    def __init__(self, sectionName: str = "defaultSection") -> None:
-        super().__init__(sectionName=sectionName)
+    def __init__(self, section_name: str = "defaultSection") -> None:
+        super().__init__(section_name=section_name)
         self.sections: List[Section] = []
         self.ios: List[FileIO] = []
         self.extensions: List[Extension] = []
         self.groups: List[Group] = []
 
-    def addSection(self, section: Section):
+    def add_section(self, section: Section):
         self.sections.append(section)
 
-    def addFileIO(self, fileIO: FileIO):
-        self.ios.append(fileIO)
+    def add_fileio(self, fileio: FileIO):
+        self.ios.append(fileio)
 
-    def addExtension(self, extension: Extension):
+    def add_extension(self, extension: Extension):
         self.extensions.append(extension)
 
-    def addGroup(self, group: Group):
+    def add_group(self, group: Group):
         self.groups.append(group)
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["sections"] = [s.toDict() for s in self.sections]
-        result["fileIOs"] = [s.toDict() for s in self.ios]
-        result["extensions"] = [s.toDict() for s in self.extensions]
-        result["groups"] = [s.toDict() for s in self.groups]
+        result["sections"] = [s.to_dict() for s in self.sections]
+        result["fileios"] = [s.to_dict() for s in self.ios]
+        result["extensions"] = [s.to_dict() for s in self.extensions]
+        result["groups"] = [s.to_dict() for s in self.groups]
         return result
-    
-    def fromDict(self, d: dict, version: int):
-        super().fromDict(d, version=version)
+
+    def from_dict(self, d: dict, version: int):
+        super().from_dict(d, version=version)
 
         if "sections" in d.keys() and len(d["sections"]) > 0:
             sections = d["sections"]
-            
-            from lammpsinputbuilder.loader.sectionLoader import SectionLoader
+
+            from lammpsinputbuilder.loader.section_loader import SectionLoader
             loader = SectionLoader()
 
             for section in sections:
-                self.sections.append(loader.dictToSection(section))
+                self.sections.append(loader.dict_to_section(section))
 
-        if "fileIOs" in d.keys() and len(d["fileIOs"]) > 0:
-            ios = d["fileIOs"]
-            
-            from lammpsinputbuilder.loader.fileIOLoader import FileIOLoader
+        if "fileios" in d.keys() and len(d["fileios"]) > 0:
+            ios = d["fileios"]
+
+            from lammpsinputbuilder.loader.fileio_loader import FileIOLoader
             loader = FileIOLoader()
 
             for io in ios:
-                self.ios.append(loader.dictToFileIO(io))
+                self.ios.append(loader.dict_to_fileio(io))
 
         if "extensions" in d.keys() and len(d["extensions"]) > 0:
             exts = d["extensions"]
-            
-            from lammpsinputbuilder.loader.extensionLoader import ExtensionLoader
+
+            from lammpsinputbuilder.loader.extension_loader import ExtensionLoader
             loader = ExtensionLoader()
 
             for ext in exts:
-                self.extensions.append(loader.dictToExtension(ext))
+                self.extensions.append(loader.dict_to_extension(ext))
 
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
-            
-            from lammpsinputbuilder.loader.groupLoader import GroupLoader
+
+            from lammpsinputbuilder.loader.group_loader import GroupLoader
             loader = GroupLoader()
 
             for group in groups:
-                self.groups.append(loader.dictToGroup(group))
+                self.groups.append(loader.dict_to_group(group))
 
-    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
-        
-        # Declare all the objects which are going to live during the entire duractions of the sections
-        result = f"################# START Section {self.sectionName} #################\n"
-        result +=  "################# START Groups DECLARATION #################\n"
+    def add_all_commands(self, global_information: GlobalInformation) -> str:
+
+        # Declare all the objects which are going to live during the entire
+        # duractions of the sections
+        result = f"################# START Section {self.section_name} #################\n"
+        result += "################# START Groups DECLARATION #################\n"
         for grp in self.groups:
-            result += grp.addDoCommands()
-        result +=  "################# END Groups DECLARATION #################\n"
-        
-        result +=  "################# START Extensions DECLARATION #################\n"
+            result += grp.add_do_commands()
+        result += "################# END Groups DECLARATION #################\n"
+
+        result += "################# START Extensions DECLARATION #################\n"
         for ext in self.extensions:
-            result += ext.addDoCommands(globalInformation=globalInformation)
-        result +=  "################# END Extensions DECLARATION #################\n"
-        
-        result +=  "################# START IOs DECLARATION #################\n"
+            result += ext.add_do_commands(global_information=global_information)
+        result += "################# END Extensions DECLARATION #################\n"
+
+        result += "################# START IOs DECLARATION #################\n"
         for io in self.ios:
-            result += io.addDoCommands(globalInformation=globalInformation)
-        result +=  "################# END IOs DECLARATION #################\n"
-        
+            result += io.add_do_commands(global_information=global_information)
+        result += "################# END IOs DECLARATION #################\n"
+
         # Everything is declared, now we can execute the differente sections
         for section in self.sections:
-            result += section.addAllCommands(globalInformation=globalInformation)
+            result += section.add_all_commands(
+                global_information=global_information)
 
         # Everything is executed, now we can undo the differente sections
-        result +=  "################# START IO REMOVAL #################\n"
+        result += "################# START IO REMOVAL #################\n"
         for io in reversed(self.ios):
-            result += io.addUndoCommands()
-        result +=  "################# END IOs DECLARATION #################\n"
-        
-        result +=  "################# START Extensions REMOVAL #################\n"
-        for ext in reversed(self.extensions):
-            result += ext.addUndoCommands()
-        result +=  "################# END Extensions DECLARATION #################\n"
-        
-        result +=  "################# START Groups REMOVAL #################\n"
-        for grp in reversed(self.groups):
-            result += grp.addUndoCommands()
-        result +=  "################# END Groups DECLARATION #################\n"
+            result += io.add_undo_commands()
+        result += "################# END IOs DECLARATION #################\n"
 
-        result += f"################# END Section {self.sectionName} #################\n"
+        result += "################# START Extensions REMOVAL #################\n"
+        for ext in reversed(self.extensions):
+            result += ext.add_undo_commands()
+        result += "################# END Extensions DECLARATION #################\n"
+
+        result += "################# START Groups REMOVAL #################\n"
+        for grp in reversed(self.groups):
+            result += grp.add_undo_commands()
+        result += "################# END Groups DECLARATION #################\n"
+
+        result += f"################# END Section {self.section_name} #################\n"
 
         return result
 
+
 class IntegratorSection(Section):
-    def __init__(self, sectionName: str = "defaultSection", integrator: Integrator = RunZeroIntegrator()) -> None:
-        super().__init__(sectionName=sectionName)
+    def __init__(self, section_name: str = "defaultSection",
+                 integrator: Integrator = RunZeroIntegrator()) -> None:
+        super().__init__(section_name=section_name)
         self.integrator = integrator
-        self.fileIOs = []
+        self.fileios = []
         self.extensions = []
         self.groups = []
 
-    def getIntegrator(self) -> Integrator:
+    def get_integrator(self) -> Integrator:
         return self.integrator
-    
-    def setIntegrator(self, integrator: Integrator) -> None:
+
+    def set_integrator(self, integrator: Integrator) -> None:
         self.integrator = integrator
 
-    def addFileIO(self, fileIO: FileIO) -> None:
-        self.fileIOs.append(fileIO)
+    def add_fileio(self, fileio: FileIO) -> None:
+        self.fileios.append(fileio)
 
-    def addExtension(self, extension: Extension) -> None:
+    def add_extension(self, extension: Extension) -> None:
         self.extensions.append(extension)
 
-    def addGroup(self, group: Group) -> None:
+    def add_group(self, group: Group) -> None:
         self.groups.append(group)
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["integrator"] = self.integrator.toDict()
-        result["fileIOs"] = [f.toDict() for f in self.fileIOs]
-        result["extensions"] = [e.toDict() for e in self.extensions]
-        result["groups"] = [g.toDict() for g in self.groups]
+        result["integrator"] = self.integrator.to_dict()
+        result["fileios"] = [f.to_dict() for f in self.fileios]
+        result["extensions"] = [e.to_dict() for e in self.extensions]
+        result["groups"] = [g.to_dict() for g in self.groups]
         return result
-    
-    def fromDict(self, d: dict, version: int) -> None:
-        super().fromDict(d, version=version)
+
+    def from_dict(self, d: dict, version: int) -> None:
+        super().from_dict(d, version=version)
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
         if "integrator" not in d.keys():
             raise ValueError(f"Missing 'integrator' key in {d}.")
-        
-        import lammpsinputbuilder.loader.integratorLoader as loader
-        integratorLoader = loader.IntegratorLoader()
-        self.integrator = integratorLoader.dictToIntegrator(d["integrator"], version)
 
-        if "fileIOs" in d.keys() and len(d["fileIOs"]) > 0:
-            ios = d["fileIOs"]
+        import lammpsinputbuilder.loader.integrator_loader as loader
+        integrator_loader = loader.IntegratorLoader()
+        self.integrator = integrator_loader.dictToIntegrator(
+            d["integrator"], version)
 
-            import lammpsinputbuilder.loader.fileIOLoader as loader
-            fileIOLoader = loader.FileIOLoader()
+        if "fileios" in d.keys() and len(d["fileios"]) > 0:
+            ios = d["fileios"]
+
+            import lammpsinputbuilder.loader.fileio_loader as loader
+            fileio_loader = loader.FileIOLoader()
 
             for io in ios:
-                self.fileIOs.append(fileIOLoader.dictToFileIO(io))
+                self.fileios.append(fileio_loader.dictToFileIO(io))
 
         if "extensions" in d.keys() and len(d["extensions"]) > 0:
             exts = d["extensions"]
 
-            import lammpsinputbuilder.loader.extensionLoader as loader
-            extensionLoader = loader.ExtensionLoader()
+            import lammpsinputbuilder.loader.extension_loader as loader
+            extension_loader = loader.ExtensionLoader()
 
             for ext in exts:
-                self.extensions.append(extensionLoader.dictToExtension(ext))
+                self.extensions.append(extension_loader.dictToExtension(ext))
 
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
 
-            import lammpsinputbuilder.loader.groupLoader as loader
-            groupLoader = loader.GroupLoader()
+            import lammpsinputbuilder.loader.group_loader as loader
+            group_loader = loader.GroupLoader()
 
             for group in groups:
-                self.groups.append(groupLoader.dictToGroup(group))
+                self.groups.append(group_loader.dict_to_group(group))
 
-            
-        
-    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
-        result =  "################# START SECTION " + self.sectionName + " #################\n\n"
-        result += self.addDoCommands(globalInformation=globalInformation)
-        result +=  "################# START RUN INTEGRATOR FOR SECTION " + self.sectionName + " #################\n"
-        result += self.integrator.addRunCommands()
-        result +=  "################# END RUN INTEGRATOR FOR SECTION " + self.sectionName + " #################\n"
-        result += self.addUndoCommands()
-        result += "################# END SECTION " + self.sectionName + " #################\n\n"
+    def add_all_commands(self, global_information: GlobalInformation) -> str:
+        result = "################# START SECTION " + \
+            self.section_name + " #################\n\n"
+        result += self.add_do_commands(global_information=global_information)
+        result += "################# START RUN INTEGRATOR FOR SECTION " + \
+            self.section_name + " #################\n"
+        result += self.integrator.add_run_commands()
+        result += "################# END RUN INTEGRATOR FOR SECTION " + \
+            self.section_name + " #################\n"
+        result += self.add_undo_commands()
+        result += "################# END SECTION " + \
+            self.section_name + " #################\n\n"
         return result
 
-    def addDoCommands(self, globalInformation:GlobalInformation) -> str:
+    def add_do_commands(self, global_information: GlobalInformation) -> str:
         result = ""
-        result +=  "################# START Groups DECLARATION #################\n"
+        result += "################# START Groups DECLARATION #################\n"
         for grp in self.groups:
-            result += grp.addDoCommands()
-        result +=  "################# END Groups DECLARATION #################\n"
-        
-        result +=  "################# START Extensions DECLARATION #################\n"
+            result += grp.add_do_commands()
+        result += "################# END Groups DECLARATION #################\n"
+
+        result += "################# START Extensions DECLARATION #################\n"
         for ext in self.extensions:
-            result += ext.addDoCommands(globalInformation=globalInformation)
-        result +=  "################# END Extensions DECLARATION #################\n"
-        
-        result +=  "################# START IOs DECLARATION #################\n"
-        for io in self.fileIOs:
-            result += io.addDoCommands(globalInformation=globalInformation)
-        result +=  "################# END IOs DECLARATION #################\n"
-        
-        result +=  "################# START INTEGRATOR DECLARATION #################\n"
-        result += self.integrator.addDoCommands(globalInformation=globalInformation)
-        result +=  "################# END INTEGRATOR DECLARATION #################\n"
+            result += ext.add_do_commands(global_information=global_information)
+        result += "################# END Extensions DECLARATION #################\n"
+
+        result += "################# START IOs DECLARATION #################\n"
+        for io in self.fileios:
+            result += io.add_do_commands(global_information=global_information)
+        result += "################# END IOs DECLARATION #################\n"
+
+        result += "################# START INTEGRATOR DECLARATION #################\n"
+        result += self.integrator.add_do_commands(
+            global_information=global_information)
+        result += "################# END INTEGRATOR DECLARATION #################\n"
         return result
-    
-    def addUndoCommands(self) -> str:
+
+    def add_undo_commands(self) -> str:
         # Undo if the reverse order is needed
         result = ""
-        result +=  "################# START INTEGRATOR REMOVAL #################\n"
-        result += self.integrator.addUndoCommands()
-        result +=  "################# END INTEGRATOR REMOVAL #################\n"
-        
-        result +=  "################# START IO REMOVAL #################\n"
-        for io in reversed(self.fileIOs):
-            result += io.addUndoCommands()
-        result +=  "################# END IOs DECLARATION #################\n"
-        
-        result +=  "################# START Extensions REMOVAL #################\n"
+        result += "################# START INTEGRATOR REMOVAL #################\n"
+        result += self.integrator.add_undo_commands()
+        result += "################# END INTEGRATOR REMOVAL #################\n"
+
+        result += "################# START IO REMOVAL #################\n"
+        for io in reversed(self.fileios):
+            result += io.add_undo_commands()
+        result += "################# END IOs DECLARATION #################\n"
+
+        result += "################# START Extensions REMOVAL #################\n"
         for ext in reversed(self.extensions):
-            result += ext.addUndoCommands()
-        result +=  "################# END Extensions DECLARATION #################\n"
-        
-        result +=  "################# START Groups REMOVAL #################\n"
+            result += ext.add_undo_commands()
+        result += "################# END Extensions DECLARATION #################\n"
+
+        result += "################# START Groups REMOVAL #################\n"
         for grp in reversed(self.groups):
-            result += grp.addUndoCommands()
-        result +=  "################# END Groups DECLARATION #################\n"
+            result += grp.add_undo_commands()
+        result += "################# END Groups DECLARATION #################\n"
 
         return result
+
 
 class InstructionsSection(Section):
-    def __init__(self, sectionName: str = "defaultSection") -> None:
-        super().__init__(sectionName=sectionName)
+    def __init__(self, section_name: str = "defaultSection") -> None:
+        super().__init__(section_name=section_name)
         self.instructions: List[Instruction] = []
 
-    def addInstruction(self, instruction: Instruction):
+    def add_instruction(self, instruction: Instruction):
         self.instructions.append(instruction)
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["instructions"] = [c.toDict() for c in self.instructions]
+        result["instructions"] = [c.to_dict() for c in self.instructions]
         return result
-    
-    def fromDict(self, d: dict, version: int):
-        super().fromDict(d, version=version)
-        instructionsDict = d.get("instructions", [])
-        if len(instructionsDict) > 0:
-            import lammpsinputbuilder.loader.instructionLoader as loader
-        
-            instructionLoader = loader.InstructionLoader()
-            self.instructions = [instructionLoader.dictToInstruction(c, version) for c in instructionsDict]
 
-    def addAllCommands(self, globalInformation:GlobalInformation) -> str:
-        result =  "################# START SECTION " + self.sectionName + " #################\n\n"
+    def from_dict(self, d: dict, version: int):
+        super().from_dict(d, version=version)
+        instructions_dict = d.get("instructions", [])
+        if len(instructions_dict) > 0:
+            import lammpsinputbuilder.loader.instruction_loader as loader
+
+            instruction_loader = loader.InstructionLoader()
+            self.instructions = [
+                instruction_loader.dict_to_instruction(
+                    c, version) for c in instructions_dict]
+
+    def add_all_commands(self, global_information: GlobalInformation) -> str:
+        result = "################# START SECTION " + \
+            self.section_name + " #################\n\n"
         for instruction in self.instructions:
-            result += instruction.writeInstruction(globalInformation=globalInformation)
-        result += "################# END SECTION " + self.sectionName + " #################\n\n"
+            result += instruction.write_instruction(
+                global_information=global_information)
+        result += "################# END SECTION " + \
+            self.section_name + " #################\n\n"
         return result

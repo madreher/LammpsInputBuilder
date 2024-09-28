@@ -3,94 +3,94 @@ from lammpsinputbuilder.types import GlobalInformation
 import pytest
 
 def test_NVEIntegrator():
-    integrator = NVEIntegrator(integratorName="myIntegrator", group=AllGroup(), nbSteps=1000)
-    assert integrator.getIntegratorName() == "myIntegrator"
-    assert integrator.getGroupName() == "all"
-    assert integrator.getNbSteps() == 1000
+    integrator = NVEIntegrator(integrator_name="myIntegrator", group=AllGroup(), nb_steps=1000)
+    assert integrator.get_integrator_name() == "myIntegrator"
+    assert integrator.get_group_name() == "all"
+    assert integrator.get_nb_steps() == 1000
 
-    objDict = integrator.toDict()
-    assert objDict["class"] == "NVEIntegrator"
-    assert objDict["integratorName"] == "myIntegrator"
-    assert objDict["groupName"] == "all"
-    assert objDict["nbSteps"] == 1000
+    obj_dict = integrator.to_dict()
+    assert obj_dict["class"] == "NVEIntegrator"
+    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["group_name"] == "all"
+    assert obj_dict["nb_steps"] == 1000
 
     integrator2 = NVEIntegrator()
-    integrator2.fromDict(objDict, version=0)
-    assert integrator2.getIntegratorName() == "myIntegrator"
-    assert integrator2.getGroupName() == "all"
-    assert integrator2.getNbSteps() == 1000
+    integrator2.from_dict(obj_dict, version=0)
+    assert integrator2.get_integrator_name() == "myIntegrator"
+    assert integrator2.get_group_name() == "all"
+    assert integrator2.get_nb_steps() == 1000
 
     info = GlobalInformation()
-    assert integrator.addDoCommands(info) == "fix myIntegrator all nve\n"
-    assert integrator.addRunCommands() == "run 1000\n"
-    assert integrator.addUndoCommands() == "unfix myIntegrator\n"
+    assert integrator.add_do_commands(info) == "fix myIntegrator all nve\n"
+    assert integrator.add_run_commands() == "run 1000\n"
+    assert integrator.add_undo_commands() == "unfix myIntegrator\n"
 
 def test_RunZeroIntegrator():
-    integrator = RunZeroIntegrator(integratorName="myIntegrator")
-    assert integrator.getIntegratorName() == "myIntegrator"
+    integrator = RunZeroIntegrator(integrator_name="myIntegrator")
+    assert integrator.get_integrator_name() == "myIntegrator"
 
-    objDict = integrator.toDict()
-    assert objDict["class"] == "RunZeroIntegrator"
-    assert objDict["integratorName"] == "myIntegrator"
+    obj_dict = integrator.to_dict()
+    assert obj_dict["class"] == "RunZeroIntegrator"
+    assert obj_dict["integrator_name"] == "myIntegrator"
 
     integrator2 = RunZeroIntegrator()
-    integrator2.fromDict(objDict, version=0)
-    assert integrator2.getIntegratorName() == "myIntegrator"
+    integrator2.from_dict(obj_dict, version=0)
+    assert integrator2.get_integrator_name() == "myIntegrator"
 
     info = GlobalInformation()
-    assert integrator.addDoCommands(info) == ""
-    assert integrator.addRunCommands() == "run 0\n"
-    assert integrator.addUndoCommands() == ""
+    assert integrator.add_do_commands(info) == ""
+    assert integrator.add_run_commands() == "run 0\n"
+    assert integrator.add_undo_commands() == ""
 
 def test_MinimizeIntegrator():
-    integrator = MinimizeIntegrator(integratorName="myIntegrator", style=MinimizeStyle.CG, etol=0.02, ftol=0.03, maxiter=400, maxeval=50000)
-    assert integrator.getIntegratorName() == "myIntegrator"
-    assert integrator.getMinimizeStyle() == MinimizeStyle.CG
-    assert integrator.getEtol() == 0.02
-    assert integrator.getFtol() == 0.03
-    assert integrator.getMaxiter() == 400
-    assert integrator.getMaxeval() == 50000
+    integrator = MinimizeIntegrator(integrator_name="myIntegrator", style=MinimizeStyle.CG, etol=0.02, ftol=0.03, maxiter=400, maxeval=50000)
+    assert integrator.get_integrator_name() == "myIntegrator"
+    assert integrator.get_minimize_style() == MinimizeStyle.CG
+    assert integrator.get_etol() == 0.02
+    assert integrator.get_ftol() == 0.03
+    assert integrator.get_maxiter() == 400
+    assert integrator.get_maxeval() == 50000
 
-    objDict = integrator.toDict()
-    assert objDict["class"] == "MinimizeIntegrator"
-    assert objDict["integratorName"] == "myIntegrator"
-    assert objDict["style"] == MinimizeStyle.CG.value
-    assert objDict["etol"] == 0.02
-    assert objDict["ftol"] == 0.03
-    assert objDict["maxiter"] == 400
-    assert objDict["maxeval"] == 50000
+    obj_dict = integrator.to_dict()
+    assert obj_dict["class"] == "MinimizeIntegrator"
+    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["style"] == MinimizeStyle.CG.value
+    assert obj_dict["etol"] == 0.02
+    assert obj_dict["ftol"] == 0.03
+    assert obj_dict["maxiter"] == 400
+    assert obj_dict["maxeval"] == 50000
 
     integrator2 = MinimizeIntegrator()
-    integrator2.fromDict(objDict, version=0)
-    assert integrator2.getIntegratorName() == "myIntegrator"
-    assert integrator2.getMinimizeStyle() == MinimizeStyle.CG
-    assert integrator2.getEtol() == 0.02
-    assert integrator2.getFtol() == 0.03
-    assert integrator2.getMaxiter() == 400
-    assert integrator2.getMaxeval() == 50000
+    integrator2.from_dict(obj_dict, version=0)
+    assert integrator2.get_integrator_name() == "myIntegrator"
+    assert integrator2.get_minimize_style() == MinimizeStyle.CG
+    assert integrator2.get_etol() == 0.02
+    assert integrator2.get_ftol() == 0.03
+    assert integrator2.get_maxiter() == 400
+    assert integrator2.get_maxeval() == 50000
 
     info = GlobalInformation()
-    assert integrator.addDoCommands(info) == ""
-    runCmds = integrator.addRunCommands().splitlines()
+    assert integrator.add_do_commands(info) == ""
+    runCmds = integrator.add_run_commands().splitlines()
     assert runCmds[0] == "min_style cg"
     assert runCmds[1] == "minimize 0.02 0.03 400 50000"
-    assert integrator.addUndoCommands() == ""
+    assert integrator.add_undo_commands() == ""
 
 def test_MultipassIntegrator():
-    integrator = MultipassMinimizeIntegrator(integratorName="myIntegrator")
-    assert integrator.getIntegratorName() == "myIntegrator"
+    integrator = MultipassMinimizeIntegrator(integrator_name="myIntegrator")
+    assert integrator.get_integrator_name() == "myIntegrator"
 
-    objDict = integrator.toDict()
-    assert objDict["class"] == "MultipassMinimizeIntegrator"
-    assert objDict["integratorName"] == "myIntegrator"
+    obj_dict = integrator.to_dict()
+    assert obj_dict["class"] == "MultipassMinimizeIntegrator"
+    assert obj_dict["integrator_name"] == "myIntegrator"
 
     integrator2 = MultipassMinimizeIntegrator()
-    integrator2.fromDict(objDict, version=0)
-    assert integrator2.getIntegratorName() == "myIntegrator"
+    integrator2.from_dict(obj_dict, version=0)
+    assert integrator2.get_integrator_name() == "myIntegrator"
 
     info = GlobalInformation()
-    assert integrator.addDoCommands(info) == ""
-    assert integrator.addRunCommands() == """min_style      cg
+    assert integrator.add_do_commands(info) == ""
+    assert integrator.add_run_commands() == """min_style      cg
 minimize       1.0e-10 1.0e-10 10000 100000
 min_style      hftn
 minimize       1.0e-10 1.0e-10 10000 100000
@@ -115,29 +115,29 @@ next           i
 jump           SELF loop1
 label          break1
 variable       i delete\n"""
-    assert integrator.addUndoCommands() == ""
+    assert integrator.add_undo_commands() == ""
 
 def test_ManualIntegrator():
-    integrator = ManualIntegrator(integratorName="myIntegrator", cmdDo="do", cmdUndo="undo", cmdRun="run")
-    assert integrator.getIntegratorName() == "myIntegrator"
+    integrator = ManualIntegrator(integrator_name="myIntegrator", cmd_do="do", cmd_undo="undo", cmd_run="run")
+    assert integrator.get_integrator_name() == "myIntegrator"
 
-    assert integrator.getDoCommands() == "do"
-    assert integrator.getUndoCommands() == "undo"
-    assert integrator.getRunCommands() == "run"
+    assert integrator.get_do_commands() == "do"
+    assert integrator.get_undo_commands() == "undo"
+    assert integrator.get_run_commands() == "run"
 
-    objDict = integrator.toDict()
-    assert objDict["class"] == "ManualIntegrator"
-    assert objDict["integratorName"] == "myIntegrator"
-    assert objDict["cmdDo"] == "do"
-    assert objDict["cmdUndo"] == "undo"
-    assert objDict["cmdRun"] == "run"
+    obj_dict = integrator.to_dict()
+    assert obj_dict["class"] == "ManualIntegrator"
+    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["cmd_do"] == "do"
+    assert obj_dict["cmd_undo"] == "undo"
+    assert obj_dict["cmd_run"] == "run"
 
     integrator2 = ManualIntegrator()
-    integrator2.fromDict(objDict, version=0)
-    assert integrator2.getIntegratorName() == "myIntegrator"
+    integrator2.from_dict(obj_dict, version=0)
+    assert integrator2.get_integrator_name() == "myIntegrator"
 
     info = GlobalInformation()
-    assert integrator.addDoCommands(info) == "do\n"
-    assert integrator.addRunCommands() == "run\n"
-    assert integrator.addUndoCommands() == "undo\n"
+    assert integrator.add_do_commands(info) == "do\n"
+    assert integrator.add_run_commands() == "run\n"
+    assert integrator.add_undo_commands() == "undo\n"
 

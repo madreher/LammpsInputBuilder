@@ -27,73 +27,73 @@ def main():
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(modelData, forcefield)
+    typedMolecule.load_from_file(modelData, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.setTypedMolecularSystem(typedMolecule)
+    workflow.set_typed_molecular_system(typedMolecule)
 
     # Create a minimization Section 
     sectionMin = IntegratorSection(
         integrator=MinimizeIntegrator(
-            integratorName="Minimize",
+            integrator_name="Minimize",
             style=MinimizeStyle.CG, 
             etol=0.01,
             ftol=0.01, 
             maxiter=100, 
             maxeval=10000))
-    workflow.addSection(sectionMin)
+    workflow.add_section(sectionMin)
 
     # Create a Langevin Section
     sectionWarmup = IntegratorSection(
         integrator=NVEIntegrator(
-            integratorName="warmup",
+            integrator_name="warmup",
             group=AllGroup(),
-            nbSteps=10000
+            nb_steps=10000
         )
     )
     langevinWarmup = LangevinExtension(
-        extensionName="langevin",
+        extension_name="langevin",
         group=AllGroup(), 
-        startTemp=TemperatureQuantity(1, "K"),
-        endTemp=TemperatureQuantity(300, "K"),
+        start_temp=TemperatureQuantity(1, "K"),
+        end_temp=TemperatureQuantity(300, "K"),
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
-    sectionWarmup.addExtension(langevinWarmup)
-    workflow.addSection(sectionWarmup)
+    sectionWarmup.add_extension(langevinWarmup)
+    workflow.add_section(sectionWarmup)
 
     # Create a NVE Section
     sectionNVE = IntegratorSection(integrator=NVEIntegrator(
-        integratorName="equilibrium",
+        integrator_name="equilibrium",
         group=AllGroup(),
-        nbSteps=100000
+        nb_steps=100000
     ))
     langevinWarmup = LangevinExtension(
-        extensionName="langevin",
+        extension_name="langevin",
         group=AllGroup(), 
-        startTemp=TemperatureQuantity(300, "K"),
-        endTemp=TemperatureQuantity(300, "K"),
+        start_temp=TemperatureQuantity(300, "K"),
+        end_temp=TemperatureQuantity(300, "K"),
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
-    pos = DumpTrajectoryFileIO(fileIOName="fulltrajectory", addDefaultFields=True, interval=10, group=AllGroup())
-    sectionNVE.addFileIO(pos)
-    bonds = ReaxBondFileIO(fileIOName="bonds", interval=10, group=AllGroup())
-    sectionNVE.addFileIO(bonds)
-    thermo = ThermoFileIO(fileIOName="thermo", addDefaultFields=True, interval=10, userFields=typedMolecule.getDefaultThermoVariables())
-    sectionNVE.addFileIO(thermo)
+    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", add_default_fields=True, interval=10, group=AllGroup())
+    sectionNVE.add_fileio(pos)
+    bonds = ReaxBondFileIO(fileio_name="bonds", interval=10, group=AllGroup())
+    sectionNVE.add_fileio(bonds)
+    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=10, user_fields=typedMolecule.get_default_thermo_variables())
+    sectionNVE.add_fileio(thermo)
 
-    workflow.addSection(sectionNVE)
+    workflow.add_section(sectionNVE)
 
 
     # Generate the inputs
-    jobFolder = workflow.generateInputs()
+    job_folder = workflow.generate_inputs()
 
-    logger.info(f"Inputs generated in the job folder: {jobFolder}")
+    logger.info(f"Inputs generated in the job folder: {job_folder}")
 
 if __name__ == "__main__":
     main()

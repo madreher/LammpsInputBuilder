@@ -1,146 +1,181 @@
-from lammpsinputbuilder.quantities import TimeQuantity, LammpsUnitSystem, TemperatureQuantity
+"""Module containing the definition of the Instruction class and its subclasses."""
+
+from enum import Enum
+
+from lammpsinputbuilder.quantities import TimeQuantity, TemperatureQuantity
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.quantities import LengthQuantity
 from lammpsinputbuilder.types import GlobalInformation
 
-from enum import Enum
 
 class Instruction:
-    def __init__(self, instructionName: str = "defaultInstruction") -> None:
-        self.instructionName = instructionName
+    def __init__(self, instruction_name: str = "defaultInstruction") -> None:
+        self.instruction_name = instruction_name
 
-    def getInstructionName(self) -> str:
-        return self.instructionName
+    def get_instruction_name(self) -> str:
+        return self.instruction_name
 
-    def toDict(self) -> dict:
+    def to_dict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
-        result["instructionName"] = self.instructionName
+        result["instruction_name"] = self.instruction_name
         return result
-    
-    def fromDict(self, d: dict, version: int):
-        self.instructionName = d.get("instructionName", "defaultInstruction")
 
-    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
+    def from_dict(self, d: dict, version: int):
+        del version  # unused
+        self.instruction_name = d.get("instruction_name", "defaultInstruction")
+
+    def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return ""
-    
+
+
 class ResetTimestepInstruction(Instruction):
-    def __init__(self, instructionName: str = "defaultResetTimestep", timestep: int = 0) -> None:
-        super().__init__(instructionName=instructionName)
+    def __init__(
+            self,
+            instruction_name: str = "defaultResetTimestep",
+            timestep: int = 0) -> None:
+        super().__init__(instruction_name=instruction_name)
         self.timestep = timestep
         self.validate()
 
     def validate(self):
         if self.timestep < 0:
-            raise ValueError(f"Invalid timestep {self.timestep} in Intruction {self.instructionName}.")
-        
-    def getTimestep(self) -> int:
+            raise ValueError(
+                f"Invalid timestep {self.timestep} in Intruction {self.instruction_name}.")
+
+    def get_timestep(self) -> int:
         return self.timestep
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["timestep"] = self.timestep
         return result
-    
-    def fromDict(self, d: dict, version: int):
+
+    def from_dict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version)
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().from_dict(d, version)
         self.timestep = d.get("timestep", 0)
         self.validate()
 
-    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
+    def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return f"reset_timestep {self.timestep}\n"
-    
+
+
 class SetTimestepInstruction(Instruction):
-    def __init__(self, instructionName: str = "defaultTimeStep", timestep: TimeQuantity = TimeQuantity(1, "fs")) -> None:
-        super().__init__(instructionName=instructionName)
+    def __init__(
+        self,
+        instruction_name: str = "defaultTimeStep",
+        timestep: TimeQuantity = TimeQuantity(
+            1,
+            "fs")) -> None:
+        super().__init__(instruction_name=instruction_name)
         self.timestep = timestep
         self.validate()
 
-    def getTimestep(self) -> TimeQuantity:
+    def get_timestep(self) -> TimeQuantity:
         return self.timestep
 
     def validate(self):
-        if self.timestep.getMagnitude() < 0:
-            raise ValueError(f"Invalid timestep {self.timestep.getMagnitude()} in Intruction {self.instructionName}.")
-        
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["timestep"] = self.timestep.toDict()
+        if self.timestep.get_magnitude() < 0:
+            raise ValueError(
+                (f"Invalid timestep {self.timestep.get_magnitude()} "
+                 f"in Intruction {self.instruction_name}."))
+
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result["timestep"] = self.timestep.to_dict()
         return result
-    
-    def fromDict(self, d: dict, version: int):
+
+    def from_dict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version)
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().from_dict(d, version)
         self.timestep = TimeQuantity()
-        self.timestep.fromDict(d["timestep"], version)
+        self.timestep.from_dict(d["timestep"], version)
         self.validate()
 
-    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
-        return f"timestep {self.timestep.convertTo(globalInformation.getUnitStyle())}\n"
-    
+    def write_instruction(self, global_information: GlobalInformation) -> str:
+        return f"timestep {self.timestep.convert_to(global_information.get_unit_style())}\n"
+
+
 class VelocityCreateInstruction(Instruction):
-    def __init__(self, instructionName: str = "defaultVelocityCreate", group: Group = AllGroup(), temp: TemperatureQuantity = TemperatureQuantity(300, "kelvin"), seed: int =12335) -> None:
-        super().__init__(instructionName=instructionName)
-        self.group = group.getGroupName()
+    def __init__(
+            self,
+            instruction_name: str = "defaultVelocityCreate",
+            group: Group = AllGroup(),
+            temp: TemperatureQuantity = TemperatureQuantity(
+                300,
+                "kelvin"),
+            seed: int = 12335) -> None:
+        super().__init__(instruction_name=instruction_name)
+        self.group = group.get_group_name()
         self.temp = temp
         self.seed = seed
         self.validate()
 
-    def getGroupName(self) -> str:
+    def get_group_name(self) -> str:
         return self.group
-    
-    def getTemp(self) -> TemperatureQuantity:
+
+    def get_temp(self) -> TemperatureQuantity:
         return self.temp
-    
-    def getSeed(self) -> int:
+
+    def get_seed(self) -> int:
         return self.seed
 
     def validate(self):
-        if self.temp.getMagnitude() < 0:
-            raise ValueError(f"Invalid temperature {self.temp.getMagnitude()} in Intruction {self.instructionName}.")
+        if self.temp.get_magnitude() < 0:
+            raise ValueError(
+                (f"Invalid temperature {self.temp.get_magnitude()} "
+                 f"in Intruction {self.instruction_name}."))
 
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["groupName"] = self.group
-        result["temp"] = self.temp.toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result["group_name"] = self.group
+        result["temp"] = self.temp.to_dict()
         result["seed"] = self.seed
         return result
-    
-    def fromDict(self, d: dict, version: int):
+
+    def from_dict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version)
-        self.group = d.get("groupName", AllGroup().getGroupName())
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().from_dict(d, version)
+        self.group = d.get("group_name", AllGroup().get_group_name())
         self.temp = TemperatureQuantity()
-        self.temp.fromDict(d["temp"], version)
+        self.temp.from_dict(d["temp"], version)
         self.seed = d.get("seed", 12335)
         self.validate()
 
-    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
-        return f"velocity {self.group} create {self.temp.convertTo(globalInformation.getUnitStyle())} {self.seed} dist gaussian\n"
-    
+    def write_instruction(self, global_information: GlobalInformation) -> str:
+        return (f"velocity {self.group} create "
+                f"{self.temp.convert_to(global_information.get_unit_style())} "
+                f"{self.seed} dist gaussian\n")
+
 
 class VariableStyle(Enum):
-    DELETE = 0, 
-    ATOMFILE = 1, 
-    FILE = 2, 
-    FORMAT = 3,
-    GETENV = 4,
-    INDEX = 5,
-    INTERNAL = 6,
-    LOOP = 7,
-    PYTHON = 8,
-    STRING = 9,
-    TIMER = 10,
-    ULOOP = 11,
-    UNIVERSE = 12,
-    WORLD = 13,
-    EQUAL = 14,
-    VECTOR = 15,
+    DELETE = 0
+    ATOMFILE = 1
+    FILE = 2
+    FORMAT = 3
+    GETENV = 4
+    INDEX = 5
+    INTERNAL = 6
+    LOOP = 7
+    PYTHON = 8
+    STRING = 9
+    TIMER = 10
+    ULOOP = 11
+    UNIVERSE = 12
+    WORLD = 13
+    EQUAL = 14
+    VECTOR = 15
     ATOM = 16
+
 
 class VariableInstruction(Instruction):
     variableStyleToStr = {
@@ -163,61 +198,84 @@ class VariableInstruction(Instruction):
         VariableStyle.ATOM: "atom"
     }
 
-    def __init__(self, instructionName: str = "defaultVariable", variableName: str = "defaultVariable", style: VariableStyle = VariableStyle.EQUAL, args: str = "") -> None:
-        super().__init__(instructionName=instructionName)
-        self.variableName = variableName
+    def __init__(
+            self,
+            instruction_name: str = "defaultVariable",
+            variable_name: str = "defaultVariable",
+            style: VariableStyle = VariableStyle.EQUAL,
+            args: str = "") -> None:
+        super().__init__(instruction_name=instruction_name)
+        self.variable_name = variable_name
         self.style = style
         self.args = args
         self.validate()
 
-    def getVariableName(self) -> str:
-        return self.variableName
-    
-    def getVariableStyle(self) -> VariableStyle:
+    def get_variable_name(self) -> str:
+        return self.variable_name
+
+    def get_variable_style(self) -> VariableStyle:
         return self.style
-    
-    def getArgs(self) -> str:
+
+    def get_args(self) -> str:
         return self.args
 
     def validate(self):
-        pass 
+        pass
 
-    def toDict(self) -> dict:
-        result = super().toDict()
-        result["variableName"] = self.variableName
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result["variable_name"] = self.variable_name
         result["style"] = self.style.value
         result["args"] = self.args
         return result
-    
-    def fromDict(self, d: dict, version: int):
+
+    def from_dict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version)
-        self.variableName = d.get("variableName", "defaultVariable")
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().from_dict(d, version)
+        self.variable_name = d.get("variable_name", "defaultVariable")
         self.style = VariableStyle(d.get("style", VariableStyle.EQUAL.value))
         self.args = d.get("args", "")
         self.validate()
 
-    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
-        return f"variable {self.variableName} {self.variableStyleToStr[self.style]} {self.args}\n"
+    def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
+        return f"variable {self.variable_name} {self.variableStyleToStr[self.style]} {self.args}\n"
+
 
 class DisplaceAtomsInstruction(Instruction):
-    def __init__(self, instructionName: str = "defaultDisplaceAtoms", group: Group = AllGroup(), dx: LengthQuantity = LengthQuantity(0.0, "lmp_real_length"), dy: LengthQuantity = LengthQuantity(0.0, "lmp_real_length"), dz: LengthQuantity = LengthQuantity(0.0, "lmp_real_length")) -> None:
+    def __init__(
+        self,
+        instruction_name: str = "defaultDisplaceAtoms",
+        group: Group = AllGroup(),
+        dx: LengthQuantity = LengthQuantity(
+            0.0,
+            "lmp_real_length"),
+        dy: LengthQuantity = LengthQuantity(
+            0.0,
+            "lmp_real_length"),
+            dz: LengthQuantity = LengthQuantity(
+                0.0,
+            "lmp_real_length")) -> None:
         """
         Initializes a new instance of the DisplaceAtomsInstruction class.
 
         Parameters:
-        instructionName (str): The name of the instruction. Defaults to "defaultDisplaceAtom".
+        instruction_name (str): The name of the instruction. Defaults to "defaultDisplaceAtom".
         group (Group): The group to which the instruction belongs. Defaults to AllGroup.
-        dx (LengthQuantity): The displacement in the x-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
-        dy (LengthQuantity): The displacement in the y-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
-        dz (LengthQuantity): The displacement in the z-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dx (LengthQuantity): The displacement in the x-direction. 
+                            Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dy (LengthQuantity): The displacement in the y-direction. 
+                            Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dz (LengthQuantity): The displacement in the z-direction. 
+                            Defaults to LengthQuantity(0.0, "lmp_real_length").
 
         Returns:
         None
         """
-        super().__init__(instructionName=instructionName)
-        self.group = group.getGroupName()
+        super().__init__(instruction_name=instruction_name)
+        self.group = group.get_group_name()
         self.dx = dx
         self.dy = dy
         self.dz = dz
@@ -225,53 +283,64 @@ class DisplaceAtomsInstruction(Instruction):
 
     def validate(self) -> bool:
         return True
-    
-    def getGroupName(self) -> str:
+
+    def get_group_name(self) -> str:
         return self.group
-    
-    def getDisplacement(self) -> tuple[LengthQuantity, LengthQuantity, LengthQuantity]:
+
+    def get_displacement(
+            self) -> tuple[LengthQuantity, LengthQuantity, LengthQuantity]:
         return self.dx, self.dy, self.dz
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["group"] = self.group
-        result["dx"] = self.dx.toDict()
-        result["dy"] = self.dy.toDict()
-        result["dz"] = self.dz.toDict()
+        result["dx"] = self.dx.to_dict()
+        result["dy"] = self.dy.to_dict()
+        result["dz"] = self.dz.to_dict()
         return result
-    
-    def fromDict(self, d: dict, version: int):
+
+    def from_dict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version)
-        self.group = d.get("group", AllGroup().getGroupName())
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().from_dict(d, version)
+        self.group = d.get("group", AllGroup().get_group_name())
         self.dx = LengthQuantity()
-        self.dx.fromDict(d.get("dx", {}))
+        self.dx.from_dict(d.get("dx", {}))
         self.dy = LengthQuantity()
-        self.dy.fromDict(d.get("dy", {}))
+        self.dy.from_dict(d.get("dy", {}))
         self.dz = LengthQuantity()
-        self.dz.fromDict(d.get("dz", {}))
+        self.dz.from_dict(d.get("dz", {}))
         self.validate()
 
-    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
-        return f"displace_atoms {self.group} move {self.dx.convertTo(globalInformation.getUnitStyle())} {self.dy.convertTo(globalInformation.getUnitStyle())} {self.dz.convertTo(globalInformation.getUnitStyle())}\n"
+    def write_instruction(self, global_information: GlobalInformation) -> str:
+        return (f"displace_atoms {self.group} move "
+                f"{self.dx.convert_to(global_information.get_unit_style())} "
+                f"{self.dy.convert_to(global_information.get_unit_style())} "
+                f"{self.dz.convert_to(global_information.get_unit_style())}\n")
+
 
 class ManualInstruction(Instruction):
-    def __init__(self, instructionName: str = "defaultManual", cmd: str = "") -> None:
-        super().__init__(instructionName=instructionName)
+    def __init__(
+            self,
+            instruction_name: str = "defaultManual",
+            cmd: str = "") -> None:
+        super().__init__(instruction_name=instruction_name)
         self.cmd = cmd
 
-    def toDict(self) -> dict:
-        result = super().toDict()
+    def to_dict(self) -> dict:
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["cmd"] = self.cmd
         return result
-    
-    def fromDict(self, d: dict, version: int):
+
+    def from_dict(self, d: dict, version: int):
         if d["class"] != self.__class__.__name__:
-            raise ValueError(f"Expected class {self.__class__.__name__}, got {d['class']}.")
-        super().fromDict(d, version)
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+        super().from_dict(d, version)
         self.cmd = d.get("cmd", "")
 
-    def writeInstruction(self, globalInformation:GlobalInformation) -> str:
+    def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return f"{self.cmd}\n"
