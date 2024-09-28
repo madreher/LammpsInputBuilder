@@ -21,12 +21,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create virtual environment
+        run: python -m venv venv
+        working-directory: ${{ github.workspace }}
+
       - name: Install LIB and run pytest
         run: |
-          cd ${{ github.workspace }}
+          source venv/bin/activate
           pip3 install -r requirements.txt
           pip3 install -e .
           pytest tests/ --cov=lammpsinputbuilder
+          deactivate
+        working-directory: ${{ github.workspace }}
 
       - name: Coverage comment
         id: coverage_comment
