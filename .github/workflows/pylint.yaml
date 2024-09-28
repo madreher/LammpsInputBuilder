@@ -48,7 +48,7 @@ jobs:
     - name: Create badge
       uses: schneegans/dynamic-badges-action@v1.7.0
       with:
-        auth: ${{ secrets.GIST_TOKEN }}
+        auth: ${{ secrets.GIST_SECRET }}
         gistID: bc29e267d35fad12ca2de2bd7138ecfc
         filename: test.json
         label: "Pylint"
