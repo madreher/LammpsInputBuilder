@@ -37,6 +37,6 @@ jobs:
     - name: Analyze code with Pylint
       run: |
         source venv/bin/activate
-        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --exit-zero
+        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --fail-under=9.0
         deactivate
       working-directory: ${{ github.workspace }} 
