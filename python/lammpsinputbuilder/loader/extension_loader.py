@@ -17,10 +17,10 @@ class ExtensionLoader():
         extension_table[MoveExtension.__name__] = MoveExtension()
         extension_table[ManualExtension.__name__] = ManualExtension()
 
-        if "class" not in d.keys():
+        if "class" not in d:
             raise RuntimeError(f"Missing 'class' key in {d}.")
         class_name = d["class"]
-        if class_name not in extension_table.keys():
+        if class_name not in extension_table:
             raise RuntimeError(f"Unknown Extension class {class_name}.")
         # Create a copy of the base object, and we will update the settings
         # of the object from the dictionary

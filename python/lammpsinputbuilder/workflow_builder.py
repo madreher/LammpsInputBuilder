@@ -6,7 +6,7 @@ import shutil
 import logging
 import tempfile
 
-from lammpsinputbuilder.typedMolecule import TypedMolecularSystem
+from lammpsinputbuilder.typedmolecule import TypedMolecularSystem
 from lammpsinputbuilder.section import Section
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class WorkflowBuilder:
         self.sections = []
 
     def set_typed_molecular_system(self, molecule: TypedMolecularSystem):
-        if not molecule.isModelLoaded():
+        if not molecule.is_model_loaded():
             raise ValueError(
                 "The molecule must be loaded before it can be set.")
         self.molecule = molecule
@@ -34,7 +34,8 @@ class WorkflowBuilder:
 
         if self.molecule is None:
             raise ValueError(
-                "A molecule must be set before generating the input files. See set_typed_molecular_system().")
+                "A molecule must be set before generating the input files. \
+                See set_typed_molecular_system().")
 
         job_id = str(uuid4())
 
@@ -44,11 +45,11 @@ class WorkflowBuilder:
 
         job_folder = prefix / job_id
         job_folder.mkdir(parents=True, exist_ok=True)
-        logger.debug(f"WorkflowBuilder generated the job folder: {job_folder}")
+        logger.debug("WorkflowBuilder generated the job folder: %s", job_folder)
 
         # Write the initial Lammps files
-        global_information = self.molecule.generateLammpsDataFile(job_folder)
-        input_path = self.molecule.generateLammpsInputFile(
+        global_information = self.molecule.generate_lammps_data_file(job_folder)
+        input_path = self.molecule.generate_lammps_input_file(
             job_folder, global_information)
 
         # System is now declared, we can add sections to the input file
@@ -64,7 +65,7 @@ class WorkflowBuilder:
         for section in self.sections:
             section_content += section.add_all_commands(global_information)
 
-        with open(workflow_input_path, "a") as f:
+        with open(workflow_input_path, "a", encoding="utf-8") as f:
             f.write(section_content)
 
         return job_folder

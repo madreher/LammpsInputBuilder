@@ -13,7 +13,7 @@ class FileIO:
     def __init__(self, fileio_name: str = "defaultFileIO") -> None:
         self.fileio_name = fileio_name
 
-    def getFileIOName(self) -> str:
+    def get_fileio_name(self) -> str:
         return self.fileio_name
 
     def to_dict(self) -> dict:
@@ -23,9 +23,11 @@ class FileIO:
         return result
 
     def from_dict(self, d: dict, version: int):
+        del version  # unused
         self.fileio_name = d.get("fileio_name", "defaultFileIO")
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return ""
 
     def add_undo_commands(self) -> str:
@@ -44,9 +46,11 @@ class XYZTrajectoryFileIO(FileIO):
         pass
 
     def from_dict(self, d: dict, version: int):
-        pass
+        del d  # unused
+        del version  # unused
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return ""
 
     def add_undo_commands(self) -> str:
@@ -57,7 +61,7 @@ class XYZTrajectoryFileIO(FileIO):
 
 
 class DumpStyle(Enum):
-    CUSTOM = 1,
+    CUSTOM = 1
     XYZ = 2
 
 
@@ -67,12 +71,15 @@ class DumpTrajectoryFileIO(FileIO):
             self,
             fileio_name: str = "defaultDumpTrajectoryFileIO",
             style: DumpStyle = DumpStyle.CUSTOM,
-            user_fields: List[str] = [],
+            user_fields: List[str] = None,
             add_default_fields: bool = True,
             interval: int = 100,
             group: Group = AllGroup()) -> None:
         super().__init__(fileio_name=fileio_name)
-        self.user_fields = user_fields
+        if user_fields is None:
+            self.user_fields = []
+        else:
+            self.user_fields = user_fields
         self.add_default_fields = add_default_fields
         self.default_fields = ["id", "type", "x", "y", "z"]
         self.interval = interval
@@ -114,12 +121,12 @@ class DumpTrajectoryFileIO(FileIO):
         self.interval = d.get("interval", 100)
         self.group_name = d.get("group_name", AllGroup().get_group_name())
         self.style = DumpStyle(d.get("style", DumpStyle.CUSTOM.value))
-        pass
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         result = ""
         if self.style == DumpStyle.CUSTOM:
-            result += f"dump {self.fileio_name} {self.group_name} custom {self.interval} {self.get_associated_file_path()}"
+            result += (f"dump {self.fileio_name} {self.group_name} custom "
+                    f"{self.interval} {self.get_associated_file_path()}")
             fields = []
             if self.add_default_fields:
                 fields.extend(self.default_fields)
@@ -139,13 +146,16 @@ class DumpTrajectoryFileIO(FileIO):
             if "element" in fields:
                 if len(global_information.get_element_table()) == 0:
                     raise RuntimeError(
-                        "\'element\' is part of the dump file custom fields, but the element table is empty. Unable to produce to correct trajectory file.")
+                        ("\'element\' is part of the dump file custom fields, "
+                        "but the element table is empty. Unable to produce to "
+"                       correct trajectory file."))
                 result += f"dump_modify {self.fileio_name} element"
                 for elem in global_information.get_element_table().values():
                     result += f" {elem}"
                 result += "\n"
         elif self.style == DumpStyle.XYZ:
-            result += f"dump {self.fileio_name} {self.group_name} xyz {self.interval} {self.get_associated_file_path()}\n"
+            result += (f"dump {self.fileio_name} {self.group_name} xyz "
+                    f"{self.interval} {self.get_associated_file_path()}\n")
         else:
             raise ValueError(f"Invalid dump style {self.style}.")
 
@@ -157,10 +167,10 @@ class DumpTrajectoryFileIO(FileIO):
     def get_associated_file_path(self) -> Path:
         if self.style == DumpStyle.CUSTOM:
             return Path("dump." + self.fileio_name + ".lammpstrj")
-        elif self.style == DumpStyle.XYZ:
+        if self.style == DumpStyle.XYZ:
             return Path("dump." + self.fileio_name + ".xyz")
-        else:
-            raise ValueError(f"Invalid dump style {self.style}.")
+
+        raise ValueError(f"Invalid dump style {self.style}.")
 
 
 class ReaxBondFileIO(FileIO):
@@ -198,7 +208,8 @@ class ReaxBondFileIO(FileIO):
         self.interval = d.get("interval", 100)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return f"fix {self.fileio_name} {self.group_name} reaxff/bonds {self.interval} bonds.{self.fileio_name}.txt\n"
+        return (f"fix {self.fileio_name} {self.group_name} reaxff/bonds "
+                f"{self.interval} bonds.{self.fileio_name}.txt\n")
 
     def add_undo_commands(self) -> str:
         return f"unfix {self.fileio_name}\n"
@@ -214,10 +225,13 @@ class ThermoFileIO(FileIO):
             fileio_name: str = "defaultThermoFileIO",
             interval: int = 10,
             add_default_fields: bool = True,
-            user_fields: List[str] = []) -> None:  # ) -> None:
+            user_fields: List[str] = None) -> None:  # ) -> None:
         super().__init__(fileio_name=fileio_name)
         self.interval = interval
-        self.user_fields = user_fields
+        if user_fields is None:
+            self.user_fields = []
+        else:
+            self.user_fields = user_fields
         self.add_default_fields = add_default_fields
         self.default_fields = ["step", "temp", "pe", "ke", "etotal", "press"]
 
@@ -257,6 +271,7 @@ class ThermoFileIO(FileIO):
         self.interval = d.get("interval", 10)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         result = ""
         result += f"thermo {self.interval}\n"
         fields = []
@@ -319,13 +334,14 @@ class ManualFileIO(FileIO):
         self.associated_file_path = d.get("associated_file_path", "")
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         if self.do_cmd.endswith("\n"):
             return self.do_cmd
-        else:
-            return self.do_cmd + "\n"
+
+        return self.do_cmd + "\n"
 
     def add_undo_commands(self) -> str:
         if self.undo_cmd.endswith("\n"):
             return self.undo_cmd
-        else:
-            return self.undo_cmd + "\n"
+
+        return self.undo_cmd + "\n"

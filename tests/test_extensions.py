@@ -11,12 +11,12 @@ from lammpsinputbuilder.instructions import ResetTimestepInstruction
 def test_MoveExtension():
     obj  = MoveExtension("myMoveExtension", group=AllGroup(), vx=VelocityQuantity(1.0, "angstrom/ps"), vy=VelocityQuantity(2.0, "angstrom/ps"), vz=VelocityQuantity(3.0, "angstrom/ps"))
     assert obj.group == "all"
-    assert obj.vx.getMagnitude() == 1.0
-    assert obj.vx.getUnits() == "angstrom/ps"
-    assert obj.vy.getMagnitude() == 2.0
-    assert obj.vy.getUnits() == "angstrom/ps"
-    assert obj.vz.getMagnitude() == 3.0
-    assert obj.vz.getUnits() == "angstrom/ps"
+    assert obj.vx.get_magnitude() == 1.0
+    assert obj.vx.get_units() == "angstrom/ps"
+    assert obj.vy.get_magnitude() == 2.0
+    assert obj.vy.get_units() == "angstrom/ps"
+    assert obj.vz.get_magnitude() == 3.0
+    assert obj.vz.get_units() == "angstrom/ps"
 
     dict_result = obj.to_dict()
     assert dict_result["group"] == "all"
@@ -32,12 +32,12 @@ def test_MoveExtension():
     load_back_obj.from_dict(dict_result, version=0)
 
     assert load_back_obj.group == "all"
-    assert load_back_obj.vx.getMagnitude() == 1.0
-    assert load_back_obj.vx.getUnits() == "angstrom/ps"
-    assert load_back_obj.vy.getMagnitude() == 2.0
-    assert load_back_obj.vy.getUnits() == "angstrom/ps"
-    assert load_back_obj.vz.getMagnitude() == 3.0
-    assert load_back_obj.vz.getUnits() == "angstrom/ps"
+    assert load_back_obj.vx.get_magnitude() == 1.0
+    assert load_back_obj.vx.get_units() == "angstrom/ps"
+    assert load_back_obj.vy.get_magnitude() == 2.0
+    assert load_back_obj.vy.get_units() == "angstrom/ps"
+    assert load_back_obj.vz.get_magnitude() == 3.0
+    assert load_back_obj.vz.get_units() == "angstrom/ps"
 
     assert load_back_obj.to_dict() == dict_result
 
@@ -58,12 +58,12 @@ def test_SetForceExtension():
         fz=ForceQuantity(3.0, "lmp_real_force"))
 
     assert obj.group == "all"
-    assert obj.fx.getMagnitude() == 1.0
-    assert obj.fx.getUnits() == "lmp_real_force"
-    assert obj.fy.getMagnitude() == 2.0
-    assert obj.fy.getUnits() == "lmp_real_force"
-    assert obj.fz.getMagnitude() == 3.0
-    assert obj.fz.getUnits() == "lmp_real_force"
+    assert obj.fx.get_magnitude() == 1.0
+    assert obj.fx.get_units() == "lmp_real_force"
+    assert obj.fy.get_magnitude() == 2.0
+    assert obj.fy.get_units() == "lmp_real_force"
+    assert obj.fz.get_magnitude() == 3.0
+    assert obj.fz.get_units() == "lmp_real_force"
 
     dict_result = obj.to_dict()
     assert dict_result["group"] == "all"
@@ -79,12 +79,12 @@ def test_SetForceExtension():
     load_back_obj.from_dict(dict_result, version=0)
 
     assert load_back_obj.group == "all"
-    assert load_back_obj.fx.getMagnitude() == 1.0
-    assert load_back_obj.fx.getUnits() == "lmp_real_force"
-    assert load_back_obj.fy.getMagnitude() == 2.0
-    assert load_back_obj.fy.getUnits() == "lmp_real_force"
-    assert load_back_obj.fz.getMagnitude() == 3.0
-    assert load_back_obj.fz.getUnits() == "lmp_real_force"
+    assert load_back_obj.fx.get_magnitude() == 1.0
+    assert load_back_obj.fx.get_units() == "lmp_real_force"
+    assert load_back_obj.fy.get_magnitude() == 2.0
+    assert load_back_obj.fy.get_units() == "lmp_real_force"
+    assert load_back_obj.fz.get_magnitude() == 3.0
+    assert load_back_obj.fz.get_units() == "lmp_real_force"
 
     assert load_back_obj.to_dict() == dict_result
 
@@ -100,26 +100,26 @@ def test_LangevinExtension():
     obj = LangevinExtension(
         "myLangevinExtension", 
         group=AllGroup(), 
-        startTemp=TemperatureQuantity(1.0, "K"), 
-        endTemp=TemperatureQuantity(2.0, "K"), 
+        start_temp=TemperatureQuantity(1.0, "K"), 
+        end_temp=TemperatureQuantity(2.0, "K"), 
         damp=TimeQuantity(3.0, "ps"), 
         seed=122345)
     
     assert obj.group == "all"
-    assert obj.startTemp.getMagnitude() == 1.0
-    assert obj.startTemp.getUnits() == "K"
-    assert obj.endTemp.getMagnitude() == 2.0
-    assert obj.endTemp.getUnits() == "K"
-    assert obj.damp.getMagnitude() == 3.0
-    assert obj.damp.getUnits() == "ps"
+    assert obj.start_temp.get_magnitude() == 1.0
+    assert obj.start_temp.get_units() == "K"
+    assert obj.end_temp.get_magnitude() == 2.0
+    assert obj.end_temp.get_units() == "K"
+    assert obj.damp.get_magnitude() == 3.0
+    assert obj.damp.get_units() == "ps"
     assert obj.seed == 122345
 
     dict_result = obj.to_dict()
     assert dict_result["group"] == "all"
-    assert dict_result["startTemp"]["magnitude"] == 1.0
-    assert dict_result["startTemp"]["units"] == "K"
-    assert dict_result["endTemp"]["magnitude"] == 2.0
-    assert dict_result["endTemp"]["units"] == "K"
+    assert dict_result["start_temp"]["magnitude"] == 1.0
+    assert dict_result["start_temp"]["units"] == "K"
+    assert dict_result["end_temp"]["magnitude"] == 2.0
+    assert dict_result["end_temp"]["units"] == "K"
     assert dict_result["damp"]["magnitude"] == 3.0
     assert dict_result["damp"]["units"] == "ps"
     assert dict_result["seed"] == 122345
@@ -129,12 +129,12 @@ def test_LangevinExtension():
     load_back_obj.from_dict(dict_result, version=0)
 
     assert load_back_obj.group == "all"
-    assert load_back_obj.startTemp.getMagnitude() == 1.0
-    assert load_back_obj.startTemp.getUnits() == "K"
-    assert load_back_obj.endTemp.getMagnitude() == 2.0
-    assert load_back_obj.endTemp.getUnits() == "K"
-    assert load_back_obj.damp.getMagnitude() == 3.0
-    assert load_back_obj.damp.getUnits() == "ps"
+    assert load_back_obj.start_temp.get_magnitude() == 1.0
+    assert load_back_obj.start_temp.get_units() == "K"
+    assert load_back_obj.end_temp.get_magnitude() == 2.0
+    assert load_back_obj.end_temp.get_units() == "K"
+    assert load_back_obj.damp.get_magnitude() == 3.0
+    assert load_back_obj.damp.get_units() == "ps"
     assert load_back_obj.seed == 122345
 
     assert load_back_obj.to_dict() == dict_result

@@ -12,7 +12,7 @@ class Instruction:
     def __init__(self, instruction_name: str = "defaultInstruction") -> None:
         self.instruction_name = instruction_name
 
-    def getInstructionName(self) -> str:
+    def get_instruction_name(self) -> str:
         return self.instruction_name
 
     def to_dict(self) -> dict:
@@ -22,9 +22,11 @@ class Instruction:
         return result
 
     def from_dict(self, d: dict, version: int):
+        del version  # unused
         self.instruction_name = d.get("instruction_name", "defaultInstruction")
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return ""
 
 
@@ -59,6 +61,7 @@ class ResetTimestepInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return f"reset_timestep {self.timestep}\n"
 
 
@@ -77,9 +80,10 @@ class SetTimestepInstruction(Instruction):
         return self.timestep
 
     def validate(self):
-        if self.timestep.getMagnitude() < 0:
+        if self.timestep.get_magnitude() < 0:
             raise ValueError(
-                f"Invalid timestep {self.timestep.getMagnitude()} in Intruction {self.instruction_name}.")
+                (f"Invalid timestep {self.timestep.get_magnitude()} "
+                 f"in Intruction {self.instruction_name}."))
 
     def to_dict(self) -> dict:
         result = super().to_dict()
@@ -96,7 +100,7 @@ class SetTimestepInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
-        return f"timestep {self.timestep.convertTo(global_information.get_unit_style())}\n"
+        return f"timestep {self.timestep.convert_to(global_information.get_unit_style())}\n"
 
 
 class VelocityCreateInstruction(Instruction):
@@ -124,9 +128,10 @@ class VelocityCreateInstruction(Instruction):
         return self.seed
 
     def validate(self):
-        if self.temp.getMagnitude() < 0:
+        if self.temp.get_magnitude() < 0:
             raise ValueError(
-                f"Invalid temperature {self.temp.getMagnitude()} in Intruction {self.instruction_name}.")
+                (f"Invalid temperature {self.temp.get_magnitude()} "
+                 f"in Intruction {self.instruction_name}."))
 
     def to_dict(self) -> dict:
         result = super().to_dict()
@@ -147,7 +152,9 @@ class VelocityCreateInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
-        return f"velocity {self.group} create {self.temp.convertTo(global_information.get_unit_style())} {self.seed} dist gaussian\n"
+        return (f"velocity {self.group} create "
+                f"{self.temp.convert_to(global_information.get_unit_style())} "
+                f"{self.seed} dist gaussian\n")
 
 
 class VariableStyle(Enum):
@@ -233,6 +240,7 @@ class VariableInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return f"variable {self.variable_name} {self.variableStyleToStr[self.style]} {self.args}\n"
 
 
@@ -256,9 +264,12 @@ class DisplaceAtomsInstruction(Instruction):
         Parameters:
         instruction_name (str): The name of the instruction. Defaults to "defaultDisplaceAtom".
         group (Group): The group to which the instruction belongs. Defaults to AllGroup.
-        dx (LengthQuantity): The displacement in the x-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
-        dy (LengthQuantity): The displacement in the y-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
-        dz (LengthQuantity): The displacement in the z-direction. Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dx (LengthQuantity): The displacement in the x-direction. 
+                            Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dy (LengthQuantity): The displacement in the y-direction. 
+                            Defaults to LengthQuantity(0.0, "lmp_real_length").
+        dz (LengthQuantity): The displacement in the z-direction. 
+                            Defaults to LengthQuantity(0.0, "lmp_real_length").
 
         Returns:
         None
@@ -303,7 +314,10 @@ class DisplaceAtomsInstruction(Instruction):
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
-        return f"displace_atoms {self.group} move {self.dx.convertTo(global_information.get_unit_style())} {self.dy.convertTo(global_information.get_unit_style())} {self.dz.convertTo(global_information.get_unit_style())}\n"
+        return (f"displace_atoms {self.group} move "
+                f"{self.dx.convert_to(global_information.get_unit_style())} "
+                f"{self.dy.convert_to(global_information.get_unit_style())} "
+                f"{self.dz.convert_to(global_information.get_unit_style())}\n")
 
 
 class ManualInstruction(Instruction):
@@ -328,4 +342,5 @@ class ManualInstruction(Instruction):
         self.cmd = d.get("cmd", "")
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return f"{self.cmd}\n"

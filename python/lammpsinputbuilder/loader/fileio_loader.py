@@ -18,10 +18,10 @@ class FileIOLoader():
         file_io_table[ThermoFileIO.__name__] = ThermoFileIO()
         file_io_table[ManualFileIO.__name__] = ManualFileIO()
 
-        if "class" not in d.keys():
+        if "class" not in d:
             raise RuntimeError(f"Missing 'class' key in {d}.")
         class_name = d["class"]
-        if class_name not in file_io_table.keys():
+        if class_name not in file_io_table:
             raise RuntimeError(f"Unknown FileIO class {class_name}.")
         # Create a copy of the base object, and we will update the settings of
         # the object from the dictionary

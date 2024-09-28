@@ -25,10 +25,10 @@ def main():
         'potentials' / 'Si_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(modelData, forcefield)
+    typedMolecule.load_from_file(modelData, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder()
@@ -54,11 +54,11 @@ def main():
     groupAnchors = OperationGroup(
         group_name="anchors",
         op=OperationGroupEnum.UNION, 
-        otherGroups=[groupAnchorSlab, groupAnchorTooltip])
+        other_groups=[groupAnchorSlab, groupAnchorTooltip])
     groupFree = OperationGroup(
         group_name="free",
         op=OperationGroupEnum.SUBTRACT, 
-        otherGroups=[AllGroup(), groupAnchors])
+        other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
     globalSection = RecusiveSection(section_name="GlobalSection")
@@ -75,19 +75,19 @@ def main():
 
     # Second section: reset timestep
     sectionReset = InstructionsSection(section_name="ResetSection")
-    sectionReset.addInstruction(ResetTimestepInstruction(
+    sectionReset.add_instruction(ResetTimestepInstruction(
         instruction_name="resetTS", timestep=0))
-    sectionReset.addInstruction(SetTimestepInstruction(
+    sectionReset.add_instruction(SetTimestepInstruction(
         instruction_name="setDT", timestep=TimeQuantity(value=1.0, units="fs")))
     globalSection.add_section(sectionReset)
 
     # Third section: NVE
     sectionNVE = IntegratorSection(section_name="NVESection", integrator=NVEIntegrator(
-        integrator_name="NVE", group=groupFree, nbSteps=1000))
+        integrator_name="NVE", group=groupFree, nb_steps=1000))
     # Declare the IOs for the entire workflow, will split into 2 trajectory later
     thermoTrajectory = ThermoFileIO(
         fileio_name="nve", add_default_fields=True, interval=50)
-    thermoTrajectory.set_user_fields(typedMolecule.getDefaultThermoVariables())
+    thermoTrajectory.set_user_fields(typedMolecule.get_default_thermo_variables())
     dumpTrajectory = DumpTrajectoryFileIO(
         fileio_name="nve", add_default_fields=True, interval=50, group=AllGroup())
     reaxBond = ReaxBondFileIO(fileio_name="nve", interval=50, group=AllGroup())

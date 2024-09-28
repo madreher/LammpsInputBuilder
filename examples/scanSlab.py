@@ -76,10 +76,10 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
         raise ValueError(f"Unknown model {model}")
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(modelData, forcefield)
+    typedMolecule.load_from_file(modelData, forcefield)
     workflow = WorkflowBuilder ()
     workflow.set_typed_molecular_system(typedMolecule)
 
@@ -110,8 +110,8 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
     groupAnchorTooltip = IndicesGroup(group_name="anchorTooltip", indices=indiceAnchorTooltip)
     groupAnchorSlab = IndicesGroup(group_name="anchorSlab", indices=indiceAnchorSlab)
-    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
-    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, other_groups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
     globalSection = RecusiveSection(section_name="GlobalSection")
@@ -156,10 +156,10 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
     # Load the model to get atom positions
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(xyzPath, forcefield)
+    typedMolecule.load_from_file(xyzPath, forcefield)
 
     # List of relevant atoms 
     # Selection of 1-based indices, extracted from scanSelections.json
@@ -185,7 +185,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
         raise ValueError(f"Unknown model {model}")
    
     # Get the positions and the list of atoms for the slab to compute its bounding box
-    positions = typedMolecule.getASEAtoms().get_positions()
+    positions = typedMolecule.get_ase_model().get_positions()
     slabIndicesZeroBased = np.array(indicesSlab) - 1
     slabPositions = np.take(positions, slabIndicesZeroBased, axis=0)
 
@@ -198,9 +198,9 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
 
     # Now that we know where the slab is, and where the head is, we can plan a trajectory
     # For this example, we are going to put the head 2A abobe the slab, and scan every 1A on x and y axis 
-    desiredZDelta = LengthQuantity(zplane, 'angstrom').getMagnitude()
-    desiredXDelta = LengthQuantity(xydelta, 'angstrom').getMagnitude()
-    desiredYDelta = LengthQuantity(xydelta, 'angstrom').getMagnitude()
+    desiredZDelta = LengthQuantity(zplane, 'angstrom').get_magnitude()
+    desiredXDelta = LengthQuantity(xydelta, 'angstrom').get_magnitude()
+    desiredYDelta = LengthQuantity(xydelta, 'angstrom').get_magnitude()
     logger.info(f"Generating trajectory with the following parameters in A: zplane={zplane}, xdelta={desiredXDelta}, ydelta={desiredYDelta}")
     heightTip = slabBoundingBox[1][2] + desiredZDelta
     headTargetPositions = []
@@ -223,8 +223,8 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
     groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
     groupAnchorTooltip = IndicesGroup(group_name="anchorTooltip", indices=indiceAnchorTooltip)
     groupAnchorSlab = IndicesGroup(group_name="anchorSlab", indices=indiceAnchorSlab)
-    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
-    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, other_groups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
     globalSection = RecusiveSection(section_name="GlobalSection")
@@ -246,7 +246,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
         moveForwardSection = InstructionsSection(section_name="MoveForwardSection")
 
         # Unit note: ASE positions are in Angstroms
-        moveForwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instruction_name="moveforward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
+        moveForwardSection.add_instruction(instruction=DisplaceAtomsInstruction(instruction_name="moveforward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
                                                                         dx=LengthQuantity(value=headTargetPosition[0] - headInitialPosition[0], units="angstrom"),
                                                                         dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="angstrom"),
                                                                         dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="angstrom")))
@@ -255,12 +255,12 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
         trajectoryFiles.append(dumpIO.get_associated_file_path())
         bondIO = ReaxBondFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
         bondFiles.append(bondIO.get_associated_file_path())
-        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.getDefaultThermoVariables())
+        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.get_default_thermo_variables())
         speSection.add_fileio(dumpIO)
         speSection.add_fileio(bondIO)
         speSection.add_fileio(thermoIO)
         moveBackwardSection = InstructionsSection(section_name="MoveBackwardSection")
-        moveBackwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instruction_name="movebackward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
+        moveBackwardSection.add_instruction(instruction=DisplaceAtomsInstruction(instruction_name="movebackward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
                                                                         dx=LengthQuantity(value=headInitialPosition[0] - headTargetPosition[0], units="angstrom"),
                                                                         dy=LengthQuantity(value=headInitialPosition[1] - headTargetPosition[1], units="angstrom"),
                                                                         dz=LengthQuantity(value=headInitialPosition[2] - headTargetPosition[2], units="angstrom")))

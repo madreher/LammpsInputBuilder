@@ -42,7 +42,7 @@ class TemplateSection(Section):
         if "fileios" in d.keys() and len(d["fileios"]) > 0:
             ios = d["fileios"]
 
-            from lammpsinputbuilder.loader.fileIOLoader import FileIOLoader
+            from lammpsinputbuilder.loader.fileio_loader import FileIOLoader
             loader = FileIOLoader()
 
             for io in ios:
@@ -51,7 +51,7 @@ class TemplateSection(Section):
         if "extensions" in d.keys() and len(d["extensions"]) > 0:
             exts = d["extensions"]
 
-            from lammpsinputbuilder.loader.extensionLoader import ExtensionLoader
+            from lammpsinputbuilder.loader.extension_loader import ExtensionLoader
             loader = ExtensionLoader()
 
             for ext in exts:
@@ -60,7 +60,7 @@ class TemplateSection(Section):
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
 
-            from lammpsinputbuilder.loader.groupLoader import GroupLoader
+            from lammpsinputbuilder.loader.group_loader import GroupLoader
             loader = GroupLoader()
 
             for group in groups:
@@ -113,4 +113,6 @@ class TemplateSection(Section):
 
     def generate_sections(self) -> List[Section]:
         raise NotImplementedError(
-            "The class {self.__class__.__name__} cannot be used directly. Please use a subclass and implement the function generate_sections() or override the function add_all_commands().")
+            "The class {self.__class__.__name__} cannot be used directly. \
+            Please use a subclass and implement the function generate_sections() \
+            or override the function add_all_commands().")

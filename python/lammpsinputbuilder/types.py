@@ -16,27 +16,27 @@ class Forcefield(Enum):
 def get_forcefield_from_extension(extension: str) -> Forcefield:
     if extension.lower() == ".reax":
         return Forcefield.REAX
-    elif extension.lower() == ".airebo":
+    if extension.lower() == ".airebo":
         return Forcefield.AIREBO
-    elif extension.lower() == ".rebo":
+    if extension.lower() == ".rebo":
         return Forcefield.REBO
-    elif extension.lower() == ".airebo-m":
+    if extension.lower() == ".airebo-m":
         return Forcefield.AIREBOM
-    else:
-        raise NotImplementedError(f"Forcefield {extension} not supported.")
+
+    raise NotImplementedError(f"Forcefield {extension} not supported.")
 
 
 def get_extension_from_forcefield(forcefield: Forcefield) -> str:
     if forcefield == Forcefield.REAX:
         return ".reax"
-    elif forcefield == Forcefield.AIREBO:
+    if forcefield == Forcefield.AIREBO:
         return ".airebo"
-    elif forcefield == Forcefield.REBO:
+    if forcefield == Forcefield.REBO:
         return ".rebo"
-    elif forcefield == Forcefield.AIREBOM:
+    if forcefield == Forcefield.AIREBOM:
         return ".airebo-m"
-    else:
-        raise NotImplementedError(f"Forcefield {forcefield} not supported.")
+
+    raise NotImplementedError(f"Forcefield {forcefield} not supported.")
 
 
 class BoundingBoxStyle(Enum):
@@ -53,24 +53,22 @@ class MoleculeFileFormat(Enum):
 def get_molecule_file_format_from_extension(extension: str) -> MoleculeFileFormat:
     if extension.lower() == ".xyz":
         return MoleculeFileFormat.XYZ
-    elif extension.lower() == ".mol2":
+    if extension.lower() == ".mol2":
         return MoleculeFileFormat.MOL2
-    elif extension.lower() == ".lammpstrj":
+    if extension.lower() == ".lammpstrj":
         return MoleculeFileFormat.LAMMPS_DUMP_TEXT
-    else:
-        raise NotImplementedError(
-            f"Molecule format {extension} not supported.")
+
+    raise NotImplementedError(f"Molecule format {extension} not supported.")
 
 
 def get_extension_from_molecule_file_format(
         molecule_file_format: MoleculeFileFormat) -> str:
     if molecule_file_format == MoleculeFileFormat.XYZ:
         return ".xyz"
-    elif molecule_file_format == MoleculeFileFormat.MOL2:
+    if molecule_file_format == MoleculeFileFormat.MOL2:
         return ".mol2"
-    else:
-        raise NotImplementedError(
-            f"Molecule format {molecule_file_format} not supported.")
+
+    raise NotImplementedError(f"Molecule format {molecule_file_format} not supported.")
 
 
 class ElectrostaticMethod(Enum):

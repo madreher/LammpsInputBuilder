@@ -3,7 +3,7 @@
 from typing import List
 
 from lammpsinputbuilder.integrator import Integrator, RunZeroIntegrator
-from lammpsinputbuilder.fileIO import FileIO
+from lammpsinputbuilder.fileio import FileIO
 from lammpsinputbuilder.instructions import Instruction
 from lammpsinputbuilder.extensions import Extension
 from lammpsinputbuilder.group import Group
@@ -20,9 +20,9 @@ class Section:
         result["section_name"] = self.section_name
         return result
 
-    def from_dict(self, d: dict):
+    def from_dict(self, d: dict, version: int):
+        del version  # unused
         self.section_name = d.get("section_name", "defaultSection")
-        return
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
         result = ""
@@ -31,6 +31,7 @@ class Section:
         return result
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
+        del global_information  # unused
         return ""
 
     def add_undo_commands(self) -> str:
@@ -72,7 +73,7 @@ class RecusiveSection(Section):
         if "sections" in d.keys() and len(d["sections"]) > 0:
             sections = d["sections"]
 
-            from lammpsinputbuilder.loader.sectionLoader import SectionLoader
+            from lammpsinputbuilder.loader.section_loader import SectionLoader
             loader = SectionLoader()
 
             for section in sections:
@@ -81,7 +82,7 @@ class RecusiveSection(Section):
         if "fileios" in d.keys() and len(d["fileios"]) > 0:
             ios = d["fileios"]
 
-            from lammpsinputbuilder.loader.fileIOLoader import FileIOLoader
+            from lammpsinputbuilder.loader.fileio_loader import FileIOLoader
             loader = FileIOLoader()
 
             for io in ios:
@@ -90,7 +91,7 @@ class RecusiveSection(Section):
         if "extensions" in d.keys() and len(d["extensions"]) > 0:
             exts = d["extensions"]
 
-            from lammpsinputbuilder.loader.extensionLoader import ExtensionLoader
+            from lammpsinputbuilder.loader.extension_loader import ExtensionLoader
             loader = ExtensionLoader()
 
             for ext in exts:
@@ -99,7 +100,7 @@ class RecusiveSection(Section):
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
 
-            from lammpsinputbuilder.loader.groupLoader import GroupLoader
+            from lammpsinputbuilder.loader.group_loader import GroupLoader
             loader = GroupLoader()
 
             for group in groups:
@@ -160,10 +161,10 @@ class IntegratorSection(Section):
         self.extensions = []
         self.groups = []
 
-    def getIntegrator(self) -> Integrator:
+    def get_integrator(self) -> Integrator:
         return self.integrator
 
-    def setIntegrator(self, integrator: Integrator) -> None:
+    def set_integrator(self, integrator: Integrator) -> None:
         self.integrator = integrator
 
     def add_fileio(self, fileio: FileIO) -> None:
@@ -192,37 +193,37 @@ class IntegratorSection(Section):
         if "integrator" not in d.keys():
             raise ValueError(f"Missing 'integrator' key in {d}.")
 
-        import lammpsinputbuilder.loader.integratorLoader as loader
-        integratorLoader = loader.IntegratorLoader()
-        self.integrator = integratorLoader.dictToIntegrator(
+        import lammpsinputbuilder.loader.integrator_loader as loader
+        integrator_loader = loader.IntegratorLoader()
+        self.integrator = integrator_loader.dictToIntegrator(
             d["integrator"], version)
 
         if "fileios" in d.keys() and len(d["fileios"]) > 0:
             ios = d["fileios"]
 
-            import lammpsinputbuilder.loader.fileIOLoader as loader
-            fileIOLoader = loader.FileIOLoader()
+            import lammpsinputbuilder.loader.fileio_loader as loader
+            fileio_loader = loader.FileIOLoader()
 
             for io in ios:
-                self.fileios.append(fileIOLoader.dictToFileIO(io))
+                self.fileios.append(fileio_loader.dictToFileIO(io))
 
         if "extensions" in d.keys() and len(d["extensions"]) > 0:
             exts = d["extensions"]
 
-            import lammpsinputbuilder.loader.extensionLoader as loader
-            extensionLoader = loader.ExtensionLoader()
+            import lammpsinputbuilder.loader.extension_loader as loader
+            extension_loader = loader.ExtensionLoader()
 
             for ext in exts:
-                self.extensions.append(extensionLoader.dictToExtension(ext))
+                self.extensions.append(extension_loader.dictToExtension(ext))
 
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
 
-            import lammpsinputbuilder.loader.groupLoader as loader
-            groupLoader = loader.GroupLoader()
+            import lammpsinputbuilder.loader.group_loader as loader
+            group_loader = loader.GroupLoader()
 
             for group in groups:
-                self.groups.append(groupLoader.dict_to_group(group))
+                self.groups.append(group_loader.dict_to_group(group))
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
         result = "################# START SECTION " + \
@@ -230,7 +231,7 @@ class IntegratorSection(Section):
         result += self.add_do_commands(global_information=global_information)
         result += "################# START RUN INTEGRATOR FOR SECTION " + \
             self.section_name + " #################\n"
-        result += self.integrator.addRunCommands()
+        result += self.integrator.add_run_commands()
         result += "################# END RUN INTEGRATOR FOR SECTION " + \
             self.section_name + " #################\n"
         result += self.add_undo_commands()
@@ -291,7 +292,7 @@ class InstructionsSection(Section):
         super().__init__(section_name=section_name)
         self.instructions: List[Instruction] = []
 
-    def addInstruction(self, instruction: Instruction):
+    def add_instruction(self, instruction: Instruction):
         self.instructions.append(instruction)
 
     def to_dict(self) -> dict:
@@ -302,14 +303,14 @@ class InstructionsSection(Section):
 
     def from_dict(self, d: dict, version: int):
         super().from_dict(d, version=version)
-        instructionsDict = d.get("instructions", [])
-        if len(instructionsDict) > 0:
-            import lammpsinputbuilder.loader.instructionLoader as loader
+        instructions_dict = d.get("instructions", [])
+        if len(instructions_dict) > 0:
+            import lammpsinputbuilder.loader.instruction_loader as loader
 
-            instructionLoader = loader.InstructionLoader()
+            instruction_loader = loader.InstructionLoader()
             self.instructions = [
-                instructionLoader.dict_to_instruction(
-                    c, version) for c in instructionsDict]
+                instruction_loader.dict_to_instruction(
+                    c, version) for c in instructions_dict]
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
         result = "################# START SECTION " + \

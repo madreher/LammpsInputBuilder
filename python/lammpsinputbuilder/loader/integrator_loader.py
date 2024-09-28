@@ -18,10 +18,10 @@ class IntegratorLoader():
         integrator_table[MultipassMinimizeIntegrator.__name__] = MultipassMinimizeIntegrator()
         integrator_table[ManualIntegrator.__name__] = ManualIntegrator()
 
-        if "class" not in d.keys():
+        if "class" not in d:
             raise RuntimeError(f"Missing 'class' key in {d}.")
         class_name = d["class"]
-        if class_name not in integrator_table.keys():
+        if class_name not in integrator_table:
             raise RuntimeError(f"Unknown Integrator class {class_name}.")
         # Create a copy of the base object, and we will update the settings of
         # the object from the dictionary

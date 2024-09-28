@@ -18,6 +18,7 @@ class Group:
         return result
 
     def from_dict(self, d: dict, version: int):
+        del version  # unused
         self.group_name = d.get("group_name", "defaultGroupName")
 
     def add_do_commands(self) -> str:
@@ -31,23 +32,28 @@ class IndicesGroup(Group):
     def __init__(
             self,
             group_name: str = "defaultIndiceGroupName",
-            indices: List[int] = []) -> None:
+            indices: List[int] = None) -> None:
         super().__init__(group_name)
-        self.indices = indices
 
-        self.validateIndices()
+        if indices is None:
+            self.indices = []
+        else:
+            self.indices = indices
 
-    def validateIndices(self):
+        self.validate_indices()
+
+    def validate_indices(self):
         # Check that all the indices are positive
         for index in self.indices:
             if index <= 0:
                 raise ValueError(
-                    f"Indices {index} declared in group {self.group_name}. Indices must be greater than 0 when creating an IndicesGroup.")
+                    (f"Indices {index} declared in group {self.group_name}. "
+                     "Indices must be greater than 0 when creating an IndicesGroup."))
 
-    def getIndices(self) -> List[int]:
+    def get_indices(self) -> List[int]:
         return self.indices
 
-    def setIndices(self, indices: List[int]):
+    def set_indices(self, indices: List[int]):
         self.indices = indices
 
     def to_dict(self) -> dict:
@@ -63,17 +69,17 @@ class IndicesGroup(Group):
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().from_dict(d, version=version)
         self.indices = d.get("indices", [])
-        self.validateIndices()
+        self.validate_indices()
 
     def add_do_commands(self) -> str:
         if len(self.indices) == 0:
             return f"group {self.group_name} empty\n"
-        else:
-            commands = f"group {self.group_name} id"
-            for index in self.indices:
-                commands += f" {index}"
-            commands += "\n"
-            return commands
+
+        commands = f"group {self.group_name} id"
+        for index in self.indices:
+            commands += f" {index}"
+        commands += "\n"
+        return commands
 
     def add_undo_commands(self) -> str:
         return f"group {self.group_name} delete\n"
@@ -126,8 +132,8 @@ class EmptyGroup(Group):
 
 
 class OperationGroupEnum(Enum):
-    SUBTRACT = 0,
-    UNION = 1,
+    SUBTRACT = 0
+    UNION = 1
     INTERSECT = 2
 
 
@@ -143,42 +149,46 @@ class OperationGroup(Group):
             self,
             group_name: str = "defaultOperationGroupName",
             op: OperationGroupEnum = OperationGroupEnum.UNION,
-            otherGroups: List[Group] = [
-            EmptyGroup()]) -> None:
+            other_groups: List[Group] = None) -> None:
         super().__init__(group_name)
         self.op = op
-        self.otherGroups = [g.get_group_name() for g in otherGroups]
+        if other_groups is None:
+            self.other_groups = [EmptyGroup().get_group_name()]
+        else:
+            self.other_groups = [g.get_group_name() for g in other_groups]
 
-        self.validateConfiguration()
+        self.validate_configuration()
 
-    def validateConfiguration(self):
-        if len(self.otherGroups) == 0 and self.op == OperationGroupEnum.UNION:
+    def validate_configuration(self):
+        if len(self.other_groups) == 0 and self.op == OperationGroupEnum.UNION:
             raise ValueError(
-                f"Union operation cannot be performed with an empty list of other groups when creating an {__class__.__name__}.")
+                ("Union operation cannot be performed with an empty list of "
+                 f"other groups when creating an {__class__.__name__}."))
         if len(
-                self.otherGroups) < 2 and self.op in [
+                self.other_groups) < 2 and self.op in [
                 OperationGroupEnum.SUBTRACT,
                 OperationGroupEnum.INTERSECT]:
             raise ValueError(
-                f"Operation {self.op} requires at least 2 other groups when creating an {__class__.__name__}.")
+                (f"Operation {self.op} requires at least 2 other groups "
+                 f"when creating an {__class__.__name__}."))
 
-    def getOperation(self) -> OperationGroupEnum:
+    def get_operation(self) -> OperationGroupEnum:
         return self.op
 
-    def setOperation(self, op: OperationGroupEnum):
+    def set_operation(self, op: OperationGroupEnum):
         self.op = op
 
-    def getOtherGroups(self) -> List[str]:
-        return self.otherGroups
+    def get_other_groups(self) -> List[str]:
+        return self.other_groups
 
-    def setOtherGroups(self, otherGroups: List[Group]):
-        self.otherGroups = [g.get_group_name() for g in otherGroups]
+    def set_other_groups(self, other_groups: List[Group]):
+        self.other_groups = [g.get_group_name() for g in other_groups]
 
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__
         result["op"] = self.op.value
-        result["otherGroups"] = self.otherGroups
+        result["other_groups"] = self.other_groups
         return result
 
     def from_dict(self, d: dict, version: int):
@@ -187,14 +197,14 @@ class OperationGroup(Group):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().from_dict(d, version=version)
-        self.otherGroups = d.get("otherGroups", [])
+        self.other_groups = d.get("other_groups", [])
 
-        self.validateConfiguration()
+        self.validate_configuration()
 
     def add_do_commands(self) -> str:
-        self.validateConfiguration()
+        self.validate_configuration()
         commands = f"group {self.group_name} {OperationGroup.operationToStr[self.op]}"
-        for grp in self.otherGroups:
+        for grp in self.other_groups:
             commands += f" {grp}"
         commands += "\n"
         return commands
@@ -212,10 +222,10 @@ class ReferenceGroup(Group):
     def get_group_name(self) -> str:
         return self.reference
 
-    def getReferenceName(self) -> str:
+    def get_reference_name(self) -> str:
         return self.reference
 
-    def setReference(self, reference: Group):
+    def set_reference(self, reference: Group):
         self.reference = reference.get_group_name()
 
     def to_dict(self) -> dict:

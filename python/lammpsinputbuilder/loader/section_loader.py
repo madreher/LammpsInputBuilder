@@ -3,8 +3,8 @@
 import copy
 
 from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
-from lammpsinputbuilder.templates.templateSection import TemplateSection
-from lammpsinputbuilder.templates.minimizeTemplate import MinimizeTemplate
+from lammpsinputbuilder.templates.template_section import TemplateSection
+from lammpsinputbuilder.templates.minimize_template import MinimizeTemplate
 
 
 class SectionLoader():
@@ -19,10 +19,10 @@ class SectionLoader():
         section_table[TemplateSection.__name__] = TemplateSection()
         section_table[MinimizeTemplate.__name__] = MinimizeTemplate()
 
-        if "class" not in d.keys():
+        if "class" not in d:
             raise RuntimeError(f"Missing 'class' key in {d}.")
         class_name = d["class"]
-        if class_name not in section_table.keys():
+        if class_name not in section_table:
             raise RuntimeError(f"Unknown Section class {class_name}.")
         # Create a copy of the base object, and we will update the settings of
         # the object from the dictionary

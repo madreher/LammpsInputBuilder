@@ -27,10 +27,10 @@ def main():
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(modelData, forcefield)
+    typedMolecule.load_from_file(modelData, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
@@ -52,14 +52,14 @@ def main():
         integrator=NVEIntegrator(
             integrator_name="warmup",
             group=AllGroup(),
-            nbSteps=10000
+            nb_steps=10000
         )
     )
     langevinWarmup = LangevinExtension(
         extension_name="langevin",
         group=AllGroup(), 
-        startTemp=TemperatureQuantity(1, "K"),
-        endTemp=TemperatureQuantity(300, "K"),
+        start_temp=TemperatureQuantity(1, "K"),
+        end_temp=TemperatureQuantity(300, "K"),
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
@@ -70,13 +70,13 @@ def main():
     sectionNVE = IntegratorSection(integrator=NVEIntegrator(
         integrator_name="equilibrium",
         group=AllGroup(),
-        nbSteps=100000
+        nb_steps=100000
     ))
     langevinWarmup = LangevinExtension(
         extension_name="langevin",
         group=AllGroup(), 
-        startTemp=TemperatureQuantity(300, "K"),
-        endTemp=TemperatureQuantity(300, "K"),
+        start_temp=TemperatureQuantity(300, "K"),
+        end_temp=TemperatureQuantity(300, "K"),
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
@@ -84,7 +84,7 @@ def main():
     sectionNVE.add_fileio(pos)
     bonds = ReaxBondFileIO(fileio_name="bonds", interval=10, group=AllGroup())
     sectionNVE.add_fileio(bonds)
-    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=10, user_fields=typedMolecule.getDefaultThermoVariables())
+    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=10, user_fields=typedMolecule.get_default_thermo_variables())
     sectionNVE.add_fileio(thermo)
 
     workflow.add_section(sectionNVE)

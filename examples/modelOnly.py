@@ -22,10 +22,10 @@ def main():
         'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(modelData, forcefield)
+    typedMolecule.load_from_file(modelData, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder()

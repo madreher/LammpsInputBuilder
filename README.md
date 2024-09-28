@@ -28,10 +28,10 @@ Here is a simple example on how to load a molecular model, assign a reax potenti
     forcefield = Path('ffield.reax.Fe_O_C_H.reax') 
 
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(modelData, forcefield)
+    typedMolecule.load_from_file(modelData, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder()
@@ -203,7 +203,7 @@ timestep 20.0
 
 The `Integrator` objects are responsible for declaring the base process which is going to advance the step counter of the simulation. In most cases, that means in particular executing the Lammps `run` command in addition to the method to use for the time integration during that `run`. There are exceptions though such as the `minimize` command which technically doesn't use the `run` command but still involve some type of multistep process. 
 
-The `Integrator` object implements up to three methods: `add_do_commands()`, `add_undo_commands()`, and `addRunCommands()`. The `add_do_commands()` and `add_undo_commands()` methods have the same as the other objects, i.e declare the necessary computation to perform and stop them respectively. The `addRunCommands()` is specific to the `Integrator` objects and is responsible for specifying how to trigger the computation. This is usually done by specify a `run` command. Note that an `Integrator` may only need to implement some of these methods.
+The `Integrator` object implements up to three methods: `add_do_commands()`, `add_undo_commands()`, and `add_run_commands()`. The `add_do_commands()` and `add_undo_commands()` methods have the same as the other objects, i.e declare the necessary computation to perform and stop them respectively. The `add_run_commands()` is specific to the `Integrator` objects and is responsible for specifying how to trigger the computation. This is usually done by specify a `run` command. Note that an `Integrator` may only need to implement some of these methods.
 
 Example:
 ```
@@ -211,9 +211,9 @@ from lammpsinputbuilder.integrator import NVEIntegrator
 from lammpsinputbuilder.group import AllGroup
 from lammpsinputbuilder.types import GlobalInformation
 
-integrator = NVEIntegrator(integrator_name="myIntegrator", group=AllGroup(), nbSteps=1000)
+integrator = NVEIntegrator(integrator_name="myIntegrator", group=AllGroup(), nb_steps=1000)
 print(integrator.add_do_commands(info))
-print(integrator.addRunCommands())
+print(integrator.add_run_commands())
 print(integrator.add_undo_commands())
 ```
 
@@ -265,10 +265,10 @@ Example:
 from lammpsinputbuilder.quantities import TimeQuantity, LammpsUnitSystem
 
 timestep=TimeQuantity(20, "fs")
-timestep.getMagnitude() # print 20
-timestep.getUnits() # print "fs"
+timestep.get_magnitude() # print 20
+timestep.get_units() # print "fs"
 
-timestep.convertTo(LammpsUnitSystem.METAL) # print 0.02 , Lammps metal unit style is in ps
+timestep.convert_to(LammpsUnitSystem.METAL) # print 0.02 , Lammps metal unit style is in ps
 ```
 
 ## Workflow examples
@@ -286,10 +286,10 @@ The first step is to declare a model and assign a forcefield to it. In this exam
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
 
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(modelData, forcefield)
+    typedMolecule.load_from_file(modelData, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
@@ -325,14 +325,14 @@ Now that the model is minimized, we can warm up the molecular system in the seco
         integrator=NVEIntegrator(
             integrator_name="warmup",
             group=AllGroup(),
-            nbSteps=10000
+            nb_steps=10000
         )
     )
     langevinWarmup = LangevinExtensioln(
         extension_name="langevin",
         group=AllGroup(), 
-        startTemp=TemperatureQuantity(1, "K"),
-        endTemp=TemperatureQuantity(300, "K"),
+        start_temp=TemperatureQuantity(1, "K"),
+        end_temp=TemperatureQuantity(300, "K"),
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
@@ -349,13 +349,13 @@ To complete this example, we are going to run an equilibration phase at 300K wit
     sectionNVE = IntegratorSection(integrator=NVEIntegrator(
         integrator_name="equilibrium",
         group=AllGroup(),
-        nbSteps=100000
+        nb_steps=100000
     ))
     langevinWarmup = LangevinExtensioln(
         extension_name="langevin",
         group=AllGroup(), 
-        startTemp=TemperatureQuantity(300, "K"),
-        endTemp=TemperatureQuantity(300, "K"),
+        start_temp=TemperatureQuantity(300, "K"),
+        end_temp=TemperatureQuantity(300, "K"),
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
@@ -404,10 +404,10 @@ With this being done, we can start to load the molecular model with LammpsInputG
     # Load the model to get atom positions
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(xyzPath, forcefield)
+    typedMolecule.load_from_file(xyzPath, forcefield)
     workflow = WorkflowBuilder ()
     workflow.set_typed_molecular_system(typedMolecule)
 ```
@@ -426,8 +426,8 @@ The molecular system XYZ coordinates need to be adjusted to lower the initial en
     groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
     groupAnchorTooltip = IndicesGroup(group_name="anchorTooltip", indices=indiceAnchorTooltip)
     groupAnchorSlab = IndicesGroup(group_name="anchorSlab", indices=indiceAnchorSlab)
-    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
-    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, other_groups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
     globalSection = RecusiveSection(section_name="GlobalSection")
@@ -479,15 +479,15 @@ In this phase, we are going to displace the tooltip to various positions above t
     xyzPath = previousJobFolder / finalXYZ
     forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'Si_C_H.reax'
     typedMolecule = ReaxTypedMolecularSystem(
-        bboxStyle=BoundingBoxStyle.PERIODIC,
-        electrostaticMethod=ElectrostaticMethod.QEQ
+        bbox_style=BoundingBoxStyle.PERIODIC,
+        electrostatic_method=ElectrostaticMethod.QEQ
     )
-    typedMolecule.loadFromFile(xyzPath, forcefield)
+    typedMolecule.load_from_file(xyzPath, forcefield)
 ```
 Once the model is loaded, we need to compute the bounding box of the slab specifically. To do so, we need the list of atom indices forming the slab that we have defined previously, and the current positions. Internally, the `TypedMolecularSystem` object stores a ASE [Atoms](https://wiki.fysik.dtu.dk/ase/ase/atoms.html) object which can be querried to access atom positions. This can be done as follows:
 ```
     # Get the positions and the list of atoms for the slab to compute its bounding box
-    positions = typedMolecule.getASEAtoms().get_positions()
+    positions = typedMolecule.get_ase_model().get_positions()
     slabIndicesZeroBased = np.array(indicesSlab) - 1
     slabPositions = np.take(positions, slabIndicesZeroBased, axis=0)
 
@@ -533,8 +533,8 @@ During the generation of the grid, we save the corresponding tooltip positions f
     groupTooltip  = IndicesGroup(group_name="tooltip", indices=indicesTooltip)
     groupAnchorTooltip = IndicesGroup(group_name="anchorTooltip", indices=indiceAnchorTooltip)
     groupAnchorSlab = IndicesGroup(group_name="anchorSlab", indices=indiceAnchorSlab)
-    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, otherGroups=[groupAnchorSlab, groupAnchorTooltip])
-    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, otherGroups=[AllGroup(), groupAnchors])
+    groupAnchors = OperationGroup(group_name="anchors", op=OperationGroupEnum.UNION, other_groups=[groupAnchorSlab, groupAnchorTooltip])
+    groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
     globalSection = RecusiveSection(section_name="GlobalSection")
@@ -554,7 +554,7 @@ During the generation of the grid, we save the corresponding tooltip positions f
 
         stepSection = RecusiveSection(section_name=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
         moveForwardSection = InstructionsSection(section_name="MoveForwardSection")
-        moveForwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instruction_name="moveforward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
+        moveForwardSection.add_instruction(instruction=DisplaceAtomsInstruction(instruction_name="moveforward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
                                                                         dx=LengthQuantity(value=headTargetPosition[0] - headInitialPosition[0], units="lmp_real_length"),
                                                                         dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="lmp_real_length"),
                                                                         dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="lmp_real_length")))
@@ -563,12 +563,12 @@ During the generation of the grid, we save the corresponding tooltip positions f
         trajectoryFiles.append(dumpIO.get_associated_file_path())
         bondIO = ReaxBondFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
         bondFiles.append(bondIO.get_associated_file_path())
-        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.getDefaultThermoVariables())
+        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.get_default_thermo_variables())
         speSection.add_fileio(dumpIO)
         speSection.add_fileio(bondIO)
         speSection.add_fileio(thermoIO)
         moveBackwardSection = InstructionsSection(section_name="MoveBackwardSection")
-        moveBackwardSection.addInstruction(instruction=DisplaceAtomsInstruction(instruction_name="movebackward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
+        moveBackwardSection.add_instruction(instruction=DisplaceAtomsInstruction(instruction_name="movebackward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
                                                                         dx=LengthQuantity(value=headInitialPosition[0] - headTargetPosition[0], units="lmp_real_length"),
                                                                         dy=LengthQuantity(value=headInitialPosition[1] - headTargetPosition[1], units="lmp_real_length"),
                                                                         dz=LengthQuantity(value=headInitialPosition[2] - headTargetPosition[2], units="lmp_real_length")))

@@ -55,7 +55,7 @@ class MinimizeTemplate(TemplateSection):
         self.maxeval = d["maxeval"]
         self.use_anchors = d["use_anchors"]
         if "anchor_group" in d:
-            from lammpsinputbuilder.loader.groupLoader import GroupLoader
+            from lammpsinputbuilder.loader.group_loader import GroupLoader
             loader = GroupLoader()
 
             self.anchor_group = loader.dict_to_group(d["anchor_group"])
