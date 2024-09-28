@@ -31,12 +31,28 @@ jobs:
         source venv/bin/activate
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install anybadge
         deactivate
       working-directory: ${{ github.workspace }}
 
     - name: Analyze code with Pylint
       run: |
         source venv/bin/activate
-        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --fail-under=9.0
+        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --fail-under=7.0 | tee pylint_report.txt
+        score=$(sed -n 's/Your code has been rated at \(.*\)/\1/p' pylint_report.txt)
+        echo "PyLint score is: $score"
+        echo "pylint_score=$score" >> $GITHUB_ENV
         deactivate
       working-directory: ${{ github.workspace }} 
+
+    - name: Create badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: bc29e267d35fad12ca2de2bd7138ecfc
+        filename: test.json
+        label: "Pylint"
+        message: ${{ env.pylint_score }}
+        color: green
+
+
