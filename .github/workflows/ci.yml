@@ -10,6 +10,9 @@ jobs:
   test:
     name: Run tests & display coverage
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
     permissions:
       # Gives the action the necessary permissions for publishing new
       # comments in pull requests.
@@ -20,6 +23,11 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Create virtual environment
         run: python -m venv venv
