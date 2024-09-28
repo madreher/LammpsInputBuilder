@@ -36,7 +36,6 @@ jobs:
       working-directory: ${{ github.workspace }}
 
     - name: Analyze code with Pylint
-      # anybadge --label "Pylint" --value $score --file=public/pylint_badge.svg
       run: |
         source venv/bin/activate
         pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --fail-under=7.0 | tee pylint_report.txt
