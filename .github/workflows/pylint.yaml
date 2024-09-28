@@ -44,7 +44,11 @@ jobs:
         anybadge --label "Pylint" --value $score --file=public/pylint_badge.svg
         deactivate
       working-directory: ${{ github.workspace }} 
-    
-    artifacts:
-      paths:
-        - public/pylint_badge.svg
+
+    - name: Upload Pylint badge
+      uses: actions/upload-artifact@v3
+      with:
+        name: pylint_badge
+        path: public/pylint_badge.svg
+
+        
