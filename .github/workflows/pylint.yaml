@@ -45,10 +45,3 @@ jobs:
         deactivate
       working-directory: ${{ github.workspace }} 
 
-    - name: Upload Pylint badge
-      uses: actions/upload-artifact@v3
-      with:
-        name: pylint_badge
-        path: public/pylint_badge.svg
-
-        
