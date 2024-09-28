@@ -41,6 +41,10 @@ jobs:
         pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --exit-zero | tee pylint_report.txt
         score=$(sed -n 's/Your code has been rated at \(.*\)/\1/p' pylint_report.txt)
         echo "PyLint score is: $score"
-        anybadge --label "Pylint" --value $score --file=pylint_badge.svg
+        anybadge --label "Pylint" --value $score --file=public/pylint_badge.svg
         deactivate
       working-directory: ${{ github.workspace }} 
+    
+    artifacts:
+      paths:
+        - public/pylint_badge.svg
