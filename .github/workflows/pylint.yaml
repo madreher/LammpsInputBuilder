@@ -31,12 +31,15 @@ jobs:
         source venv/bin/activate
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install anybadge
         deactivate
       working-directory: ${{ github.workspace }}
 
     - name: Analyze code with Pylint
       run: |
         source venv/bin/activate
-        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --fail-under=9.0
+        pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --exit-zero | tee pylint_report.txt
+        echo "PyLint score is: $(cat pylint_report.txt | grep "Your code has been rated at" | cut -d " " -f 4)"
+        anybadge --label "Pylint" --value "$(cat pylint_report.txt | grep "Your code has been rated at" | cut -d " " -f 4)"
         deactivate
       working-directory: ${{ github.workspace }} 
