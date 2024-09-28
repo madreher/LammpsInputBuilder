@@ -39,7 +39,8 @@ jobs:
       run: |
         source venv/bin/activate
         pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --exit-zero | tee pylint_report.txt
-        echo "PyLint score is: $(cat pylint_report.txt | grep "Your code has been rated at" | cut -d " " -f 4)"
-        anybadge --label "Pylint" --value "$(cat pylint_report.txt | grep "Your code has been rated at" | cut -d " " -f 4)"
+        score=$(sed -n 's/Your code has been rated at \(.*\)/\1/p' pylint_report.txt)
+        echo "PyLint score is: $score"
+        anybadge --label "Pylint" --value $score --file=pylint_badge.svg
         deactivate
       working-directory: ${{ github.workspace }} 
