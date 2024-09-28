@@ -42,6 +42,7 @@ jobs:
         pylint $(git ls-files 'python/lammpsinputbuilder/*.py') --output-format=text --fail-under=7.0 | tee pylint_report.txt
         score=$(sed -n 's/Your code has been rated at \(.*\)/\1/p' pylint_report.txt)
         echo "PyLint score is: $score"
+        echo "pylint_score=$score" >> $GITHUB_ENV
         deactivate
       working-directory: ${{ github.workspace }} 
 
@@ -52,7 +53,7 @@ jobs:
         gistID: bc29e267d35fad12ca2de2bd7138ecfc
         filename: test.json
         label: "Pylint"
-        message: ${{ env.score }}
+        message: ${{ env.pylint_score }}
         color: green
 
 
