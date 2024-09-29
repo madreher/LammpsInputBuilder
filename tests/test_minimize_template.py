@@ -93,9 +93,16 @@ def test_minimize_template_commands():
     global_info = GlobalInformation()
     global_info.set_unit_style(LammpsUnitSystem.REAL)
 
-    result = section_list[0].add_all_commands(global_information=global_info)
+    result = template.add_all_commands(global_information=global_info)
 
-    assert result == """################# START SECTION minimizationTemplate #################
+    assert result == """################# START Section test #################
+################# START Groups DECLARATION #################
+################# END Groups DECLARATION #################
+################# START Extensions DECLARATION #################
+################# END Extensions DECLARATION #################
+################# START IOs DECLARATION #################
+################# END IOs DECLARATION #################
+################# START SECTION minimizationTemplate #################
 
 ################# START Groups DECLARATION #################
 ################# END Groups DECLARATION #################
@@ -121,5 +128,12 @@ unfix zeroForceAnchor
 ################# END Groups DECLARATION #################
 ################# END SECTION minimizationTemplate #################
 
+################# START IO REMOVAL #################
+################# END IOs DECLARATION #################
+################# START Extensions REMOVAL #################
+################# END Extensions DECLARATION #################
+################# START Groups REMOVAL #################
+################# END Groups DECLARATION #################
+################# END Section test #################
 """
     

@@ -76,36 +76,6 @@ class ElectrostaticMethod(Enum):
     QEQ = 2
 
 
-class MoleculeHolder():
-    """
-    Class used to store the molecule information
-    """
-
-    def __init__(self, atoms: Atoms, bbox_coords: List) -> None:
-        self.atoms = atoms
-        if len(bbox_coords) != 6:
-            raise ValueError(
-                "Invalid number of bounding box coordinates (6 expected, received " + 
-                str(len(bbox_coords)) + ")")
-        self.bbox_coords = bbox_coords
-        self.bbox_dims = [
-            bbox_coords[1] -
-            bbox_coords[0],
-            bbox_coords[3] -
-            bbox_coords[2],
-            bbox_coords[5] -
-            bbox_coords[4]]
-
-    def get_atoms(self) -> Atoms:
-        return self.atoms
-
-    def get_bbox_coords(self) -> List:
-        return self.bbox_coords
-
-    def get_bbox_dims(self) -> List:
-        return self.bbox_dims
-
-
 class GlobalInformation:
     def __init__(self) -> None:
         self.unit_style = None
