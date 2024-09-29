@@ -45,6 +45,7 @@ jobs:
       - name: Coverage comment
         id: coverage_comment
         uses: py-cov-action/python-coverage-comment-action@v3
+        if: ${{ matrix.python-version }} == "3.11"
         with:
           GITHUB_TOKEN: ${{ github.token }}
 
