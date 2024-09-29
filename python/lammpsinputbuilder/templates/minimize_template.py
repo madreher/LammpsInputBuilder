@@ -2,7 +2,7 @@
 
 from typing import List
 from lammpsinputbuilder.section import Section, IntegratorSection
-from lammpsinputbuilder.templates.templateSection import TemplateSection
+from lammpsinputbuilder.templates.template_section import TemplateSection
 from lammpsinputbuilder.integrator import MinimizeIntegrator, MinimizeStyle
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.extensions import SetForceExtension

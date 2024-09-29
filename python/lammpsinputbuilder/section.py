@@ -45,18 +45,37 @@ class RecusiveSection(Section):
         self.ios: List[FileIO] = []
         self.extensions: List[Extension] = []
         self.groups: List[Group] = []
+        self.instructions: List[Instruction] = []
 
     def add_section(self, section: Section):
         self.sections.append(section)
 
+    def get_sections(self) -> List[Section]:
+        return self.sections
+
     def add_fileio(self, fileio: FileIO):
         self.ios.append(fileio)
+
+    def get_fileios(self) -> List[FileIO]:
+        return self.ios
 
     def add_extension(self, extension: Extension):
         self.extensions.append(extension)
 
+    def get_extensions(self) -> List[Extension]:
+        return self.extensions
+
     def add_group(self, group: Group):
         self.groups.append(group)
+
+    def get_groups(self) -> List[Group]:
+        return self.groups
+    
+    def add_instruction(self, instruction: Instruction):
+        self.instructions.append(instruction)
+
+    def get_instructions(self) -> List[Instruction]:
+        return self.instructions
 
     def to_dict(self) -> dict:
         result = super().to_dict()
@@ -65,6 +84,7 @@ class RecusiveSection(Section):
         result["fileios"] = [s.to_dict() for s in self.ios]
         result["extensions"] = [s.to_dict() for s in self.extensions]
         result["groups"] = [s.to_dict() for s in self.groups]
+        result["instructions"] = [s.to_dict() for s in self.instructions]
         return result
 
     def from_dict(self, d: dict, version: int):
@@ -105,6 +125,15 @@ class RecusiveSection(Section):
 
             for group in groups:
                 self.groups.append(loader.dict_to_group(group))
+
+        if "instructions" in d.keys() and len(d["instructions"]) > 0:
+            instructions = d["instructions"]
+
+            from lammpsinputbuilder.loader.instruction_loader import InstructionLoader
+            loader = InstructionLoader()
+
+            for instruction in instructions:
+                self.instructions.append(loader.dict_to_instruction(instruction))
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
 
@@ -160,6 +189,7 @@ class IntegratorSection(Section):
         self.fileios = []
         self.extensions = []
         self.groups = []
+        self.instructions = []
 
     def get_integrator(self) -> Integrator:
         return self.integrator
@@ -173,8 +203,20 @@ class IntegratorSection(Section):
     def add_extension(self, extension: Extension) -> None:
         self.extensions.append(extension)
 
+    def get_extensions(self) -> List[Extension]:
+        return self.extensions
+
     def add_group(self, group: Group) -> None:
         self.groups.append(group)
+
+    def get_groups(self) -> List[Group]:
+        return self.groups
+
+    def add_instruction(self, instruction: Instruction) -> None:
+        self.instructions.append(instruction)
+
+    def get_instructions(self) -> List[Instruction]:
+        return self.instructions
 
     def to_dict(self) -> dict:
         result = super().to_dict()
@@ -183,6 +225,7 @@ class IntegratorSection(Section):
         result["fileios"] = [f.to_dict() for f in self.fileios]
         result["extensions"] = [e.to_dict() for e in self.extensions]
         result["groups"] = [g.to_dict() for g in self.groups]
+        result["instructions"] = [i.to_dict() for i in self.instructions]
         return result
 
     def from_dict(self, d: dict, version: int) -> None:
@@ -195,7 +238,7 @@ class IntegratorSection(Section):
 
         import lammpsinputbuilder.loader.integrator_loader as loader
         integrator_loader = loader.IntegratorLoader()
-        self.integrator = integrator_loader.dictToIntegrator(
+        self.integrator = integrator_loader.dict_to_integrator(
             d["integrator"], version)
 
         if "fileios" in d.keys() and len(d["fileios"]) > 0:
@@ -205,7 +248,7 @@ class IntegratorSection(Section):
             fileio_loader = loader.FileIOLoader()
 
             for io in ios:
-                self.fileios.append(fileio_loader.dictToFileIO(io))
+                self.fileios.append(fileio_loader.dict_to_fileio(io))
 
         if "extensions" in d.keys() and len(d["extensions"]) > 0:
             exts = d["extensions"]
@@ -214,7 +257,7 @@ class IntegratorSection(Section):
             extension_loader = loader.ExtensionLoader()
 
             for ext in exts:
-                self.extensions.append(extension_loader.dictToExtension(ext))
+                self.extensions.append(extension_loader.dict_to_extension(ext))
 
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
@@ -224,6 +267,16 @@ class IntegratorSection(Section):
 
             for group in groups:
                 self.groups.append(group_loader.dict_to_group(group))
+
+        if "instructions" in d.keys() and len(d["instructions"]) > 0:
+            instructions = d["instructions"]
+
+            import lammpsinputbuilder.loader.instruction_loader as loader
+            instruction_loader = loader.InstructionLoader()
+
+            for instruction in instructions:
+                self.instructions.append(
+                    instruction_loader.dict_to_instruction(instruction))
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
         result = "################# START SECTION " + \

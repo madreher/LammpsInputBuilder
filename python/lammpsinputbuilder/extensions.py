@@ -54,7 +54,7 @@ class LangevinExtension(Extension):
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["group"] = self.group
+        result["group_name"] = self.group
         result["start_temp"] = self.start_temp.to_dict()
         result["end_temp"] = self.end_temp.to_dict()
         result["damp"] = self.damp.to_dict()
@@ -67,7 +67,7 @@ class LangevinExtension(Extension):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
-        self.group = d.get("group", AllGroup().get_group_name())
+        self.group = d.get("group_name", AllGroup().get_group_name())
         self.start_temp = TemperatureQuantity()
         self.start_temp.from_dict(d["start_temp"], version)
         self.end_temp = TemperatureQuantity()
@@ -109,7 +109,7 @@ class SetForceExtension(Extension):
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["group"] = self.group
+        result["group_name"] = self.group
         result["fx"] = self.fx.to_dict()
         result["fy"] = self.fy.to_dict()
         result["fz"] = self.fz.to_dict()
@@ -121,7 +121,7 @@ class SetForceExtension(Extension):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
-        self.group = d.get("group", AllGroup().get_group_name())
+        self.group = d.get("group_name", AllGroup().get_group_name())
         self.fx = ForceQuantity()
         self.fx.from_dict(d["fx"], version)
         self.fy = ForceQuantity()
@@ -162,7 +162,7 @@ class MoveExtension(Extension):
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["group"] = self.group
+        result["group_name"] = self.group
         result["vx"] = self.vx.to_dict()
         result["vy"] = self.vy.to_dict()
         result["vz"] = self.vz.to_dict()
@@ -174,7 +174,7 @@ class MoveExtension(Extension):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
         super().from_dict(d, version)
-        self.group = d.get("group", AllGroup().get_group_name())
+        self.group = d.get("group_name", AllGroup().get_group_name())
         self.vx = VelocityQuantity()
         self.vx.from_dict(d["vx"], version)
         self.vy = VelocityQuantity()

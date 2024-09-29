@@ -19,7 +19,7 @@ def test_MoveExtension():
     assert obj.vz.get_units() == "angstrom/ps"
 
     dict_result = obj.to_dict()
-    assert dict_result["group"] == "all"
+    assert dict_result["group_name"] == "all"
     assert dict_result["vx"]["magnitude"] == 1.0
     assert dict_result["vx"]["units"] == "angstrom/ps"
     assert dict_result["vy"]["magnitude"] == 2.0
@@ -52,9 +52,9 @@ def test_MoveExtension():
 def test_SetForceExtension():
     obj = SetForceExtension(
         "mySetForceExtension", 
-        group=AllGroup(), 
-        fx=ForceQuantity(1.0, "lmp_real_force"), 
-        fy=ForceQuantity(2.0, "lmp_real_force"), 
+        group=AllGroup(),
+        fx=ForceQuantity(1.0, "lmp_real_force"),
+        fy=ForceQuantity(2.0, "lmp_real_force"),
         fz=ForceQuantity(3.0, "lmp_real_force"))
 
     assert obj.group == "all"
@@ -66,7 +66,7 @@ def test_SetForceExtension():
     assert obj.fz.get_units() == "lmp_real_force"
 
     dict_result = obj.to_dict()
-    assert dict_result["group"] == "all"
+    assert dict_result["group_name"] == "all"
     assert dict_result["fx"]["magnitude"] == 1.0
     assert dict_result["fx"]["units"] == "lmp_real_force"
     assert dict_result["fy"]["magnitude"] == 2.0
@@ -115,7 +115,7 @@ def test_LangevinExtension():
     assert obj.seed == 122345
 
     dict_result = obj.to_dict()
-    assert dict_result["group"] == "all"
+    assert dict_result["group_name"] == "all"
     assert dict_result["start_temp"]["magnitude"] == 1.0
     assert dict_result["start_temp"]["units"] == "K"
     assert dict_result["end_temp"]["magnitude"] == 2.0

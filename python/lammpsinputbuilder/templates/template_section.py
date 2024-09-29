@@ -4,7 +4,7 @@ Module implementing a template for sections.
 
 from typing import List
 
-from lammpsinputbuilder.fileIO import FileIO
+from lammpsinputbuilder.fileio import FileIO
 from lammpsinputbuilder.group import Group
 from lammpsinputbuilder.section import Section
 from lammpsinputbuilder.extensions import Extension
