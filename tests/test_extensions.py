@@ -150,7 +150,7 @@ def test_LangevinExtension():
 def test_InstructionExtension():
     instr = ResetTimestepInstruction(
             instruction_name="myInstruction", 
-            timestep=10
+            new_timestep=10
         )
     obj = InstructionExtension(
         instruction=instr)

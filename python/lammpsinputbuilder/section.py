@@ -14,6 +14,12 @@ class Section:
     def __init__(self, section_name: str = "defaultSection") -> None:
         self.section_name = section_name
 
+    def get_section_name(self) -> str:
+        return self.section_name
+    
+    def set_section_name(self, section_name: str):
+        self.section_name = section_name
+
     def to_dict(self) -> dict:
         result = {}
         result["class"] = self.__class__.__name__
@@ -200,6 +206,9 @@ class IntegratorSection(Section):
     def add_fileio(self, fileio: FileIO) -> None:
         self.fileios.append(fileio)
 
+    def get_fileios(self) -> List[FileIO]:
+        return self.fileios
+
     def add_extension(self, extension: Extension) -> None:
         self.extensions.append(extension)
 
@@ -347,6 +356,9 @@ class InstructionsSection(Section):
 
     def add_instruction(self, instruction: Instruction):
         self.instructions.append(instruction)
+
+    def get_instructions(self) -> List[Instruction]:
+        return self.instructions
 
     def to_dict(self) -> dict:
         result = super().to_dict()

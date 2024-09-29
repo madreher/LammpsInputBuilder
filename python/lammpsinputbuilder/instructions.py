@@ -34,22 +34,22 @@ class ResetTimestepInstruction(Instruction):
     def __init__(
             self,
             instruction_name: str = "defaultResetTimestep",
-            timestep: int = 0) -> None:
+            new_timestep: int = 0) -> None:
         super().__init__(instruction_name=instruction_name)
-        self.timestep = timestep
+        self.new_timestep = new_timestep
         self.validate()
 
     def validate(self):
-        if self.timestep < 0:
+        if self.new_timestep < 0:
             raise ValueError(
-                f"Invalid timestep {self.timestep} in Intruction {self.instruction_name}.")
+                f"Invalid timestep {self.new_timestep} in Intruction {self.instruction_name}.")
 
-    def get_timestep(self) -> int:
-        return self.timestep
+    def get_new_timestep(self) -> int:
+        return self.new_timestep
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["timestep"] = self.timestep
+        result["new_timestep"] = self.new_timestep
         return result
 
     def from_dict(self, d: dict, version: int):
@@ -57,12 +57,12 @@ class ResetTimestepInstruction(Instruction):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().from_dict(d, version)
-        self.timestep = d.get("timestep", 0)
+        self.new_timestep = d.get("new_timestep", 0)
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
         del global_information  # unused
-        return f"reset_timestep {self.timestep}\n"
+        return f"reset_timestep {self.new_timestep}\n"
 
 
 class SetTimestepInstruction(Instruction):

@@ -73,7 +73,7 @@ def test_load_move_extension():
 def test_load_instruction_extension():
     instr = ResetTimestepInstruction(
             instruction_name="myInstruction", 
-            timestep=10
+            new_timestep=10
         )
     obj = InstructionExtension(
         instruction=instr)
@@ -81,7 +81,7 @@ def test_load_instruction_extension():
     obj_dict = obj.to_dict()
     loader = ExtensionLoader()
     obj2 = loader.dict_to_extension(obj_dict, 0)
-    assert obj2.instruction.timestep == 10
+    assert obj2.instruction.get_new_timestep() == 10
 
 
 def test_load_manual_extension():

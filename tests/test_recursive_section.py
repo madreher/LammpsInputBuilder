@@ -9,8 +9,6 @@ from lammpsinputbuilder.extensions import MoveExtension
 from lammpsinputbuilder.quantities import TimeQuantity, VelocityQuantity
 from lammpsinputbuilder.types import GlobalInformation, LammpsUnitSystem
 
-import json
-
 def test_recursive_section_accessors():
     integrator = NVEIntegrator(integrator_name="myIntegrator", group=AllGroup(), nb_steps=1000)
 
@@ -26,6 +24,7 @@ def test_recursive_section_accessors():
         interval=10,
         group=AllGroup(), style=DumpStyle.CUSTOM)
     recursive_section.add_fileio(io)
+    assert len(recursive_section.get_fileios()) == 1
 
     grp = IndicesGroup(group_name="myIndicesGroup", indices=[1, 2, 3])
     recursive_section.add_group(grp)

@@ -10,13 +10,13 @@ from lammpsinputbuilder.group import AllGroup
 def test_load_reset_timestep_instruction():
     obj = ResetTimestepInstruction(
         instruction_name="myInstruction",
-        timestep=10
+        new_timestep=10
     )
     obj_dict = obj.to_dict()
     loader = InstructionLoader()
     obj2 = loader.dict_to_instruction(obj_dict, 0)
     assert obj2.get_instruction_name() == "myInstruction"
-    assert obj2.get_timestep() == 10
+    assert obj2.get_new_timestep() == 10
 
 def test_load_set_timestep_instruction():
     obj = SetTimestepInstruction(

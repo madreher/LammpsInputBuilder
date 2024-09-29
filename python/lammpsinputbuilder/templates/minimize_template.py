@@ -31,6 +31,24 @@ class MinimizeTemplate(TemplateSection):
         # is needed when unrolling the template into base sections
         self.anchor_group = anchor_group
 
+    def get_minimize_style(self) -> MinimizeStyle:
+        return self.style
+
+    def get_etol(self) -> float:
+        return self.etol
+
+    def get_ftol(self) -> float:
+        return self.ftol
+
+    def get_maxiter(self) -> int:
+        return self.maxiter
+
+    def get_maxeval(self) -> int:
+        return self.maxeval
+
+    def get_use_anchors(self) -> bool:
+        return self.use_anchors
+
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__

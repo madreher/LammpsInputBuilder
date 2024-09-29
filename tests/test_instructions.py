@@ -6,8 +6,8 @@ from lammpsinputbuilder.quantities import TimeQuantity, TemperatureQuantity, Len
 from lammpsinputbuilder.group import AllGroup
 
 def test_instructions_ResetTimestep():
-    instruction = ResetTimestepInstruction(instruction_name="defaultResetTimestep", timestep=20)
-    assert instruction.get_timestep() == 20
+    instruction = ResetTimestepInstruction(instruction_name="defaultResetTimestep", new_timestep=20)
+    assert instruction.get_new_timestep() == 20
     assert instruction.get_instruction_name() == "defaultResetTimestep"
 
     info = GlobalInformation()
@@ -15,12 +15,12 @@ def test_instructions_ResetTimestep():
 
     obj_dict = instruction.to_dict()
     assert obj_dict["class"] == "ResetTimestepInstruction"
-    assert obj_dict["timestep"] == 20
+    assert obj_dict["new_timestep"] == 20
     assert obj_dict["instruction_name"] == "defaultResetTimestep"
 
     instruction2 = ResetTimestepInstruction()
     instruction2.from_dict(obj_dict, version=0)
-    assert instruction2.get_timestep() == 20
+    assert instruction2.get_new_timestep() == 20
     assert instruction2.get_instruction_name() == "defaultResetTimestep"
 
 def test_instructions_SetTimestep():
