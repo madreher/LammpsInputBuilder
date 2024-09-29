@@ -67,6 +67,8 @@ def get_extension_from_molecule_file_format(
         return ".xyz"
     if molecule_file_format == MoleculeFileFormat.MOL2:
         return ".mol2"
+    if molecule_file_format == MoleculeFileFormat.LAMMPS_DUMP_TEXT:
+        return ".lammpstrj"
 
     raise NotImplementedError(f"Molecule format {molecule_file_format} not supported.")
 
