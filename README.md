@@ -6,26 +6,26 @@
 |---------------------------------------------------------- | -------: | -------: | ------: | --------: |
 | python/lammpsinputbuilder/\_\_init\_\_.py                 |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/extensions.py                   |      164 |       17 |     90% |25-26, 29, 67, 121, 174, 209, 219, 223, 246, 253-256, 259-261 |
-| python/lammpsinputbuilder/fileio.py                       |      237 |       30 |     87% |30-31, 34, 37, 43, 46, 49-50, 53-54, 57, 60, 116, 140, 148, 156-160, 170-173, 203, 218, 239, 248, 266, 294, 329, 339, 345 |
-| python/lammpsinputbuilder/group.py                        |      189 |       30 |     84% |25, 28, 49, 57, 68, 100, 123, 179, 185, 197, 219-220, 223, 226, 229, 232-235, 239-243, 246, 249, 266, 272, 284, 292, 298 |
-| python/lammpsinputbuilder/instructions.py                 |      203 |       27 |     87% |29-30, 44, 57, 84, 95, 132, 145, 234, 295-300, 303-314, 339 |
+| python/lammpsinputbuilder/fileio.py                       |      222 |       22 |     90% |30-31, 34, 37, 92, 116, 124, 132-136, 146-149, 179, 194, 215, 224, 242, 270, 305, 315, 321 |
+| python/lammpsinputbuilder/group.py                        |      189 |       19 |     90% |25, 28, 49, 57, 68, 100, 123, 179, 185, 197, 229, 240, 246, 249, 266, 272, 284, 292, 298 |
+| python/lammpsinputbuilder/instructions.py                 |      205 |       11 |     95% |29-30, 44, 57, 84, 95, 132, 145, 234, 304, 342 |
 | python/lammpsinputbuilder/integrator.py                   |      199 |       10 |     95% |36, 50, 83, 130, 156, 193, 273, 283, 288, 293 |
 | python/lammpsinputbuilder/loader/\_\_init\_\_.py          |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/loader/extension\_loader.py     |       19 |       19 |      0% |      3-30 |
-| python/lammpsinputbuilder/loader/fileio\_loader.py        |       20 |       20 |      0% |      3-31 |
-| python/lammpsinputbuilder/loader/group\_loader.py         |       21 |       21 |      0% |      3-33 |
-| python/lammpsinputbuilder/loader/instruction\_loader.py   |       20 |        2 |     90% |    26, 29 |
-| python/lammpsinputbuilder/loader/integrator\_loader.py    |       20 |       20 |      0% |      3-31 |
+| python/lammpsinputbuilder/loader/extension\_loader.py     |       20 |        0 |    100% |           |
+| python/lammpsinputbuilder/loader/fileio\_loader.py        |       19 |        0 |    100% |           |
+| python/lammpsinputbuilder/loader/group\_loader.py         |       21 |        0 |    100% |           |
+| python/lammpsinputbuilder/loader/instruction\_loader.py   |       21 |        0 |    100% |           |
+| python/lammpsinputbuilder/loader/integrator\_loader.py    |       20 |        0 |    100% |           |
 | python/lammpsinputbuilder/loader/section\_loader.py       |       22 |       22 |      0% |      3-32 |
-| python/lammpsinputbuilder/loader/typedmolecule\_loader.py |       16 |       16 |      0% |      3-27 |
+| python/lammpsinputbuilder/loader/typedmolecule\_loader.py |       16 |        0 |    100% |           |
 | python/lammpsinputbuilder/quantities.py                   |      176 |       16 |     91% |82, 85, 105, 115, 132, 142, 162, 173, 190, 200, 220, 230, 246, 256, 273, 283 |
 | python/lammpsinputbuilder/section.py                      |      228 |      142 |     38% |18-21, 24-25, 28-31, 34-35, 38, 43-47, 50, 53, 56, 59, 62-68, 71-107, 113-152, 165, 168, 174, 177, 180-186, 189-226, 246, 251, 279, 284, 292-293, 296, 299-302, 305-311, 316-323 |
-| python/lammpsinputbuilder/typedmolecule.py                |      160 |       29 |     82% |42-47, 68, 71, 78, 82, 109, 118, 120, 129, 141, 144-149, 157-158, 173, 182, 207-210, 231, 249, 294 |
+| python/lammpsinputbuilder/typedmolecule.py                |      162 |       26 |     84% |42-47, 68, 71, 78, 82, 109, 118, 120, 129, 141, 144-149, 157-158, 173, 182, 228, 247, 301 |
 | python/lammpsinputbuilder/types.py                        |       94 |       35 |     63% |19-26, 30-39, 56-61, 68-71, 85-91, 100, 103, 106, 121, 125, 138 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py         |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/model\_to\_data.py      |      162 |       25 |     85% |34, 55, 58-61, 67-68, 130, 157, 182, 213-217, 231, 237-248 |
 | python/lammpsinputbuilder/workflow\_builder.py            |       40 |        3 |     92% |23, 28, 36 |
-|                                                 **TOTAL** | **1990** |  **484** | **76%** |           |
+|                                                 **TOTAL** | **1980** |  **348** | **82%** |           |
 
 
 ## Setup coverage badge
