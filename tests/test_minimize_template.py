@@ -45,6 +45,7 @@ def test_minimize_template_dict():
     "fileios": [],
     "extensions": [],
     "groups": [],
+    "instructions": [],
     "style": 0,
     "etol": 0.02,
     "ftol": 0.03,

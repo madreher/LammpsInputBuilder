@@ -16,6 +16,9 @@ class Extension:
         result["class"] = self.__class__.__name__
         result["extension_name"] = self.extension_name
         return result
+    
+    def get_extension_name(self) -> str:
+        return self.extension_name
 
     def from_dict(self, d: dict, version: int):
         del version  # unused

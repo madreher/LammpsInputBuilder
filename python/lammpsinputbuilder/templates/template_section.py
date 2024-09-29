@@ -8,6 +8,7 @@ from lammpsinputbuilder.fileio import FileIO
 from lammpsinputbuilder.group import Group
 from lammpsinputbuilder.section import Section
 from lammpsinputbuilder.extensions import Extension
+from lammpsinputbuilder.instructions import Instruction
 from lammpsinputbuilder.types import GlobalInformation
 
 
@@ -18,15 +19,32 @@ class TemplateSection(Section):
         self.ios: List[FileIO] = []
         self.extensions: List[Extension] = []
         self.groups: List[Group] = []
+        self.instructions: List[Instruction] = []
 
     def add_fileio(self, fileio: FileIO):
         self.ios.append(fileio)
 
+    def get_fileios(self) -> List[FileIO]:
+        return self.ios
+
+    def add_instruction(self, instruction: Instruction):
+        self.instructions.append(instruction)
+
+    def get_instructions(self) -> List[Instruction]:
+        return self.instructions
+
     def add_extension(self, extension: Extension):
         self.extensions.append(extension)
 
+    def get_extensions(self) -> List[Extension]:
+        return self.extensions
+
     def add_group(self, group: Group):
         self.groups.append(group)
+
+    def get_groups(self) -> List[Group]:
+        return self.groups
+    
 
     def to_dict(self) -> dict:
         result = super().to_dict()
@@ -34,6 +52,7 @@ class TemplateSection(Section):
         result["fileios"] = [s.to_dict() for s in self.ios]
         result["extensions"] = [s.to_dict() for s in self.extensions]
         result["groups"] = [s.to_dict() for s in self.groups]
+        result["instructions"] = [s.to_dict() for s in self.instructions]
         return result
 
     def from_dict(self, d: dict, version: int):
@@ -65,6 +84,16 @@ class TemplateSection(Section):
 
             for group in groups:
                 self.groups.append(loader.dict_to_group(group))
+
+        if "instructions" in d.keys() and len(d["instructions"]) > 0:
+            instructions = d["instructions"]
+
+            from lammpsinputbuilder.loader.instruction_loader import InstructionLoader
+            loader = InstructionLoader()
+
+            for instruction in instructions:
+                self.instructions.append(loader.dict_to_instruction(
+                    instruction, version))
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
         # Declare all the objects which are going to live during the entire
