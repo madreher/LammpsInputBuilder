@@ -23,11 +23,11 @@
 | python/lammpsinputbuilder/templates/minimize\_template.py |       60 |        1 |     98% |        66 |
 | python/lammpsinputbuilder/templates/template\_section.py  |       78 |       25 |     68% |23, 26, 29, 43-49, 52-58, 61-67, 75, 80, 85, 97, 102, 107, 115 |
 | python/lammpsinputbuilder/typedmolecule.py                |      162 |       26 |     84% |42-47, 68, 71, 78, 82, 109, 118, 120, 129, 141, 144-149, 157-158, 173, 182, 228, 247, 301 |
-| python/lammpsinputbuilder/types.py                        |       81 |       27 |     67% |19-26, 30-39, 56-61, 68-71, 91, 95, 108 |
+| python/lammpsinputbuilder/types.py                        |       83 |        3 |     96% |93, 97, 110 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py         |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/model\_to\_data.py      |      162 |       25 |     85% |34, 55, 58-61, 67-68, 130, 157, 182, 213-217, 231, 237-248 |
 | python/lammpsinputbuilder/workflow\_builder.py            |       40 |        3 |     92% |23, 28, 36 |
-|                                                 **TOTAL** | **2149** |  **215** | **90%** |           |
+|                                                 **TOTAL** | **2151** |  **191** | **91%** |           |
 
 
 ## Setup coverage badge
