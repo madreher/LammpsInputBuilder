@@ -7,7 +7,7 @@ on:
       - "main"
 
 jobs:
-  pylint-check:
+  coverage_check:
     runs-on: ubuntu-latest
     strategy:
       matrix:
