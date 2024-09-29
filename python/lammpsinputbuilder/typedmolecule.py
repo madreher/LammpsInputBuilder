@@ -204,9 +204,6 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         return self.model_loaded
 
     def get_ase_model(self) -> Atoms:
-        if not self.is_model_loaded():
-            raise ValueError(
-                "Model is not loaded, unable to return ASE atoms.")
         return self.atoms
 
     def get_molecule_content(self) -> str:
@@ -235,11 +232,12 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         result["class"] = self.__class__.__name__
         result["electrostatic_method"] = self.electrostatic_method.value
         result["is_model_loaded"] = self.model_loaded
-        result["forcefield_path"] = Path(str(self.forcefield_path))
-        result["molecule_path"] = Path(str(self.molecule_path))
-        result["molecule_format"] = self.molecule_format.value
-        result["forcefield_content"] = self.forcefield_content
-        result["molecule_content"] = self.molecule_content
+        if self.model_loaded:
+            result["forcefield_path"] = Path(str(self.forcefield_path))
+            result["molecule_path"] = Path(str(self.molecule_path))
+            result["molecule_format"] = self.molecule_format.value
+            result["forcefield_content"] = self.forcefield_content
+            result["molecule_content"] = self.molecule_content
         return result
 
     def from_dict(self, d: dict, version: int):
@@ -251,12 +249,21 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         super().from_dict(d, version=version)
         self.electrostatic_method = ElectrostaticMethod(
             d["electrostatic_method"])
-        self.model_loaded = d["is_model_loaded"]
+        self.model_loaded = d.get("is_model_loaded", False)
+        if not self.model_loaded:
+            return
         self.forcefield_path = Path(d["forcefield_path"])
         self.molecule_path = Path(d["molecule_path"])
         self.molecule_format = MoleculeFileFormat(d["molecule_format"])
         self.forcefield_content = d["forcefield_content"]
         self.molecule_content = d["molecule_content"]
+        self.load_from_string(
+            self.molecule_content,
+            self.molecule_format,
+            self.forcefield_content,
+            self.forcefield_path,
+            str(self.molecule_path)
+        )
 
     def generate_lammps_data_file(self, job_folder: Path) -> GlobalInformation:
         # TODO: Adjust code to handle the different bbox styles

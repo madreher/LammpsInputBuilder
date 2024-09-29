@@ -124,6 +124,7 @@ def test_instruction_Manual():
     instruction = ManualInstruction(instruction_name="defaultManual", cmd="manual")
     assert instruction.get_instruction_name() == "defaultManual"
     assert instruction.write_instruction(GlobalInformation()) == "manual\n"
+    assert instruction.get_cmd() == "manual"
 
     obj_dict = instruction.to_dict()
     assert obj_dict["class"] == "ManualInstruction"

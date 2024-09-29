@@ -4,7 +4,7 @@ import copy
 
 from lammpsinputbuilder.instructions import ResetTimestepInstruction, \
     SetTimestepInstruction, VelocityCreateInstruction, \
-    DisplaceAtomsInstruction, ManualInstruction
+    DisplaceAtomsInstruction, ManualInstruction, VariableInstruction
 
 
 class InstructionLoader():
@@ -21,6 +21,7 @@ class InstructionLoader():
         instruction_table[DisplaceAtomsInstruction.__name__] = DisplaceAtomsInstruction(
         )
         instruction_table[ManualInstruction.__name__] = ManualInstruction()
+        instruction_table[VariableInstruction.__name__] = VariableInstruction()
 
         if "class" not in d:
             raise RuntimeError(f"Missing 'class' key in {d}.")

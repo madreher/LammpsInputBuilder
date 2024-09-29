@@ -3,7 +3,8 @@
 import copy
 from lammpsinputbuilder.extensions import \
     SetForceExtension, LangevinExtension, \
-    MoveExtension, ManualExtension
+    MoveExtension, ManualExtension, \
+    InstructionExtension
 
 
 class ExtensionLoader():
@@ -16,6 +17,7 @@ class ExtensionLoader():
         extension_table[LangevinExtension.__name__] = LangevinExtension()
         extension_table[MoveExtension.__name__] = MoveExtension()
         extension_table[ManualExtension.__name__] = ManualExtension()
+        extension_table[InstructionExtension.__name__] = InstructionExtension()
 
         if "class" not in d:
             raise RuntimeError(f"Missing 'class' key in {d}.")

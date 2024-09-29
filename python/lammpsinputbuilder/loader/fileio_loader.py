@@ -2,8 +2,8 @@
 
 import copy
 
-from lammpsinputbuilder.fileIO import ReaxBondFileIO, \
-    DumpTrajectoryFileIO, XYZTrajectoryFileIO, ThermoFileIO, ManualFileIO
+from lammpsinputbuilder.fileio import ReaxBondFileIO, \
+    DumpTrajectoryFileIO, ThermoFileIO, ManualFileIO
 
 
 class FileIOLoader():
@@ -14,7 +14,6 @@ class FileIOLoader():
         file_io_table = {}
         file_io_table[ReaxBondFileIO.__name__] = ReaxBondFileIO()
         file_io_table[DumpTrajectoryFileIO.__name__] = DumpTrajectoryFileIO()
-        file_io_table[XYZTrajectoryFileIO.__name__] = XYZTrajectoryFileIO()
         file_io_table[ThermoFileIO.__name__] = ThermoFileIO()
         file_io_table[ManualFileIO.__name__] = ManualFileIO()
 

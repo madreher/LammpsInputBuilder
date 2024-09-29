@@ -2,7 +2,7 @@
 
 import copy
 
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
+from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
 
 
 class TypedMolecularSystemLoader():

@@ -306,11 +306,11 @@ class DisplaceAtomsInstruction(Instruction):
         super().from_dict(d, version)
         self.group = d.get("group", AllGroup().get_group_name())
         self.dx = LengthQuantity()
-        self.dx.from_dict(d.get("dx", {}))
+        self.dx.from_dict(d.get("dx", {}), version=version)
         self.dy = LengthQuantity()
-        self.dy.from_dict(d.get("dy", {}))
+        self.dy.from_dict(d.get("dy", {}), version=version)
         self.dz = LengthQuantity()
-        self.dz.from_dict(d.get("dz", {}))
+        self.dz.from_dict(d.get("dz", {}), version=version)
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
@@ -327,6 +327,9 @@ class ManualInstruction(Instruction):
             cmd: str = "") -> None:
         super().__init__(instruction_name=instruction_name)
         self.cmd = cmd
+
+    def get_cmd(self) -> str:
+        return self.cmd
 
     def to_dict(self) -> dict:
         result = super().to_dict()

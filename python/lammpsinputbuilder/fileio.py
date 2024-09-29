@@ -36,30 +36,6 @@ class FileIO:
     def get_associated_file_path(self) -> Path:
         return Path()
 
-
-class XYZTrajectoryFileIO(FileIO):
-
-    def __init__(self):
-        super().__init__()
-
-    def to_dict(self) -> dict:
-        pass
-
-    def from_dict(self, d: dict, version: int):
-        del d  # unused
-        del version  # unused
-
-    def add_do_commands(self, global_information: GlobalInformation) -> str:
-        del global_information  # unused
-        return ""
-
-    def add_undo_commands(self) -> str:
-        return ""
-
-    def get_associated_file_path(self) -> Path:
-        return Path()
-
-
 class DumpStyle(Enum):
     CUSTOM = 1
     XYZ = 2
