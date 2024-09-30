@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, ReaxBondFileIO, \
     ThermoFileIO, ManualFileIO
 from lammpsinputbuilder.types import GlobalInformation
@@ -117,4 +119,8 @@ def test_ManualFileIO():
     assert obj.add_do_commands(info) == "startFile\n"
     assert obj.add_undo_commands() == "endFile\n"
 
+def test_wrong_name():
+    with pytest.raises(ValueError):
+        obj = ReaxBondFileIO(fileio_name="&&&", interval=10, group=AllGroup())
+        del obj
 

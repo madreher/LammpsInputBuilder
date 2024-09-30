@@ -10,15 +10,15 @@ class BaseObject:
     def validate_id(self):
         # Check that the name is alpha numeric and start with a letter
         if not re.match(r'^[A-Za-z]\w+$', self.id_name):
-            raise ValueError("Object name " + self.id_name + " is not alpha numeric or doesn't start with a non letter.")
-
+            raise ValueError("Object name " + self.id_name +
+                            " is not alpha numeric or doesn't start with a non letter.")
 
     def get_id_name(self) -> str:
         return self.id_name
-    
-    def is_registered(self) -> bool:
-        return self.register_id
-    
+
+    def set_id_name(self, id_name: str) -> None:
+        self.id_name = id_name
+
     def to_dict(self) -> dict:
         return {
             "id_name": self.id_name

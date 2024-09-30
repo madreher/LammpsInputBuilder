@@ -192,6 +192,14 @@ def test_ManualExtension():
 
     assert load_back_obj.to_dict() == dict_result
 
+def test_wrong_name():
+    with pytest.raises(ValueError):
+        obj = ManualExtension(
+            extension_name="&&&",
+            do_cmd="my_do_cmd",
+            undo_cmd="my_undo_cmd"
+        )
+        del obj
 
 
 

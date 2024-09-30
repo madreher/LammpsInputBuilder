@@ -119,3 +119,8 @@ def test_ManualGroup():
     assert grp2.get_group_name() == "myManualGroup"
     assert grp2.get_do_cmd() == "my_do_cmd"
     assert grp2.get_undo_cmd() == "my_undo_cmd"
+
+def test_wrong_name():
+    with pytest.raises(ValueError):
+        obj = ManualGroup( group_name="&&&", do_cmd="my_do_cmd", undo_cmd="my_undo_cmd")
+        del obj

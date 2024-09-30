@@ -4,26 +4,22 @@ from enum import Enum
 
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.types import GlobalInformation
+from lammpsinputbuilder.base import BaseObject
 
 
-class Integrator:
+class Integrator(BaseObject):
     """Base class for all integrators."""
 
     def __init__(self, integrator_name: str = "defaultIntegrator") -> None:
-        self.integrator_name = integrator_name
+        super().__init__(id_name=integrator_name)
 
     def get_integrator_name(self) -> str:
-        return self.integrator_name
+        return super().get_id_name()
 
     def to_dict(self) -> dict:
-        result = {}
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["integrator_name"] = self.integrator_name
         return result
-
-    def from_dict(self, d: dict, version: int):
-        del version  # unused
-        self.integrator_name = d.get("integrator_name", "defaultIntegrator")
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         del global_information  # unused
@@ -88,10 +84,10 @@ class NVEIntegrator(Integrator):
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         del global_information  # unused
-        return f"fix {self.integrator_name} {self.group} nve\n"
+        return f"fix {self.get_integrator_name()} {self.group} nve\n"
 
     def add_undo_commands(self) -> str:
-        return f"unfix {self.integrator_name}\n"
+        return f"unfix {self.get_integrator_name()}\n"
 
     def add_run_commands(self) -> str:
         return f"run {self.nb_steps}\n"

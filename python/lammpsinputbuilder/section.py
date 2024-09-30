@@ -8,27 +8,24 @@ from lammpsinputbuilder.instructions import Instruction
 from lammpsinputbuilder.extensions import Extension
 from lammpsinputbuilder.group import Group
 from lammpsinputbuilder.types import GlobalInformation
+from lammpsinputbuilder.base import BaseObject
+from lammpsinputbuilder.utility.string_utils import write_fixed_length_comment
 
 
-class Section:
+class Section(BaseObject):
     def __init__(self, section_name: str = "defaultSection") -> None:
-        self.section_name = section_name
+        super().__init__(id_name=section_name)
 
     def get_section_name(self) -> str:
-        return self.section_name
-    
+        return super().get_id_name()
+
     def set_section_name(self, section_name: str):
-        self.section_name = section_name
+        super().set_id_name(id_name=section_name)
 
     def to_dict(self) -> dict:
-        result = {}
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["section_name"] = self.section_name
         return result
-
-    def from_dict(self, d: dict, version: int):
-        del version  # unused
-        self.section_name = d.get("section_name", "defaultSection")
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
         result = ""
@@ -145,21 +142,21 @@ class RecusiveSection(Section):
 
         # Declare all the objects which are going to live during the entire
         # duractions of the sections
-        result = f"################# START Section {self.section_name} #################\n"
-        result += "################# START Groups DECLARATION #################\n"
+        result = write_fixed_length_comment(f"START Section {self.get_section_name()}")
+        result += write_fixed_length_comment("START Groups DECLARATION")
         for grp in self.groups:
             result += grp.add_do_commands()
-        result += "################# END Groups DECLARATION #################\n"
+        result += write_fixed_length_comment("END Groups DECLARATION")
 
-        result += "################# START Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("START Extensions DECLARATION")
         for ext in self.extensions:
             result += ext.add_do_commands(global_information=global_information)
-        result += "################# END Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("END Extensions DECLARATION")
 
-        result += "################# START IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("START IOs DECLARATION")
         for io in self.ios:
             result += io.add_do_commands(global_information=global_information)
-        result += "################# END IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("END IOs DECLARATION")
 
         # Everything is declared, now we can execute the differente sections
         for section in self.sections:
@@ -167,22 +164,21 @@ class RecusiveSection(Section):
                 global_information=global_information)
 
         # Everything is executed, now we can undo the differente sections
-        result += "################# START IO REMOVAL #################\n"
+        result += write_fixed_length_comment("START IO REMOVAL")
         for io in reversed(self.ios):
             result += io.add_undo_commands()
-        result += "################# END IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("END IOs DECLARATION")
 
-        result += "################# START Extensions REMOVAL #################\n"
+        result += write_fixed_length_comment("START Extensions REMOVAL")
         for ext in reversed(self.extensions):
             result += ext.add_undo_commands()
-        result += "################# END Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("END Extensions DECLARATION")
 
-        result += "################# START Groups REMOVAL #################\n"
+        result += write_fixed_length_comment("START Groups REMOVAL")
         for grp in reversed(self.groups):
             result += grp.add_undo_commands()
-        result += "################# END Groups DECLARATION #################\n"
-
-        result += f"################# END Section {self.section_name} #################\n"
+        result += write_fixed_length_comment("END Groups DECLARATION")
+        result += write_fixed_length_comment(f"END Section {self.get_section_name()}")
 
         return result
 
@@ -288,63 +284,59 @@ class IntegratorSection(Section):
                     instruction_loader.dict_to_instruction(instruction))
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
-        result = "################# START SECTION " + \
-            self.section_name + " #################\n\n"
+        result = write_fixed_length_comment(f"START SECTION {self.get_section_name()}")
         result += self.add_do_commands(global_information=global_information)
-        result += "################# START RUN INTEGRATOR FOR SECTION " + \
-            self.section_name + " #################\n"
+        result += write_fixed_length_comment(f"START RUN INTEGRATOR FOR SECTION {self.get_section_name()}")
         result += self.integrator.add_run_commands()
-        result += "################# END RUN INTEGRATOR FOR SECTION " + \
-            self.section_name + " #################\n"
+        result += write_fixed_length_comment(f"END RUN INTEGRATOR FOR SECTION {self.get_section_name()}")
         result += self.add_undo_commands()
-        result += "################# END SECTION " + \
-            self.section_name + " #################\n\n"
+        result += write_fixed_length_comment(f"END SECTION {self.get_section_name()}")
         return result
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         result = ""
-        result += "################# START Groups DECLARATION #################\n"
+        result += write_fixed_length_comment("START Groups DECLARATION")
         for grp in self.groups:
             result += grp.add_do_commands()
-        result += "################# END Groups DECLARATION #################\n"
+        result += write_fixed_length_comment("END Groups DECLARATION")
 
-        result += "################# START Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("START Extensions DECLARATION")
         for ext in self.extensions:
             result += ext.add_do_commands(global_information=global_information)
-        result += "################# END Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("END Extensions DECLARATION")
 
-        result += "################# START IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("START IOs DECLARATION")
         for io in self.fileios:
             result += io.add_do_commands(global_information=global_information)
-        result += "################# END IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("END IOs DECLARATION")
 
-        result += "################# START INTEGRATOR DECLARATION #################\n"
+        result += write_fixed_length_comment("START INTEGRATOR DECLARATION")
         result += self.integrator.add_do_commands(
             global_information=global_information)
-        result += "################# END INTEGRATOR DECLARATION #################\n"
+        result += write_fixed_length_comment("END INTEGRATOR DECLARATION")
         return result
 
     def add_undo_commands(self) -> str:
         # Undo if the reverse order is needed
         result = ""
-        result += "################# START INTEGRATOR REMOVAL #################\n"
+        result += write_fixed_length_comment("START INTEGRATOR REMOVAL")
         result += self.integrator.add_undo_commands()
-        result += "################# END INTEGRATOR REMOVAL #################\n"
+        result += write_fixed_length_comment("END INTEGRATOR REMOVAL")
 
-        result += "################# START IO REMOVAL #################\n"
+        result += write_fixed_length_comment("START IO REMOVAL")
         for io in reversed(self.fileios):
             result += io.add_undo_commands()
-        result += "################# END IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("END IOs DECLARATION")
 
-        result += "################# START Extensions REMOVAL #################\n"
+        result += write_fixed_length_comment("START Extensions REMOVAL")
         for ext in reversed(self.extensions):
             result += ext.add_undo_commands()
-        result += "################# END Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("END Extensions DECLARATION")
 
-        result += "################# START Groups REMOVAL #################\n"
+        result += write_fixed_length_comment("START Groups REMOVAL")
         for grp in reversed(self.groups):
             result += grp.add_undo_commands()
-        result += "################# END Groups DECLARATION #################\n"
+        result += write_fixed_length_comment("END Groups DECLARATION")
 
         return result
 
@@ -378,11 +370,9 @@ class InstructionsSection(Section):
                     c, version) for c in instructions_dict]
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
-        result = "################# START SECTION " + \
-            self.section_name + " #################\n\n"
+        result = write_fixed_length_comment(f"START SECTION {self.get_section_name()}")
         for instruction in self.instructions:
             result += instruction.write_instruction(
                 global_information=global_information)
-        result += "################# END SECTION " + \
-            self.section_name + " #################\n\n"
+        result += write_fixed_length_comment(f"END SECTION {self.get_section_name()}")
         return result
