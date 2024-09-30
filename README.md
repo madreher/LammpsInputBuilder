@@ -5,11 +5,12 @@
 | Name                                                      |    Stmts |     Miss |   Cover |   Missing |
 |---------------------------------------------------------- | -------: | -------: | ------: | --------: |
 | python/lammpsinputbuilder/\_\_init\_\_.py                 |        0 |        0 |    100% |           |
-| python/lammpsinputbuilder/extensions.py                   |      166 |       17 |     90% |28-29, 32, 70, 124, 177, 212, 222, 226, 249, 256-259, 262-264 |
-| python/lammpsinputbuilder/fileio.py                       |      222 |       22 |     90% |30-31, 34, 37, 92, 116, 124, 132-136, 146-149, 179, 194, 215, 224, 242, 270, 305, 315, 321 |
-| python/lammpsinputbuilder/group.py                        |      189 |       19 |     90% |25, 28, 49, 57, 68, 100, 123, 179, 185, 197, 229, 240, 246, 249, 266, 272, 284, 292, 298 |
-| python/lammpsinputbuilder/instructions.py                 |      205 |       11 |     95% |29-30, 44, 57, 84, 95, 132, 145, 234, 304, 342 |
-| python/lammpsinputbuilder/integrator.py                   |      199 |        9 |     95% |36, 50, 83, 156, 193, 273, 283, 288, 293 |
+| python/lammpsinputbuilder/base.py                         |       18 |        1 |     94% |        20 |
+| python/lammpsinputbuilder/extensions.py                   |      163 |       17 |     90% |24-25, 28, 66, 120, 173, 208, 218, 222, 245, 252-255, 258-260 |
+| python/lammpsinputbuilder/fileio.py                       |      217 |       22 |     90% |26-27, 30, 33, 88, 112, 120, 128-132, 142-145, 174, 188, 209, 218, 236, 264, 299, 309, 315 |
+| python/lammpsinputbuilder/group.py                        |      186 |       19 |     90% |22, 25, 46, 54, 65, 97, 120, 176, 182, 194, 226, 237, 243, 246, 263, 269, 281, 289, 295 |
+| python/lammpsinputbuilder/instructions.py                 |      202 |       11 |     95% |24-25, 39, 52, 79, 90, 127, 140, 229, 299, 337 |
+| python/lammpsinputbuilder/integrator.py                   |      196 |        9 |     95% |32, 46, 79, 152, 189, 269, 279, 284, 289 |
 | python/lammpsinputbuilder/loader/\_\_init\_\_.py          |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/loader/extension\_loader.py     |       20 |        0 |    100% |           |
 | python/lammpsinputbuilder/loader/fileio\_loader.py        |       19 |        0 |    100% |           |
@@ -19,15 +20,16 @@
 | python/lammpsinputbuilder/loader/section\_loader.py       |       22 |        2 |     91% |    23, 26 |
 | python/lammpsinputbuilder/loader/typedmolecule\_loader.py |       16 |        0 |    100% |           |
 | python/lammpsinputbuilder/quantities.py                   |      176 |       16 |     91% |82, 85, 105, 115, 132, 142, 162, 173, 190, 200, 220, 230, 246, 256, 273, 283 |
-| python/lammpsinputbuilder/section.py                      |      272 |       12 |     96% |21, 34-37, 40-41, 44, 60, 204, 243, 246 |
+| python/lammpsinputbuilder/section.py                      |      270 |       12 |     96% |23, 31-34, 37-38, 41, 57, 200, 239, 242 |
 | python/lammpsinputbuilder/templates/minimize\_template.py |       60 |        1 |     98% |        66 |
-| python/lammpsinputbuilder/templates/template\_section.py  |       97 |        0 |    100% |           |
+| python/lammpsinputbuilder/templates/template\_section.py  |       98 |        0 |    100% |           |
 | python/lammpsinputbuilder/typedmolecule.py                |      162 |       26 |     84% |42-47, 68, 71, 78, 82, 109, 118, 120, 129, 141, 144-149, 157-158, 173, 182, 228, 247, 301 |
 | python/lammpsinputbuilder/types.py                        |       83 |        3 |     96% |93, 97, 110 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py         |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/model\_to\_data.py      |      162 |       25 |     85% |34, 55, 58-61, 67-68, 130, 157, 182, 213-217, 231, 237-248 |
+| python/lammpsinputbuilder/utility/string\_utils.py        |        4 |        0 |    100% |           |
 | python/lammpsinputbuilder/workflow\_builder.py            |       40 |        3 |     92% |23, 28, 36 |
-|                                                 **TOTAL** | **2172** |  **166** | **92%** |           |
+|                                                 **TOTAL** | **2176** |  **167** | **92%** |           |
 
 
 ## Setup coverage badge
