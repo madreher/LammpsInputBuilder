@@ -388,7 +388,12 @@ In this example, we are going to use a passivated slab and a molecular tooltip w
 
 ![Passivated slab and tooltip with open head](data/images/slabHeadDepassivated.png)
 
-**IMPORTANT**: The code snippets provided are extracted from `examples/scanSlab.py` and may not be complete for the sake of space. Please refer to the complete example for a working example out of the box.
+**IMPORTANT**: The code snippets provided are extracted from `examples/scanSlab.py` and may not be complete for the sake of space. Please refer to the complete example for a working example out of the box. To run the example, you can do as follow from the source folder:
+```
+cd examples
+python3 scanSlab.py --lmpexec ~/dev/lammps/lammps-17Apr2024/build/install/bin/lmp --model headopen --zplane 1.5 --deltaxy 0.5 --loglevel INFO --min-bond-order 0.6
+```
+Please make sure to update the path to the lammps executable (`--lmpexec` option) to match the location of `lmp` to your machine.
 
 The first step in this process is to determine the atom indices of the groups we are going to use. I used [Radahn](https://github.com/madreher/radahn) to visualize the model and do the selection. Other tools like [Ovito](https://www.ovito.org/) or [VMD](https://www.ks.uiuc.edu/Research/vmd/) may allow to do the same task. OVerall, we are defining 5 selections:
 - The entire slab
@@ -495,7 +500,7 @@ Once the model is loaded, we need to compute the bounding box of the slab specif
     # Compute the bounding box oif the slab
     slabBoundingBox = np.min(slabPositions, axis=0), np.max(slabPositions, axis=0)
 ```
-Note that the previous selection we used were 1-based because Lammps count indices from 1. We need to generate a new list of indices starting from 0 instead for ASE to get the right positions. 
+Note that the previous selection we used was 1-based because Lammps count indices from 1. We need to generate a new list of indices starting from 0 instead for ASE to get the right positions. 
 
 Now that we have the bounding box of the slab, we need to get the current position of the head of the tooltip:
 ```
@@ -503,7 +508,7 @@ Now that we have the bounding box of the slab, we need to get the current positi
     headInitialPosition = positions[indiceHead[0] - 1]
 ```
 
-Now we have all the information needed to define the grid above the slab. The grid is define by a 3 user settings: dx, dy, dz where dx and dy are the spacing we want on the grid between 2 data points, and dz is the desired different between the top height of the slab and the head of the tooltip.
+Now we have all the information needed to define the grid above the slab. The grid is defined by a 3 user settings: dx, dy, dz where dx and dy are the spacing we want on the grid between 2 data points, and dz is the desired different between the top height of the slab and the head of the tooltip.
 
 The x,y coordinates can be generated as follow:
 ```

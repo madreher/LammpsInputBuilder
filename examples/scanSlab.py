@@ -3,19 +3,18 @@ import logging
 import argparse
 import subprocess
 import numpy as np
-from os import system
 import lammps_logfile
 
 import matplotlib.pyplot as plt
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
-from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
+from lammpsinputbuilder.workflow_builder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
-from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle, RunZeroIntegrator
-from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO, DumpStyle
+from lammpsinputbuilder.integrator import MinimizeStyle, RunZeroIntegrator
+from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO, DumpStyle
 from lammpsinputbuilder.group import IndicesGroup, OperationGroup, OperationGroupEnum, AllGroup, ReferenceGroup
-from lammpsinputbuilder.templates.minimizeTemplate import MinimizeTemplate
+from lammpsinputbuilder.templates.minimize_template import MinimizeTemplate
 from lammpsinputbuilder.instructions import DisplaceAtomsInstruction
 from lammpsinputbuilder.quantities import LengthQuantity
 
@@ -251,11 +250,11 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
                                                                         dy=LengthQuantity(value=headTargetPosition[1] - headInitialPosition[1], units="angstrom"),
                                                                         dz=LengthQuantity(value=headTargetPosition[2] - headInitialPosition[2], units="angstrom")))
         speSection = IntegratorSection(section_name="SPESection", integrator=RunZeroIntegrator())
-        dumpIO = DumpTrajectoryFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, user_fields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
+        dumpIO = DumpTrajectoryFileIO(fileio_name=f"pxl_{headPixel[i][0]}_{headPixel[i][1]}", style=DumpStyle.CUSTOM, user_fields=["id", "type", "element", "x", "y", "z"], interval=1, group=AllGroup())
         trajectoryFiles.append(dumpIO.get_associated_file_path())
-        bondIO = ReaxBondFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
+        bondIO = ReaxBondFileIO(fileio_name=f"pxl_{headPixel[i][0]}_{headPixel[i][1]}", group=AllGroup(), interval=1)
         bondFiles.append(bondIO.get_associated_file_path())
-        thermoIO = ThermoFileIO(fileio_name=f"{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.get_default_thermo_variables())
+        thermoIO = ThermoFileIO(fileio_name=f"pxl_{headPixel[i][0]}_{headPixel[i][1]}", interval=1, user_fields=typedMolecule.get_default_thermo_variables())
         speSection.add_fileio(dumpIO)
         speSection.add_fileio(bondIO)
         speSection.add_fileio(thermoIO)
@@ -354,7 +353,7 @@ def drawBondConfigurationMap(job_folder: Path, headPixel: list, minbondOrder:flo
 
     for i in range(len(headPixel)):
 
-        bondsFile = frameFolder / f"bonds.{headPixel[i][0]}_{headPixel[i][1]}.txt"
+        bondsFile = frameFolder / f"bonds.pxl_{headPixel[i][0]}_{headPixel[i][1]}.txt"
         bondPairs, ignoredPaired = readBondPairsFromFrame(bondsFile, minbondOrder)
         totalIgnoredBondPaired += ignoredPaired
 

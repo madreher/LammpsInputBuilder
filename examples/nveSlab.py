@@ -2,13 +2,13 @@ from pathlib import Path
 import logging
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
-from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
+from lammpsinputbuilder.workflow_builder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
 from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle, RunZeroIntegrator
-from lammpsinputbuilder.fileIO import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO, DumpStyle
+from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO, DumpStyle
 from lammpsinputbuilder.group import IndicesGroup, OperationGroup, OperationGroupEnum, AllGroup, ReferenceGroup
-from lammpsinputbuilder.templates.minimizeTemplate import MinimizeTemplate
+from lammpsinputbuilder.templates.minimize_template import MinimizeTemplate
 from lammpsinputbuilder.instructions import ResetTimestepInstruction, SetTimestepInstruction
 from lammpsinputbuilder.quantities import TimeQuantity
 
@@ -70,13 +70,13 @@ def main():
 
     # First section: Minimization
     sectionMinimization = MinimizeTemplate(section_name="MinimizeSection", style=MinimizeStyle.CG, etol=0.01, ftol=0.01,
-                                           maxiter=100, maxeval=10000, useAnchors=True, anchorGroup=ReferenceGroup(group_name="refAnchor", reference=groupAnchors))
+                                           maxiter=100, maxeval=10000, use_anchors=True, anchor_group=ReferenceGroup(group_name="refAnchor", reference=groupAnchors))
     globalSection.add_section(sectionMinimization)
 
     # Second section: reset timestep
     sectionReset = InstructionsSection(section_name="ResetSection")
     sectionReset.add_instruction(ResetTimestepInstruction(
-        instruction_name="resetTS", timestep=0))
+        instruction_name="resetTS", new_timestep=0))
     sectionReset.add_instruction(SetTimestepInstruction(
         instruction_name="setDT", timestep=TimeQuantity(value=1.0, units="fs")))
     globalSection.add_section(sectionReset)

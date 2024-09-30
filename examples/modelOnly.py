@@ -5,8 +5,8 @@ from pathlib import Path
 import logging
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
-from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
+from lammpsinputbuilder.workflow_builder import WorkflowBuilder
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
