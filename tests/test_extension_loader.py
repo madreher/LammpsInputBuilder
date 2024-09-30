@@ -94,7 +94,7 @@ def test_load_manual_extension():
     obj_dict = obj.to_dict()
     loader = ExtensionLoader()
     obj2 = loader.dict_to_extension(obj_dict, 0)
-    assert obj2.extension_name == "myManualExtension"
+    assert obj2.get_extension_name() == "myManualExtension"
     assert obj2.do_cmd == "my_do_cmd"
     assert obj2.undo_cmd == "my_undo_cmd"
 

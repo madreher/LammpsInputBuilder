@@ -173,12 +173,12 @@ def test_ManualExtension():
         undo_cmd="my_undo_cmd"
     )
 
-    assert obj.extension_name == "myManualExtension"
+    assert obj.get_extension_name() == "myManualExtension"
     assert obj.do_cmd == "my_do_cmd"
     assert obj.undo_cmd == "my_undo_cmd"
 
     dict_result = obj.to_dict()
-    assert dict_result["extension_name"] == "myManualExtension"
+    assert dict_result["id_name"] == "myManualExtension"
     assert dict_result["do_cmd"] == "my_do_cmd"
     assert dict_result["undo_cmd"] == "my_undo_cmd"
     assert dict_result["class"] == "ManualExtension"
@@ -186,7 +186,7 @@ def test_ManualExtension():
     load_back_obj = ManualExtension()
     load_back_obj.from_dict(dict_result, version=0)
 
-    assert load_back_obj.extension_name == "myManualExtension"
+    assert load_back_obj.get_extension_name() == "myManualExtension"
     assert load_back_obj.do_cmd == "my_do_cmd"
     assert load_back_obj.undo_cmd == "my_undo_cmd"
 

@@ -1,4 +1,4 @@
-import pytest 
+import pytest
 
 from lammpsinputbuilder.templates.minimize_template import MinimizeTemplate, MinimizeStyle
 from lammpsinputbuilder.templates.template_section import TemplateSection
@@ -8,8 +8,6 @@ from lammpsinputbuilder.types import GlobalInformation, LammpsUnitSystem
 from lammpsinputbuilder.extensions import SetForceExtension
 from lammpsinputbuilder.quantities import ForceQuantity
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, DumpStyle
-
-import json
 
 def test_template_accessors():
     template = TemplateSection(section_name="test")

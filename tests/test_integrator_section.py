@@ -103,7 +103,7 @@ def test_integrator_section_dict():
         }],
         "extensions": [{
             "class": "MoveExtension",
-            "extension_name": "myExtension",
+            "id_name": "myExtension",
             "group_name": "all",
             "vx": {
                 "class": "VelocityQuantity",

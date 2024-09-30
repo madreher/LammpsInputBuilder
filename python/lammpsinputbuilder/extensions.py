@@ -5,24 +5,23 @@ from lammpsinputbuilder.quantities import TemperatureQuantity, TimeQuantity, \
     ForceQuantity, VelocityQuantity
 from lammpsinputbuilder.types import GlobalInformation
 from lammpsinputbuilder.instructions import Instruction
+from lammpsinputbuilder.base import BaseObject
 
 
-class Extension:
+class Extension(BaseObject):
     def __init__(self, extension_name: str = "defaultExtension") -> None:
-        self.extension_name = extension_name
+        super().__init__(id_name=extension_name)
 
     def to_dict(self) -> dict:
-        result = {}
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["extension_name"] = self.extension_name
         return result
     
     def get_extension_name(self) -> str:
-        return self.extension_name
+        return super().get_id_name()
 
     def from_dict(self, d: dict, version: int):
-        del version  # unused
-        self.extension_name = d.get("extension_name", "defaultExtension")
+        super().from_dict(d, version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         del global_information  # unused
@@ -80,13 +79,13 @@ class LangevinExtension(Extension):
         self.seed = d.get("seed", 122345)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return (f"fix {self.extension_name} {self.group} langevin "
+        return (f"fix {self.get_extension_name()} {self.group} langevin "
                 f"{self.start_temp.convert_to(global_information.get_unit_style())} "
                 f"{self.end_temp.convert_to(global_information.get_unit_style())} "
                 f"{self.damp.convert_to(global_information.get_unit_style())} {self.seed}\n")
 
     def add_undo_commands(self) -> str:
-        return f"unfix {self.extension_name}\n"
+        return f"unfix {self.get_extension_name()}\n"
 
 
 class SetForceExtension(Extension):
@@ -133,13 +132,13 @@ class SetForceExtension(Extension):
         self.fz.from_dict(d["fz"], version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return (f"fix {self.extension_name} {self.group} setforce "
+        return (f"fix {self.get_extension_name()} {self.group} setforce "
             f"{self.fx.convert_to(global_information.get_unit_style())} "
             f"{self.fy.convert_to(global_information.get_unit_style())} "
             f"{self.fz.convert_to(global_information.get_unit_style())}\n")
 
     def add_undo_commands(self) -> str:
-        return f"unfix {self.extension_name}\n"
+        return f"unfix {self.get_extension_name()}\n"
 
 
 class MoveExtension(Extension):
@@ -186,13 +185,13 @@ class MoveExtension(Extension):
         self.vz.from_dict(d["vz"], version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return (f"fix {self.extension_name} {self.group} move linear "
+        return (f"fix {self.get_extension_name()} {self.group} move linear "
             f"{self.vx.convert_to(global_information.get_unit_style())} "
             f"{self.vy.convert_to(global_information.get_unit_style())} "
             f"{self.vz.convert_to(global_information.get_unit_style())}\n")
 
     def add_undo_commands(self) -> str:
-        return f"unfix {self.extension_name}\n"
+        return f"unfix {self.get_extension_name()}\n"
 
 
 class InstructionExtension(Extension):
