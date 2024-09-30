@@ -80,7 +80,7 @@ def test_integrator_section_dict():
         "section_name": "mySection",
         "fileios": [{
             "class": "DumpTrajectoryFileIO",
-            "fileio_name": "testFile",
+            "id_name": "testFile",
             "user_fields": ["a", "b", "c", "element"],
             "add_default_fields": True,
             "interval": 10,
@@ -89,7 +89,7 @@ def test_integrator_section_dict():
         }],
         "groups": [{
             "class": "IndicesGroup",
-            "group_name": "myIndicesGroup",
+            "id_name": "myIndicesGroup",
             "indices": [1, 2, 3]
         }],
         "instructions": [{

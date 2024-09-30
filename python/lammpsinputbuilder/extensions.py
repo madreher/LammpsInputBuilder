@@ -20,9 +20,6 @@ class Extension(BaseObject):
     def get_extension_name(self) -> str:
         return super().get_id_name()
 
-    def from_dict(self, d: dict, version: int):
-        super().from_dict(d, version)
-
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         del global_information  # unused
         return ""

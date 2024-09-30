@@ -54,7 +54,7 @@ def test_minimize_template_dict():
     "use_anchors": True,
     "anchor_group": {
         "class": "EmptyGroup",
-        "group_name": "empty"
+        "id_name": "empty"
     }
 }
 

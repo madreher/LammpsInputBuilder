@@ -101,7 +101,7 @@ def test_recursive_section_dict():
     "fileios": [
         {
             "class": "DumpTrajectoryFileIO",
-            "fileio_name": "testFile",
+            "id_name": "testFile",
             "user_fields": [
                 "a",
                 "b",
@@ -139,7 +139,7 @@ def test_recursive_section_dict():
     "groups": [
         {
             "class": "IndicesGroup",
-            "group_name": "myIndicesGroup",
+            "id_name": "myIndicesGroup",
             "indices": [
                 1,
                 2,
