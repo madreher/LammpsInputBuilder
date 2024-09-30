@@ -20,8 +20,8 @@ With this organization, the main objectives of LammpsInputBuilder are:
 Here is a simple example on how to load a molecular model, assign a reax potential to it, and minimize the model: 
 ```
     from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-    from lammpsinputbuilder.typedMolecule import ReaxTypedMolecularSystem
-    from lammpsinputbuilder.workflowBuilder import WorkflowBuilder
+    from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
+    from lammpsinputbuilder.workflow_builder import WorkflowBuilder
     from lammpsinputbuilder.section import IntegratorSection
     from lammpsinputbuilder.integrator import MinimizeIntegrator, MinimizeStyle
 
