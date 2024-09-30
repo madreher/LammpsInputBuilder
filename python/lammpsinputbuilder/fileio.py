@@ -5,26 +5,22 @@ from typing import List
 from enum import Enum
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.types import GlobalInformation
+from lammpsinputbuilder.base import BaseObject
 
 
 
-class FileIO:
+class FileIO(BaseObject):
 
     def __init__(self, fileio_name: str = "defaultFileIO") -> None:
-        self.fileio_name = fileio_name
+        super().__init__(id_name=fileio_name)
 
     def get_fileio_name(self) -> str:
-        return self.fileio_name
+        return self.get_id_name()
 
     def to_dict(self) -> dict:
-        result = {}
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["fileio_name"] = self.fileio_name
         return result
-
-    def from_dict(self, d: dict, version: int):
-        del version  # unused
-        self.fileio_name = d.get("fileio_name", "defaultFileIO")
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         del global_information  # unused
@@ -101,7 +97,7 @@ class DumpTrajectoryFileIO(FileIO):
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         result = ""
         if self.style == DumpStyle.CUSTOM:
-            result += (f"dump {self.fileio_name} {self.group_name} custom "
+            result += (f"dump {self.get_fileio_name()} {self.group_name} custom "
                     f"{self.interval} {self.get_associated_file_path()}")
             fields = []
             if self.add_default_fields:
@@ -118,19 +114,19 @@ class DumpTrajectoryFileIO(FileIO):
             for field in fields:
                 result += f" {field}"
             result += "\n"
-            result += f"dump_modify {self.fileio_name} sort id\n"
+            result += f"dump_modify {self.get_fileio_name()} sort id\n"
             if "element" in fields:
                 if len(global_information.get_element_table()) == 0:
                     raise RuntimeError(
                         ("\'element\' is part of the dump file custom fields, "
                         "but the element table is empty. Unable to produce to "
 "                       correct trajectory file."))
-                result += f"dump_modify {self.fileio_name} element"
+                result += f"dump_modify {self.get_fileio_name()} element"
                 for elem in global_information.get_element_table().values():
                     result += f" {elem}"
                 result += "\n"
         elif self.style == DumpStyle.XYZ:
-            result += (f"dump {self.fileio_name} {self.group_name} xyz "
+            result += (f"dump {self.get_fileio_name()} {self.group_name} xyz "
                     f"{self.interval} {self.get_associated_file_path()}\n")
         else:
             raise ValueError(f"Invalid dump style {self.style}.")
@@ -138,13 +134,13 @@ class DumpTrajectoryFileIO(FileIO):
         return result
 
     def add_undo_commands(self) -> str:
-        return f"undump {self.fileio_name}\n"
+        return f"undump {self.get_fileio_name()}\n"
 
     def get_associated_file_path(self) -> Path:
         if self.style == DumpStyle.CUSTOM:
-            return Path("dump." + self.fileio_name + ".lammpstrj")
+            return Path("dump." + self.get_fileio_name() + ".lammpstrj")
         if self.style == DumpStyle.XYZ:
-            return Path("dump." + self.fileio_name + ".xyz")
+            return Path("dump." + self.get_fileio_name() + ".xyz")
 
         raise ValueError(f"Invalid dump style {self.style}.")
 
@@ -169,7 +165,6 @@ class ReaxBondFileIO(FileIO):
     def to_dict(self) -> dict:
         result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["fileio_name"] = self.fileio_name
         result["group_name"] = self.group_name
         result["interval"] = self.interval
         return result
@@ -179,19 +174,18 @@ class ReaxBondFileIO(FileIO):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class']}.")
         super().from_dict(d, version=version)
-        self.fileio_name = d.get("fileio_name", "defaultReaxBondFileIO")
         self.group_name = d.get("group_name", AllGroup().get_group_name())
         self.interval = d.get("interval", 100)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
-        return (f"fix {self.fileio_name} {self.group_name} reaxff/bonds "
-                f"{self.interval} bonds.{self.fileio_name}.txt\n")
+        return (f"fix {self.get_fileio_name()} {self.group_name} reaxff/bonds "
+                f"{self.interval} bonds.{self.get_fileio_name()}.txt\n")
 
     def add_undo_commands(self) -> str:
-        return f"unfix {self.fileio_name}\n"
+        return f"unfix {self.get_fileio_name()}\n"
 
     def get_associated_file_path(self) -> Path:
-        return Path(f"bonds.{self.fileio_name}.txt")
+        return Path(f"bonds.{self.get_fileio_name()}.txt")
 
 
 class ThermoFileIO(FileIO):

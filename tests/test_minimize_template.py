@@ -1,11 +1,7 @@
-import pytest 
-
 from lammpsinputbuilder.templates.minimize_template import MinimizeTemplate, MinimizeStyle
 from lammpsinputbuilder.group import EmptyGroup
 from lammpsinputbuilder.section import IntegratorSection
 from lammpsinputbuilder.types import GlobalInformation, LammpsUnitSystem
-
-import json
 
 def test_minimize_template_accessors():
     template = MinimizeTemplate(
@@ -41,7 +37,7 @@ def test_minimize_template_dict():
 
     assert template.to_dict() == {
     "class": "MinimizeTemplate",
-    "section_name": "test",
+    "id_name": "test",
     "fileios": [],
     "extensions": [],
     "groups": [],
@@ -54,7 +50,7 @@ def test_minimize_template_dict():
     "use_anchors": True,
     "anchor_group": {
         "class": "EmptyGroup",
-        "group_name": "empty"
+        "id_name": "empty"
     }
 }
 
@@ -96,45 +92,43 @@ def test_minimize_template_commands():
 
     result = template.add_all_commands(global_information=global_info)
 
-    assert result == """################# START Section test #################
-################# START Groups DECLARATION #################
-################# END Groups DECLARATION #################
-################# START Extensions DECLARATION #################
-################# END Extensions DECLARATION #################
-################# START IOs DECLARATION #################
-################# END IOs DECLARATION #################
-################# START SECTION minimizationTemplate #################
-
-################# START Groups DECLARATION #################
-################# END Groups DECLARATION #################
-################# START Extensions DECLARATION #################
+    assert result == """#### START Section test ########################################################
+#### START Groups DECLARATION ##################################################
+#### END Groups DECLARATION ####################################################
+#### START Extensions DECLARATION ##############################################
+#### END Extensions DECLARATION ################################################
+#### START IOs DECLARATION #####################################################
+#### END IOs DECLARATION #######################################################
+#### START SECTION minimizationTemplate ########################################
+#### START Groups DECLARATION ##################################################
+#### END Groups DECLARATION ####################################################
+#### START Extensions DECLARATION ##############################################
 fix zeroForceAnchor empty setforce 0.0 0.0 0.0
-################# END Extensions DECLARATION #################
-################# START IOs DECLARATION #################
-################# END IOs DECLARATION #################
-################# START INTEGRATOR DECLARATION #################
-################# END INTEGRATOR DECLARATION #################
-################# START RUN INTEGRATOR FOR SECTION minimizationTemplate #################
+#### END Extensions DECLARATION ################################################
+#### START IOs DECLARATION #####################################################
+#### END IOs DECLARATION #######################################################
+#### START INTEGRATOR DECLARATION ##############################################
+#### END INTEGRATOR DECLARATION ################################################
+#### START RUN INTEGRATOR FOR SECTION minimizationTemplate #####################
 min_style cg
 minimize 0.02 0.03 400 50000
-################# END RUN INTEGRATOR FOR SECTION minimizationTemplate #################
-################# START INTEGRATOR REMOVAL #################
-################# END INTEGRATOR REMOVAL #################
-################# START IO REMOVAL #################
-################# END IOs DECLARATION #################
-################# START Extensions REMOVAL #################
+#### END RUN INTEGRATOR FOR SECTION minimizationTemplate #######################
+#### START INTEGRATOR REMOVAL ##################################################
+#### END INTEGRATOR REMOVAL ####################################################
+#### START IO REMOVAL ##########################################################
+#### END IOs DECLARATION #######################################################
+#### START Extensions REMOVAL ##################################################
 unfix zeroForceAnchor
-################# END Extensions DECLARATION #################
-################# START Groups REMOVAL #################
-################# END Groups DECLARATION #################
-################# END SECTION minimizationTemplate #################
-
-################# START IO REMOVAL #################
-################# END IOs DECLARATION #################
-################# START Extensions REMOVAL #################
-################# END Extensions DECLARATION #################
-################# START Groups REMOVAL #################
-################# END Groups DECLARATION #################
-################# END Section test #################
+#### END Extensions DECLARATION ################################################
+#### START Groups REMOVAL ######################################################
+#### END Groups DECLARATION ####################################################
+#### END SECTION minimizationTemplate ##########################################
+#### START IO REMOVAL ##########################################################
+#### END IOs DECLARATION #######################################################
+#### START Extensions REMOVAL ##################################################
+#### END Extensions DECLARATION ################################################
+#### START Groups REMOVAL ######################################################
+#### END Groups DECLARATION ####################################################
+#### END Section test ##########################################################
 """
     

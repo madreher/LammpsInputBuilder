@@ -2,24 +2,21 @@
 
 from typing import List
 from enum import Enum
+from lammpsinputbuilder.base import BaseObject
 
 
-class Group:
-    def __init__(self, group_name: str) -> None:
-        self.group_name = group_name
+class Group(BaseObject):
+    def __init__(self, group_name: str = "defaultGroupName") -> None:
+        super().__init__(id_name=group_name)
 
     def get_group_name(self) -> str:
-        return self.group_name
+        return super().get_id_name()
 
     def to_dict(self) -> dict:
-        result = {}
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["group_name"] = self.group_name
-        return result
 
-    def from_dict(self, d: dict, version: int):
-        del version  # unused
-        self.group_name = d.get("group_name", "defaultGroupName")
+        return result
 
     def add_do_commands(self) -> str:
         return ""
@@ -73,16 +70,16 @@ class IndicesGroup(Group):
 
     def add_do_commands(self) -> str:
         if len(self.indices) == 0:
-            return f"group {self.group_name} empty\n"
+            return f"group {self.get_group_name()} empty\n"
 
-        commands = f"group {self.group_name} id"
+        commands = f"group {self.get_group_name()} id"
         for index in self.indices:
             commands += f" {index}"
         commands += "\n"
         return commands
 
     def add_undo_commands(self) -> str:
-        return f"group {self.group_name} delete\n"
+        return f"group {self.get_group_name()} delete\n"
 
 
 class AllGroup(Group):
@@ -203,14 +200,14 @@ class OperationGroup(Group):
 
     def add_do_commands(self) -> str:
         self.validate_configuration()
-        commands = f"group {self.group_name} {OperationGroup.operationToStr[self.op]}"
+        commands = f"group {self.get_group_name()} {OperationGroup.operationToStr[self.op]}"
         for grp in self.other_groups:
             commands += f" {grp}"
         commands += "\n"
         return commands
 
     def add_undo_commands(self) -> str:
-        return f"group {self.group_name} delete\n"
+        return f"group {self.get_group_name()} delete\n"
 
 
 class ReferenceGroup(Group):

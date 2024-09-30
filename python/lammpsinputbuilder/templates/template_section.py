@@ -10,6 +10,7 @@ from lammpsinputbuilder.section import Section
 from lammpsinputbuilder.extensions import Extension
 from lammpsinputbuilder.instructions import Instruction
 from lammpsinputbuilder.types import GlobalInformation
+from lammpsinputbuilder.utility.string_utils import write_fixed_length_comment
 
 
 
@@ -98,21 +99,21 @@ class TemplateSection(Section):
     def add_all_commands(self, global_information: GlobalInformation) -> str:
         # Declare all the objects which are going to live during the entire
         # duractions of the sections
-        result = f"################# START Section {self.section_name} #################\n"
-        result += "################# START Groups DECLARATION #################\n"
+        result = write_fixed_length_comment(f"START Section {self.get_section_name()}")
+        result += write_fixed_length_comment("START Groups DECLARATION")
         for grp in self.groups:
             result += grp.add_do_commands()
-        result += "################# END Groups DECLARATION #################\n"
+        result += write_fixed_length_comment("END Groups DECLARATION")
 
-        result += "################# START Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("START Extensions DECLARATION")
         for ext in self.extensions:
             result += ext.add_do_commands(global_information=global_information)
-        result += "################# END Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("END Extensions DECLARATION")
 
-        result += "################# START IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("START IOs DECLARATION")
         for io in self.ios:
             result += io.add_do_commands(global_information=global_information)
-        result += "################# END IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("END IOs DECLARATION")
 
         # Everything is declared, now we can execute the differente sections
         sections = self.generate_sections()
@@ -121,22 +122,21 @@ class TemplateSection(Section):
                 global_information=global_information)
 
         # Everything is executed, now we can undo the differente sections
-        result += "################# START IO REMOVAL #################\n"
+        result += write_fixed_length_comment("START IO REMOVAL")
         for io in reversed(self.ios):
             result += io.add_undo_commands()
-        result += "################# END IOs DECLARATION #################\n"
+        result += write_fixed_length_comment("END IOs DECLARATION")
 
-        result += "################# START Extensions REMOVAL #################\n"
+        result += write_fixed_length_comment("START Extensions REMOVAL")
         for ext in reversed(self.extensions):
             result += ext.add_undo_commands()
-        result += "################# END Extensions DECLARATION #################\n"
+        result += write_fixed_length_comment("END Extensions DECLARATION")
 
-        result += "################# START Groups REMOVAL #################\n"
+        result += write_fixed_length_comment("START Groups REMOVAL")
         for grp in reversed(self.groups):
             result += grp.add_undo_commands()
-        result += "################# END Groups DECLARATION #################\n"
-
-        result += f"################# END Section {self.section_name} #################\n"
+        result += write_fixed_length_comment("END Groups DECLARATION")
+        result += write_fixed_length_comment(f"END Section {self.get_section_name()}")
 
         return result
 

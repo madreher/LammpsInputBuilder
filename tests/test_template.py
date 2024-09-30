@@ -1,4 +1,4 @@
-import pytest 
+import pytest
 
 from lammpsinputbuilder.templates.minimize_template import MinimizeTemplate, MinimizeStyle
 from lammpsinputbuilder.templates.template_section import TemplateSection
@@ -8,8 +8,6 @@ from lammpsinputbuilder.types import GlobalInformation, LammpsUnitSystem
 from lammpsinputbuilder.extensions import SetForceExtension
 from lammpsinputbuilder.quantities import ForceQuantity
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, DumpStyle
-
-import json
 
 def test_template_accessors():
     template = TemplateSection(section_name="test")
@@ -75,7 +73,7 @@ def test_template_dict():
 
     assert template.to_dict() == {
         "class": "TemplateSection",
-        "section_name": "test",
+        "id_name": "test",
         "fileios": [io.to_dict()],
         "extensions": [ext.to_dict()],
         "groups": [grp.to_dict()],
@@ -128,52 +126,50 @@ def test_template_commands():
 
     result = template.add_all_commands(global_information=global_info)
 
-    print(result)
-
-    assert result == """################# START Section test #################
-################# START Groups DECLARATION #################
-################# END Groups DECLARATION #################
-################# START Extensions DECLARATION #################
+    # Disable line length check
+    #pylint: disable=line-too-long
+    assert result == """#### START Section test ########################################################
+#### START Groups DECLARATION ##################################################
+#### END Groups DECLARATION ####################################################
+#### START Extensions DECLARATION ##############################################
 fix myExtension all setforce 0.0 0.0 0.0
-################# END Extensions DECLARATION #################
-################# START IOs DECLARATION #################
+#### END Extensions DECLARATION ################################################
+#### START IOs DECLARATION #####################################################
 dump testFile all custom 10 dump.testFile.lammpstrj id type x y z a b c element
 dump_modify testFile sort id
 dump_modify testFile element 1
-################# END IOs DECLARATION #################
-################# START SECTION minimizationTemplate #################
-
-################# START Groups DECLARATION #################
-################# END Groups DECLARATION #################
-################# START Extensions DECLARATION #################
+#### END IOs DECLARATION #######################################################
+#### START SECTION minimizationTemplate ########################################
+#### START Groups DECLARATION ##################################################
+#### END Groups DECLARATION ####################################################
+#### START Extensions DECLARATION ##############################################
 fix zeroForceAnchor empty setforce 0.0 0.0 0.0
-################# END Extensions DECLARATION #################
-################# START IOs DECLARATION #################
-################# END IOs DECLARATION #################
-################# START INTEGRATOR DECLARATION #################
-################# END INTEGRATOR DECLARATION #################
-################# START RUN INTEGRATOR FOR SECTION minimizationTemplate #################
+#### END Extensions DECLARATION ################################################
+#### START IOs DECLARATION #####################################################
+#### END IOs DECLARATION #######################################################
+#### START INTEGRATOR DECLARATION ##############################################
+#### END INTEGRATOR DECLARATION ################################################
+#### START RUN INTEGRATOR FOR SECTION minimizationTemplate #####################
 min_style cg
 minimize 0.02 0.03 400 50000
-################# END RUN INTEGRATOR FOR SECTION minimizationTemplate #################
-################# START INTEGRATOR REMOVAL #################
-################# END INTEGRATOR REMOVAL #################
-################# START IO REMOVAL #################
-################# END IOs DECLARATION #################
-################# START Extensions REMOVAL #################
+#### END RUN INTEGRATOR FOR SECTION minimizationTemplate #######################
+#### START INTEGRATOR REMOVAL ##################################################
+#### END INTEGRATOR REMOVAL ####################################################
+#### START IO REMOVAL ##########################################################
+#### END IOs DECLARATION #######################################################
+#### START Extensions REMOVAL ##################################################
 unfix zeroForceAnchor
-################# END Extensions DECLARATION #################
-################# START Groups REMOVAL #################
-################# END Groups DECLARATION #################
-################# END SECTION minimizationTemplate #################
-
-################# START IO REMOVAL #################
+#### END Extensions DECLARATION ################################################
+#### START Groups REMOVAL ######################################################
+#### END Groups DECLARATION ####################################################
+#### END SECTION minimizationTemplate ##########################################
+#### START IO REMOVAL ##########################################################
 undump testFile
-################# END IOs DECLARATION #################
-################# START Extensions REMOVAL #################
+#### END IOs DECLARATION #######################################################
+#### START Extensions REMOVAL ##################################################
 unfix myExtension
-################# END Extensions DECLARATION #################
-################# START Groups REMOVAL #################
-################# END Groups DECLARATION #################
-################# END Section test #################
+#### END Extensions DECLARATION ################################################
+#### START Groups REMOVAL ######################################################
+#### END Groups DECLARATION ####################################################
+#### END Section test ##########################################################
 """

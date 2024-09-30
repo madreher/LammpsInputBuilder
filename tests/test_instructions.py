@@ -1,3 +1,5 @@
+import pytest
+
 from lammpsinputbuilder.instructions import ResetTimestepInstruction, SetTimestepInstruction, \
     VelocityCreateInstruction, DisplaceAtomsInstruction, ManualInstruction, \
     VariableStyle, VariableInstruction
@@ -16,7 +18,7 @@ def test_instructions_ResetTimestep():
     obj_dict = instruction.to_dict()
     assert obj_dict["class"] == "ResetTimestepInstruction"
     assert obj_dict["new_timestep"] == 20
-    assert obj_dict["instruction_name"] == "defaultResetTimestep"
+    assert obj_dict["id_name"] == "defaultResetTimestep"
 
     instruction2 = ResetTimestepInstruction()
     instruction2.from_dict(obj_dict, version=0)
@@ -41,7 +43,7 @@ def test_instructions_SetTimestep():
     assert obj_dict["class"] == "SetTimestepInstruction"
     assert obj_dict["timestep"]["magnitude"] == 20
     assert obj_dict["timestep"]["units"] == "fs"
-    assert obj_dict["instruction_name"] == "defaultSetTimestep"
+    assert obj_dict["id_name"] == "defaultSetTimestep"
 
     instruction2 = SetTimestepInstruction()
     instruction2.from_dict(obj_dict, version=0)
@@ -67,7 +69,7 @@ def test_instruction_VelocityCreate():
     assert obj_dict["temp"]["magnitude"] == 300
     assert obj_dict["temp"]["units"] == "kelvin"
     assert obj_dict["seed"] == 12335
-    assert obj_dict["instruction_name"] == "defaultVelocityCreate"
+    assert obj_dict["id_name"] == "defaultVelocityCreate"
 
     instruction2 = VelocityCreateInstruction()
     instruction2.from_dict(obj_dict, version=0)
@@ -92,7 +94,7 @@ def test_instruction_Variable():
     assert obj_dict["variable_name"] == "defaultVariable"
     assert obj_dict["style"] == VariableStyle.EQUAL.value
     assert obj_dict["args"] == "{dt}"
-    assert obj_dict["instruction_name"] == "defaultVariable"
+    assert obj_dict["id_name"] == "defaultVariable"
 
     instruction2 = VariableInstruction()
     instruction2.from_dict(obj_dict, version=0)
@@ -128,10 +130,15 @@ def test_instruction_Manual():
 
     obj_dict = instruction.to_dict()
     assert obj_dict["class"] == "ManualInstruction"
-    assert obj_dict["instruction_name"] == "defaultManual"
+    assert obj_dict["id_name"] == "defaultManual"
     assert obj_dict["cmd"] == "manual"
 
     instruction2 = ManualInstruction()
     instruction2.from_dict(obj_dict, version=0)
     assert instruction2.get_instruction_name() == "defaultManual"
     assert instruction2.write_instruction(GlobalInformation()) == "manual\n"
+
+def test_wrong_name():
+    with pytest.raises(ValueError):
+        obj = ManualInstruction(instruction_name="&&&", cmd="manual")
+        del obj

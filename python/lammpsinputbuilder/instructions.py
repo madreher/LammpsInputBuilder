@@ -6,24 +6,19 @@ from lammpsinputbuilder.quantities import TimeQuantity, TemperatureQuantity
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.quantities import LengthQuantity
 from lammpsinputbuilder.types import GlobalInformation
+from lammpsinputbuilder.base import BaseObject
 
-
-class Instruction:
+class Instruction(BaseObject):
     def __init__(self, instruction_name: str = "defaultInstruction") -> None:
-        self.instruction_name = instruction_name
+        super().__init__(id_name=instruction_name)
 
     def get_instruction_name(self) -> str:
-        return self.instruction_name
+        return super().get_id_name()
 
     def to_dict(self) -> dict:
-        result = {}
+        result = super().to_dict()
         result["class"] = self.__class__.__name__
-        result["instruction_name"] = self.instruction_name
         return result
-
-    def from_dict(self, d: dict, version: int):
-        del version  # unused
-        self.instruction_name = d.get("instruction_name", "defaultInstruction")
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
         del global_information  # unused
@@ -42,7 +37,7 @@ class ResetTimestepInstruction(Instruction):
     def validate(self):
         if self.new_timestep < 0:
             raise ValueError(
-                f"Invalid timestep {self.new_timestep} in Intruction {self.instruction_name}.")
+                f"Invalid timestep {self.new_timestep} in Intruction {self.get_instruction_name()}.")
 
     def get_new_timestep(self) -> int:
         return self.new_timestep
@@ -83,7 +78,7 @@ class SetTimestepInstruction(Instruction):
         if self.timestep.get_magnitude() < 0:
             raise ValueError(
                 (f"Invalid timestep {self.timestep.get_magnitude()} "
-                 f"in Intruction {self.instruction_name}."))
+                 f"in Intruction {self.get_instruction_name()}."))
 
     def to_dict(self) -> dict:
         result = super().to_dict()
@@ -131,7 +126,7 @@ class VelocityCreateInstruction(Instruction):
         if self.temp.get_magnitude() < 0:
             raise ValueError(
                 (f"Invalid temperature {self.temp.get_magnitude()} "
-                 f"in Intruction {self.instruction_name}."))
+                 f"in Intruction {self.get_instruction_name()}."))
 
     def to_dict(self) -> dict:
         result = super().to_dict()

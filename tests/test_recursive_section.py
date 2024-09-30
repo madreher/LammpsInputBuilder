@@ -81,14 +81,14 @@ def test_recursive_section_dict():
 
     assert recursive_section.to_dict() == {
     "class": "RecusiveSection",
-    "section_name": "recursive",
+    "id_name": "recursive",
     "sections": [
         {
             "class": "IntegratorSection",
-            "section_name": "mySection",
+            "id_name": "mySection",
             "integrator": {
                 "class": "NVEIntegrator",
-                "integrator_name": "myIntegrator",
+                "id_name": "myIntegrator",
                 "group_name": "all",
                 "nb_steps": 1000
             },
@@ -101,7 +101,7 @@ def test_recursive_section_dict():
     "fileios": [
         {
             "class": "DumpTrajectoryFileIO",
-            "fileio_name": "testFile",
+            "id_name": "testFile",
             "user_fields": [
                 "a",
                 "b",
@@ -117,7 +117,7 @@ def test_recursive_section_dict():
     "extensions": [
         {
             "class": "MoveExtension",
-            "extension_name": "myExtension",
+            "id_name": "myExtension",
             "group_name": "all",
             "vx": {
                 "class": "VelocityQuantity",
@@ -139,7 +139,7 @@ def test_recursive_section_dict():
     "groups": [
         {
             "class": "IndicesGroup",
-            "group_name": "myIndicesGroup",
+            "id_name": "myIndicesGroup",
             "indices": [
                 1,
                 2,
@@ -150,7 +150,7 @@ def test_recursive_section_dict():
     "instructions": [
         {
             "class": "SetTimestepInstruction",
-            "instruction_name": "myInstruction",
+            "id_name": "myInstruction",
             "timestep": {
                 "class": "TimeQuantity",
                 "magnitude": 20,
@@ -205,51 +205,50 @@ def test_integrator_section_commands():
 
     result = recursive_section.add_all_commands(global_information=global_info)
 
-    assert result == """################# START Section recursive #################
-################# START Groups DECLARATION #################
+    #pylint: disable=line-too-long
+    assert result == """#### START Section recursive ###################################################
+#### START Groups DECLARATION ##################################################
 group myIndicesGroup id 1 2 3
-################# END Groups DECLARATION #################
-################# START Extensions DECLARATION #################
+#### END Groups DECLARATION ####################################################
+#### START Extensions DECLARATION ##############################################
 fix myExtension all move linear 0.0 0.0 0.0
-################# END Extensions DECLARATION #################
-################# START IOs DECLARATION #################
+#### END Extensions DECLARATION ################################################
+#### START IOs DECLARATION #####################################################
 dump testFile all custom 10 dump.testFile.lammpstrj id type x y z a b c element
 dump_modify testFile sort id
 dump_modify testFile element C
-################# END IOs DECLARATION #################
-################# START SECTION mySection #################
-
-################# START Groups DECLARATION #################
-################# END Groups DECLARATION #################
-################# START Extensions DECLARATION #################
-################# END Extensions DECLARATION #################
-################# START IOs DECLARATION #################
-################# END IOs DECLARATION #################
-################# START INTEGRATOR DECLARATION #################
+#### END IOs DECLARATION #######################################################
+#### START SECTION mySection ###################################################
+#### START Groups DECLARATION ##################################################
+#### END Groups DECLARATION ####################################################
+#### START Extensions DECLARATION ##############################################
+#### END Extensions DECLARATION ################################################
+#### START IOs DECLARATION #####################################################
+#### END IOs DECLARATION #######################################################
+#### START INTEGRATOR DECLARATION ##############################################
 fix myIntegrator all nve
-################# END INTEGRATOR DECLARATION #################
-################# START RUN INTEGRATOR FOR SECTION mySection #################
+#### END INTEGRATOR DECLARATION ################################################
+#### START RUN INTEGRATOR FOR SECTION mySection ################################
 run 1000
-################# END RUN INTEGRATOR FOR SECTION mySection #################
-################# START INTEGRATOR REMOVAL #################
+#### END RUN INTEGRATOR FOR SECTION mySection ##################################
+#### START INTEGRATOR REMOVAL ##################################################
 unfix myIntegrator
-################# END INTEGRATOR REMOVAL #################
-################# START IO REMOVAL #################
-################# END IOs DECLARATION #################
-################# START Extensions REMOVAL #################
-################# END Extensions DECLARATION #################
-################# START Groups REMOVAL #################
-################# END Groups DECLARATION #################
-################# END SECTION mySection #################
-
-################# START IO REMOVAL #################
+#### END INTEGRATOR REMOVAL ####################################################
+#### START IO REMOVAL ##########################################################
+#### END IOs DECLARATION #######################################################
+#### START Extensions REMOVAL ##################################################
+#### END Extensions DECLARATION ################################################
+#### START Groups REMOVAL ######################################################
+#### END Groups DECLARATION ####################################################
+#### END SECTION mySection #####################################################
+#### START IO REMOVAL ##########################################################
 undump testFile
-################# END IOs DECLARATION #################
-################# START Extensions REMOVAL #################
+#### END IOs DECLARATION #######################################################
+#### START Extensions REMOVAL ##################################################
 unfix myExtension
-################# END Extensions DECLARATION #################
-################# START Groups REMOVAL #################
+#### END Extensions DECLARATION ################################################
+#### START Groups REMOVAL ######################################################
 group myIndicesGroup delete
-################# END Groups DECLARATION #################
-################# END Section recursive #################
+#### END Groups DECLARATION ####################################################
+#### END Section recursive #####################################################
 """

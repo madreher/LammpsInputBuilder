@@ -34,11 +34,11 @@ def test_instructions_section_dict():
 
     assert d == {
     "class": "InstructionsSection",
-    "section_name": "test",
+    "id_name": "test",
     "instructions": [
         {
             "class": "ResetTimestepInstruction",
-            "instruction_name": "myInstruction",
+            "id_name": "myInstruction",
             "new_timestep": 10
         }
     ]
@@ -67,11 +67,8 @@ def test_instructions_section_commands():
 
     result = section.add_all_commands(global_information=global_info)
 
-    print(result)
-
-    assert result == """################# START SECTION test #################
-
+    #pylint: disable=line-too-long
+    assert result == """#### START SECTION test ########################################################
 reset_timestep 10
-################# END SECTION test #################
-
+#### END SECTION test ##########################################################
 """

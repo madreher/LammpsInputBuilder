@@ -10,7 +10,7 @@ def test_NVEIntegrator():
 
     obj_dict = integrator.to_dict()
     assert obj_dict["class"] == "NVEIntegrator"
-    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["id_name"] == "myIntegrator"
     assert obj_dict["group_name"] == "all"
     assert obj_dict["nb_steps"] == 1000
 
@@ -31,7 +31,7 @@ def test_RunZeroIntegrator():
 
     obj_dict = integrator.to_dict()
     assert obj_dict["class"] == "RunZeroIntegrator"
-    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["id_name"] == "myIntegrator"
 
     integrator2 = RunZeroIntegrator()
     integrator2.from_dict(obj_dict, version=0)
@@ -53,7 +53,7 @@ def test_MinimizeIntegrator():
 
     obj_dict = integrator.to_dict()
     assert obj_dict["class"] == "MinimizeIntegrator"
-    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["id_name"] == "myIntegrator"
     assert obj_dict["style"] == MinimizeStyle.CG.value
     assert obj_dict["etol"] == 0.02
     assert obj_dict["ftol"] == 0.03
@@ -82,7 +82,7 @@ def test_MultipassIntegrator():
 
     obj_dict = integrator.to_dict()
     assert obj_dict["class"] == "MultipassMinimizeIntegrator"
-    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["id_name"] == "myIntegrator"
 
     integrator2 = MultipassMinimizeIntegrator()
     integrator2.from_dict(obj_dict, version=0)
@@ -127,7 +127,7 @@ def test_ManualIntegrator():
 
     obj_dict = integrator.to_dict()
     assert obj_dict["class"] == "ManualIntegrator"
-    assert obj_dict["integrator_name"] == "myIntegrator"
+    assert obj_dict["id_name"] == "myIntegrator"
     assert obj_dict["cmd_do"] == "do"
     assert obj_dict["cmd_undo"] == "undo"
     assert obj_dict["cmd_run"] == "run"
@@ -141,3 +141,7 @@ def test_ManualIntegrator():
     assert integrator.add_run_commands() == "run\n"
     assert integrator.add_undo_commands() == "undo\n"
 
+def test_wrong_name():
+    with pytest.raises(ValueError):
+        obj = ManualIntegrator(integrator_name="&&&", cmd_do="do", cmd_undo="undo", cmd_run="run")
+        del obj

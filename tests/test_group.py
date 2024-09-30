@@ -9,7 +9,7 @@ def test_AllGroup():
     assert grp.add_undo_commands() == ""
 
     obj_dict = grp.to_dict()
-    assert obj_dict["group_name"] == "all"
+    assert obj_dict["id_name"] == "all"
     assert obj_dict["class"] == "AllGroup"
 
     grp2 = AllGroup()
@@ -25,7 +25,7 @@ def test_EmptyGroup():
     assert grp.add_undo_commands() == ""
 
     obj_dict = grp.to_dict()
-    assert obj_dict["group_name"] == "empty"
+    assert obj_dict["id_name"] == "empty"
     assert obj_dict["class"] == "EmptyGroup"
 
     grp2 = EmptyGroup()
@@ -42,7 +42,7 @@ def test_IndicesGroup():
     assert grp.add_undo_commands() == "group myIndicesGroup delete\n"
 
     obj_dict = grp.to_dict()
-    assert obj_dict["group_name"] == "myIndicesGroup"
+    assert obj_dict["id_name"] == "myIndicesGroup"
     assert obj_dict["indices"] == [1, 2, 3]
     assert obj_dict["class"] == "IndicesGroup"
 
@@ -70,7 +70,7 @@ def test_OperationGroup():
     assert grp.add_undo_commands() == "group myOperationGroup delete\n"
 
     obj_dict = grp.to_dict()
-    assert obj_dict["group_name"] == "myOperationGroup"
+    assert obj_dict["id_name"] == "myOperationGroup"
     assert obj_dict["op"] == OperationGroupEnum.UNION.value
     assert obj_dict["other_groups"][0] == "myOtherGroup1"
     assert obj_dict["other_groups"][1] == "myOtherGroup2"
@@ -109,7 +109,7 @@ def test_ManualGroup():
     assert grp.add_undo_commands() == "my_undo_cmd\n"
 
     obj_dict = grp.to_dict()
-    assert obj_dict["group_name"] == "myManualGroup"
+    assert obj_dict["id_name"] == "myManualGroup"
     assert obj_dict["do_cmd"] == "my_do_cmd"
     assert obj_dict["undo_cmd"] == "my_undo_cmd"
     assert obj_dict["class"] == "ManualGroup"
@@ -119,3 +119,8 @@ def test_ManualGroup():
     assert grp2.get_group_name() == "myManualGroup"
     assert grp2.get_do_cmd() == "my_do_cmd"
     assert grp2.get_undo_cmd() == "my_undo_cmd"
+
+def test_wrong_name():
+    with pytest.raises(ValueError):
+        obj = ManualGroup( group_name="&&&", do_cmd="my_do_cmd", undo_cmd="my_undo_cmd")
+        del obj

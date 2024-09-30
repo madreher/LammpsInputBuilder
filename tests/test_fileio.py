@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, ReaxBondFileIO, \
     ThermoFileIO, ManualFileIO
 from lammpsinputbuilder.types import GlobalInformation
@@ -16,7 +18,7 @@ def test_DumpTrajectoryFileIO():
 
     dict_obj = obj.to_dict()
     assert dict_obj["class"] == "DumpTrajectoryFileIO"
-    assert dict_obj["fileio_name"] == "testFile"
+    assert dict_obj["id_name"] == "testFile"
     assert dict_obj["user_fields"] == ["a", "b", "c", "element"]
     assert dict_obj["add_default_fields"] is True
     assert dict_obj["interval"] == 10
@@ -49,7 +51,7 @@ def test_ReaxBondFileIO():
 
     dict_obj = obj.to_dict()
     assert dict_obj["class"] == "ReaxBondFileIO"
-    assert dict_obj["fileio_name"] == "testFile"
+    assert dict_obj["id_name"] == "testFile"
     assert dict_obj["interval"] == 10
     assert dict_obj["group_name"] == AllGroup().get_group_name()
 
@@ -73,7 +75,7 @@ def test_ThermoFileIO():
 
     dict_obj = obj.to_dict()
     assert dict_obj["class"] == "ThermoFileIO"
-    assert dict_obj["fileio_name"] == "testFile"
+    assert dict_obj["id_name"] == "testFile"
     assert dict_obj["add_default_fields"] is True
     assert dict_obj["interval"] == 10
     assert dict_obj["user_fields"] == ["a", "b", "c"]
@@ -101,7 +103,7 @@ def test_ManualFileIO():
 
     dict_obj = obj.to_dict()
     assert dict_obj["class"] == "ManualFileIO"
-    assert dict_obj["fileio_name"] == "testFile"
+    assert dict_obj["id_name"] == "testFile"
     assert dict_obj["do_cmd"] == "startFile"
     assert dict_obj["undo_cmd"] == "endFile"
     assert dict_obj["associated_file_path"] == "testfile"
@@ -117,4 +119,8 @@ def test_ManualFileIO():
     assert obj.add_do_commands(info) == "startFile\n"
     assert obj.add_undo_commands() == "endFile\n"
 
+def test_wrong_name():
+    with pytest.raises(ValueError):
+        obj = ReaxBondFileIO(fileio_name="&&&", interval=10, group=AllGroup())
+        del obj
 
