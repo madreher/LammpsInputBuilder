@@ -4,7 +4,7 @@ from pydantic import Field
 from lammpsinputbuilder.model.base_model import BaseObjectModel
 from lammpsinputbuilder.model.quantity_model import TemperatureQuantityModel, ForceQuantityModel, \
     VelocityQuantityModel
-from lammpsinputbuilder.model.instruction_model import InstructionModel
+from lammpsinputbuilder.model.instruction_model import InstructionUnion
 
 class ExtensionModel(BaseObjectModel):
     pass
@@ -33,7 +33,7 @@ class MoveExtensionModel(ExtensionModel):
 
 class InstructionExtensionModel(ExtensionModel):
     class_name: Literal["InstructionExtension"]
-    instruction: InstructionModel
+    instruction: InstructionUnion
 
 class ManualExtensionModel(ExtensionModel):
     class_name: Literal["ManualExtension"]
