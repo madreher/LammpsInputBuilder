@@ -288,7 +288,7 @@ class DisplaceAtomsInstruction(Instruction):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["group"] = self.group
+        result["group_name"] = self.group
         result["dx"] = self.dx.to_dict()
         result["dy"] = self.dy.to_dict()
         result["dz"] = self.dz.to_dict()
@@ -299,7 +299,7 @@ class DisplaceAtomsInstruction(Instruction):
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
-        self.group = d.get("group", AllGroup().get_group_name())
+        self.group = d.get("group_name", AllGroup().get_group_name())
         self.dx = LengthQuantity()
         self.dx.from_dict(d.get("dx", {}), version=version)
         self.dy = LengthQuantity()

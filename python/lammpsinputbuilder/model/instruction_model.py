@@ -25,15 +25,15 @@ class VelocityCreateInstructionModel(InstructionModel):
 class VariableInstructionModel(InstructionModel):
     class_name: Literal["VariableInstruction"]
     variable_name: str
-    style: str
+    style: int
     args: str
 
 class DisplaceAtomsInstructionModel(InstructionModel):
     class_name: Literal["DisplaceAtomsInstruction"]
     group_name: str
-    x: LengthQuantityModel
-    y: LengthQuantityModel
-    z: LengthQuantityModel
+    dx: LengthQuantityModel
+    dy: LengthQuantityModel
+    dz: LengthQuantityModel
 
 class ManualInstructionModel(InstructionModel):
     class_name: Literal["ManualInstruction"]

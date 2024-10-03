@@ -115,6 +115,17 @@ def test_instruction_DisplaceAtoms():
     assert displacement_vector[2].get_units() == "lmp_real_length"
     assert instruction.get_instruction_name() == "defaultDisplaceAtoms"
 
+    obj_dict = instruction.to_dict()
+    assert obj_dict["class_name"] == "DisplaceAtomsInstruction"
+    assert obj_dict["group_name"] == "all"
+    assert obj_dict["dx"]["magnitude"] == 1.0
+    assert obj_dict["dx"]["units"] == "lmp_real_length"
+    assert obj_dict["dy"]["magnitude"] == 2.0
+    assert obj_dict["dy"]["units"] == "lmp_real_length"
+    assert obj_dict["dz"]["magnitude"] == 3.0
+    assert obj_dict["dz"]["units"] == "lmp_real_length"
+    assert obj_dict["id_name"] == "defaultDisplaceAtoms"
+
     info_real = GlobalInformation()
     info_real.set_unit_style(LammpsUnitSystem.REAL)
     assert instruction.write_instruction(info_real) == "displace_atoms all move 1.0 2.0 3.0\n"
