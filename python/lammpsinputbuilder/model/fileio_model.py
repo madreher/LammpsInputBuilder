@@ -26,7 +26,6 @@ class ThermoFileIOModel(FileIOModel):
 
 class ManualFileIOModel(FileIOModel):
     class_name: Literal["ManualFileIO"]
-    interval: int
     do_cmd: str
     undo_cmd: str
     associated_file_path: str
