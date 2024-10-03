@@ -17,7 +17,7 @@ def test_DumpTrajectoryFileIO():
     assert obj.get_group_name() == AllGroup().get_group_name()
 
     dict_obj = obj.to_dict()
-    assert dict_obj["class"] == "DumpTrajectoryFileIO"
+    assert dict_obj["class_name"] == "DumpTrajectoryFileIO"
     assert dict_obj["id_name"] == "testFile"
     assert dict_obj["user_fields"] == ["a", "b", "c", "element"]
     assert dict_obj["add_default_fields"] is True
@@ -50,7 +50,7 @@ def test_ReaxBondFileIO():
     assert obj.get_group_name() == AllGroup().get_group_name()
 
     dict_obj = obj.to_dict()
-    assert dict_obj["class"] == "ReaxBondFileIO"
+    assert dict_obj["class_name"] == "ReaxBondFileIO"
     assert dict_obj["id_name"] == "testFile"
     assert dict_obj["interval"] == 10
     assert dict_obj["group_name"] == AllGroup().get_group_name()
@@ -74,7 +74,7 @@ def test_ThermoFileIO():
     assert obj.get_user_fields() == ["a", "b", "c"]
 
     dict_obj = obj.to_dict()
-    assert dict_obj["class"] == "ThermoFileIO"
+    assert dict_obj["class_name"] == "ThermoFileIO"
     assert dict_obj["id_name"] == "testFile"
     assert dict_obj["add_default_fields"] is True
     assert dict_obj["interval"] == 10
@@ -102,7 +102,7 @@ def test_ManualFileIO():
     assert obj.get_associated_file_path() == Path("testfile")
 
     dict_obj = obj.to_dict()
-    assert dict_obj["class"] == "ManualFileIO"
+    assert dict_obj["class_name"] == "ManualFileIO"
     assert dict_obj["id_name"] == "testFile"
     assert dict_obj["do_cmd"] == "startFile"
     assert dict_obj["undo_cmd"] == "endFile"

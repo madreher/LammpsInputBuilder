@@ -75,7 +75,7 @@ def test_load_no_class_group():
     obj = ManualGroup(group_name="manual", do_cmd="start", undo_cmd="end")
 
     obj_dict = obj.to_dict()
-    del obj_dict["class"]
+    del obj_dict["class_name"]
 
     with pytest.raises(RuntimeError):
         loader = GroupLoader()
@@ -87,7 +87,7 @@ def test_load_unknown_class_group():
     obj = ManualGroup(group_name="manual", do_cmd="start", undo_cmd="end")
 
     obj_dict = obj.to_dict()
-    obj_dict["class"] = "unknown"
+    obj_dict["class_name"] = "unknown"
 
     with pytest.raises(RuntimeError):
         loader = GroupLoader()

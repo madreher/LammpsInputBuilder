@@ -70,7 +70,7 @@ def test_load_no_class_integrator():
         maxeval=50000)
 
     obj_dict = obj.to_dict()
-    del obj_dict["class"]
+    del obj_dict["class_name"]
 
     with pytest.raises(RuntimeError):
         loader = IntegratorLoader()
@@ -87,7 +87,7 @@ def test_load_unknown_class_integrator():
         maxeval=50000)
 
     obj_dict = obj.to_dict()
-    obj_dict["class"] = "unknown"
+    obj_dict["class_name"] = "unknown"
 
     with pytest.raises(RuntimeError):
         loader = IntegratorLoader()

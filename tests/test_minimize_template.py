@@ -36,7 +36,7 @@ def test_minimize_template_dict():
     )
 
     assert template.to_dict() == {
-    "class": "MinimizeTemplate",
+    "class_name": "MinimizeTemplate",
     "id_name": "test",
     "fileios": [],
     "extensions": [],
@@ -49,7 +49,7 @@ def test_minimize_template_dict():
     "maxeval": 50000,
     "use_anchors": True,
     "anchor_group": {
-        "class": "EmptyGroup",
+        "class_name": "EmptyGroup",
         "id_name": "empty"
     }
 }

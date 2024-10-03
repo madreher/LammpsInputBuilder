@@ -17,7 +17,7 @@ class Instruction(BaseObject):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
@@ -48,9 +48,9 @@ class ResetTimestepInstruction(Instruction):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.new_timestep = d.get("new_timestep", 0)
         self.validate()
@@ -86,9 +86,9 @@ class SetTimestepInstruction(Instruction):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.timestep = TimeQuantity()
         self.timestep.from_dict(d["timestep"], version)
@@ -136,9 +136,9 @@ class VelocityCreateInstruction(Instruction):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.group = d.get("group_name", AllGroup().get_group_name())
         self.temp = TemperatureQuantity()
@@ -225,9 +225,9 @@ class VariableInstruction(Instruction):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.variable_name = d.get("variable_name", "defaultVariable")
         self.style = VariableStyle(d.get("style", VariableStyle.EQUAL.value))
@@ -250,8 +250,8 @@ class DisplaceAtomsInstruction(Instruction):
         dy: LengthQuantity = LengthQuantity(
             0.0,
             "lmp_real_length"),
-            dz: LengthQuantity = LengthQuantity(
-                0.0,
+        dz: LengthQuantity = LengthQuantity(
+            0.0,
             "lmp_real_length")) -> None:
         """
         Initializes a new instance of the DisplaceAtomsInstruction class.
@@ -295,9 +295,9 @@ class DisplaceAtomsInstruction(Instruction):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.group = d.get("group", AllGroup().get_group_name())
         self.dx = LengthQuantity()
@@ -328,14 +328,14 @@ class ManualInstruction(Instruction):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["cmd"] = self.cmd
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.cmd = d.get("cmd", "")
 

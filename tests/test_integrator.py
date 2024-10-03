@@ -9,7 +9,7 @@ def test_NVEIntegrator():
     assert integrator.get_nb_steps() == 1000
 
     obj_dict = integrator.to_dict()
-    assert obj_dict["class"] == "NVEIntegrator"
+    assert obj_dict["class_name"] == "NVEIntegrator"
     assert obj_dict["id_name"] == "myIntegrator"
     assert obj_dict["group_name"] == "all"
     assert obj_dict["nb_steps"] == 1000
@@ -30,7 +30,7 @@ def test_RunZeroIntegrator():
     assert integrator.get_integrator_name() == "myIntegrator"
 
     obj_dict = integrator.to_dict()
-    assert obj_dict["class"] == "RunZeroIntegrator"
+    assert obj_dict["class_name"] == "RunZeroIntegrator"
     assert obj_dict["id_name"] == "myIntegrator"
 
     integrator2 = RunZeroIntegrator()
@@ -52,7 +52,7 @@ def test_MinimizeIntegrator():
     assert integrator.get_maxeval() == 50000
 
     obj_dict = integrator.to_dict()
-    assert obj_dict["class"] == "MinimizeIntegrator"
+    assert obj_dict["class_name"] == "MinimizeIntegrator"
     assert obj_dict["id_name"] == "myIntegrator"
     assert obj_dict["style"] == MinimizeStyle.CG.value
     assert obj_dict["etol"] == 0.02
@@ -81,7 +81,7 @@ def test_MultipassIntegrator():
     assert integrator.get_integrator_name() == "myIntegrator"
 
     obj_dict = integrator.to_dict()
-    assert obj_dict["class"] == "MultipassMinimizeIntegrator"
+    assert obj_dict["class_name"] == "MultipassMinimizeIntegrator"
     assert obj_dict["id_name"] == "myIntegrator"
 
     integrator2 = MultipassMinimizeIntegrator()
@@ -126,7 +126,7 @@ def test_ManualIntegrator():
     assert integrator.get_run_commands() == "run"
 
     obj_dict = integrator.to_dict()
-    assert obj_dict["class"] == "ManualIntegrator"
+    assert obj_dict["class_name"] == "ManualIntegrator"
     assert obj_dict["id_name"] == "myIntegrator"
     assert obj_dict["cmd_do"] == "do"
     assert obj_dict["cmd_undo"] == "undo"

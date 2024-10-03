@@ -52,7 +52,7 @@ class TypedMolecularSystem:
 
     def to_dict(self) -> dict:
         result = {}
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["forcefield"] = self.get_forcefield_type().value
         result["bbox_style"] = self.get_boundingbox_style().value
         return result
@@ -229,7 +229,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["electrostatic_method"] = self.electrostatic_method.value
         result["is_model_loaded"] = self.model_loaded
         if self.model_loaded:
@@ -242,7 +242,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
 
     def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
-        molecule_type = d["class"]
+        molecule_type = d["class_name"]
         if molecule_type != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {molecule_type}.")

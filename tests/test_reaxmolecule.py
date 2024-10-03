@@ -106,7 +106,7 @@ def test_moleculeToDict():
 
     result = typed_molecule.to_dict()
 
-    assert result["class"] == "ReaxTypedMolecularSystem"
+    assert result["class_name"] == "ReaxTypedMolecularSystem"
     assert result["electrostatic_method"] == ElectrostaticMethod.QEQ.value
     assert result["forcefield_path"] == Path(str(forcefield_path))
     assert result["molecule_path"] == Path(str(molecule_path))

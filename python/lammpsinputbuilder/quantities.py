@@ -67,7 +67,7 @@ class LIBQuantity():
 
     def to_dict(self) -> dict:
         result = {}
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["magnitude"] = self.magnitude
         result["units"] = self.units
         return result
@@ -100,7 +100,7 @@ class ForceQuantity(LIBQuantity):
         self.validate_dimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -127,7 +127,7 @@ class TemperatureQuantity(LIBQuantity):
         self.validate_dimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -157,7 +157,7 @@ class TorqueQuantity(LIBQuantity):
         self.validate_dimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -185,7 +185,7 @@ class TimeQuantity(LIBQuantity):
         self.validate_dimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -215,7 +215,7 @@ class EnergyQuantity(LIBQuantity):
         self.validate_dimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -241,7 +241,7 @@ class LengthQuantity(LIBQuantity):
         self.validate_dimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -268,7 +268,7 @@ class VelocityQuantity(LIBQuantity):
         self.validate_dimensionality()
 
     def from_dict(self, d: dict, version: int) -> None:
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")

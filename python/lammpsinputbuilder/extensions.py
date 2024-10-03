@@ -14,7 +14,7 @@ class Extension(BaseObject):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
     
     def get_extension_name(self) -> str:
@@ -52,7 +52,7 @@ class LangevinExtension(Extension):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["group_name"] = self.group
         result["start_temp"] = self.start_temp.to_dict()
         result["end_temp"] = self.end_temp.to_dict()
@@ -61,7 +61,7 @@ class LangevinExtension(Extension):
         return result
 
     def from_dict(self, d: dict, version: int):
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -107,7 +107,7 @@ class SetForceExtension(Extension):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["group_name"] = self.group
         result["fx"] = self.fx.to_dict()
         result["fy"] = self.fy.to_dict()
@@ -115,7 +115,7 @@ class SetForceExtension(Extension):
         return result
 
     def from_dict(self, d: dict, version: int):
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -160,7 +160,7 @@ class MoveExtension(Extension):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["group_name"] = self.group
         result["vx"] = self.vx.to_dict()
         result["vy"] = self.vy.to_dict()
@@ -168,7 +168,7 @@ class MoveExtension(Extension):
         return result
 
     def from_dict(self, d: dict, version: int):
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -198,12 +198,12 @@ class InstructionExtension(Extension):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["instruction"] = self.instruction.to_dict()
         return result
 
     def from_dict(self, d: dict, version: int):
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")
@@ -234,13 +234,13 @@ class ManualExtension(Extension):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["do_cmd"] = self.do_cmd
         result["undo_cmd"] = self.undo_cmd
         return result
 
     def from_dict(self, d: dict, version: int):
-        class_name = d.get("class", "")
+        class_name = d.get("class_name", "")
         if class_name != self.__class__.__name__:
             raise ValueError(
                 f"Expected class {self.__class__.__name__}, got {class_name}.")

@@ -80,14 +80,14 @@ def test_recursive_section_dict():
     recursive_section.add_extension(ext)
 
     assert recursive_section.to_dict() == {
-    "class": "RecusiveSection",
+    "class_name": "RecusiveSection",
     "id_name": "recursive",
     "sections": [
         {
-            "class": "IntegratorSection",
+            "class_name": "IntegratorSection",
             "id_name": "mySection",
             "integrator": {
-                "class": "NVEIntegrator",
+                "class_name": "NVEIntegrator",
                 "id_name": "myIntegrator",
                 "group_name": "all",
                 "nb_steps": 1000
@@ -100,7 +100,7 @@ def test_recursive_section_dict():
     ],
     "fileios": [
         {
-            "class": "DumpTrajectoryFileIO",
+            "class_name": "DumpTrajectoryFileIO",
             "id_name": "testFile",
             "user_fields": [
                 "a",
@@ -116,21 +116,21 @@ def test_recursive_section_dict():
     ],
     "extensions": [
         {
-            "class": "MoveExtension",
+            "class_name": "MoveExtension",
             "id_name": "myExtension",
             "group_name": "all",
             "vx": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0.0,
                 "units": "angstrom/ps"
             },
             "vy": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0.0,
                 "units": "angstrom/ps"
             },
             "vz": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0.0,
                 "units": "angstrom/ps"
             }
@@ -138,7 +138,7 @@ def test_recursive_section_dict():
     ],
     "groups": [
         {
-            "class": "IndicesGroup",
+            "class_name": "IndicesGroup",
             "id_name": "myIndicesGroup",
             "indices": [
                 1,
@@ -149,10 +149,10 @@ def test_recursive_section_dict():
     ],
     "instructions": [
         {
-            "class": "SetTimestepInstruction",
+            "class_name": "SetTimestepInstruction",
             "id_name": "myInstruction",
             "timestep": {
-                "class": "TimeQuantity",
+                "class_name": "TimeQuantity",
                 "magnitude": 20,
                 "units": "fs"
             }

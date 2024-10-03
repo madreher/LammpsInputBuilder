@@ -16,7 +16,7 @@ def test_instructions_ResetTimestep():
     assert instruction.write_instruction(info) == "reset_timestep 20\n"
 
     obj_dict = instruction.to_dict()
-    assert obj_dict["class"] == "ResetTimestepInstruction"
+    assert obj_dict["class_name"] == "ResetTimestepInstruction"
     assert obj_dict["new_timestep"] == 20
     assert obj_dict["id_name"] == "defaultResetTimestep"
 
@@ -40,7 +40,7 @@ def test_instructions_SetTimestep():
     assert instruction.write_instruction(info_metal) == "timestep 0.02\n"
 
     obj_dict = instruction.to_dict()
-    assert obj_dict["class"] == "SetTimestepInstruction"
+    assert obj_dict["class_name"] == "SetTimestepInstruction"
     assert obj_dict["timestep"]["magnitude"] == 20
     assert obj_dict["timestep"]["units"] == "fs"
     assert obj_dict["id_name"] == "defaultSetTimestep"
@@ -64,7 +64,7 @@ def test_instruction_VelocityCreate():
     assert instruction.write_instruction(info_real) == "velocity all create 300.0 12335 dist gaussian\n"
 
     obj_dict = instruction.to_dict()
-    assert obj_dict["class"] == "VelocityCreateInstruction"
+    assert obj_dict["class_name"] == "VelocityCreateInstruction"
     assert obj_dict["group_name"] == "all"
     assert obj_dict["temp"]["magnitude"] == 300
     assert obj_dict["temp"]["units"] == "kelvin"
@@ -90,7 +90,7 @@ def test_instruction_Variable():
     assert instruction.write_instruction(info) == "variable defaultVariable equal {dt}\n"
 
     obj_dict = instruction.to_dict()
-    assert obj_dict["class"] == "VariableInstruction"
+    assert obj_dict["class_name"] == "VariableInstruction"
     assert obj_dict["variable_name"] == "defaultVariable"
     assert obj_dict["style"] == VariableStyle.EQUAL.value
     assert obj_dict["args"] == "{dt}"
@@ -129,7 +129,7 @@ def test_instruction_Manual():
     assert instruction.get_cmd() == "manual"
 
     obj_dict = instruction.to_dict()
-    assert obj_dict["class"] == "ManualInstruction"
+    assert obj_dict["class_name"] == "ManualInstruction"
     assert obj_dict["id_name"] == "defaultManual"
     assert obj_dict["cmd"] == "manual"
 

@@ -33,11 +33,11 @@ def test_instructions_section_dict():
     print(json.dumps(d, indent=4))
 
     assert d == {
-    "class": "InstructionsSection",
+    "class_name": "InstructionsSection",
     "id_name": "test",
     "instructions": [
         {
-            "class": "ResetTimestepInstruction",
+            "class_name": "ResetTimestepInstruction",
             "id_name": "myInstruction",
             "new_timestep": 10
         }
