@@ -192,6 +192,14 @@ def test_integrator_section_commands():
         vz=VelocityQuantity(0.0, "angstrom/ps"))
     section.add_extension(ext)
 
+    post_ext = MoveExtension(
+        extension_name="myPostExtension",
+        group=AllGroup(),
+        vx=VelocityQuantity(0.0, "angstrom/ps"),
+        vy=VelocityQuantity(0.0, "angstrom/ps"),
+        vz=VelocityQuantity(0.0, "angstrom/ps"))
+    section.add_post_extension(post_ext)
+
     global_info = GlobalInformation()
     global_info.set_unit_style(LammpsUnitSystem.REAL)
     global_info.set_element_table({1: "C"})
@@ -210,6 +218,7 @@ fix myExtension all move linear 0.0 0.0 0.0
 fix myIntegrator all nve
 #### END INTEGRATOR DECLARATION ################################################
 #### START Post Extensions DECLARATION #########################################
+fix myPostExtension all move linear 0.0 0.0 0.0
 #### END Post Extensions DECLARATION ###########################################
 #### START IOs DECLARATION #####################################################
 dump testFile all custom 10 dump.testFile.lammpstrj id type x y z a b c element
@@ -223,6 +232,7 @@ run 1000
 undump testFile
 #### END IOs DECLARATION #######################################################
 #### START Post Extensions REMOVAL #############################################
+unfix myPostExtension
 #### END Post Extensions REMOVAL ###############################################
 #### START INTEGRATOR REMOVAL ##################################################
 unfix myIntegrator
