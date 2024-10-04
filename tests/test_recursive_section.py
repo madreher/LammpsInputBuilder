@@ -95,7 +95,8 @@ def test_recursive_section_dict():
             "fileios": [],
             "extensions": [],
             "groups": [],
-            "instructions": []
+            "instructions": [],
+            "post_extensions": []
         }
     ],
     "fileios": [
@@ -223,19 +224,23 @@ dump_modify testFile element C
 #### END Groups DECLARATION ####################################################
 #### START Extensions DECLARATION ##############################################
 #### END Extensions DECLARATION ################################################
-#### START IOs DECLARATION #####################################################
-#### END IOs DECLARATION #######################################################
 #### START INTEGRATOR DECLARATION ##############################################
 fix myIntegrator all nve
 #### END INTEGRATOR DECLARATION ################################################
+#### START Post Extensions DECLARATION #########################################
+#### END Post Extensions DECLARATION ###########################################
+#### START IOs DECLARATION #####################################################
+#### END IOs DECLARATION #######################################################
 #### START RUN INTEGRATOR FOR SECTION mySection ################################
 run 1000
 #### END RUN INTEGRATOR FOR SECTION mySection ##################################
+#### START IO REMOVAL ##########################################################
+#### END IOs DECLARATION #######################################################
+#### START Post Extensions REMOVAL #############################################
+#### END Post Extensions REMOVAL ###############################################
 #### START INTEGRATOR REMOVAL ##################################################
 unfix myIntegrator
 #### END INTEGRATOR REMOVAL ####################################################
-#### START IO REMOVAL ##########################################################
-#### END IOs DECLARATION #######################################################
 #### START Extensions REMOVAL ##################################################
 #### END Extensions DECLARATION ################################################
 #### START Groups REMOVAL ######################################################

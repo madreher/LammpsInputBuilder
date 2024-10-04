@@ -15,6 +15,7 @@ class IntegratorSectionModel(SectionModel):
     instructions: List[InstructionUnion] = []
     fileios: List[FileIOUnion] = []
     extensions: List[ExtensionUnion] = []
+    post_extensions: List[ExtensionUnion] = []
     integrator: IntegratorUnion
 
 class InstructionsSectionModel(SectionModel):
