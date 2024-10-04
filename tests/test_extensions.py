@@ -26,7 +26,7 @@ def test_MoveExtension():
     assert dict_result["vy"]["units"] == "angstrom/ps"
     assert dict_result["vz"]["magnitude"] == 3.0
     assert dict_result["vz"]["units"] == "angstrom/ps"
-    assert dict_result["class"] == "MoveExtension"
+    assert dict_result["class_name"] == "MoveExtension"
 
     load_back_obj = MoveExtension()
     load_back_obj.from_dict(dict_result, version=0)
@@ -73,7 +73,7 @@ def test_SetForceExtension():
     assert dict_result["fy"]["units"] == "lmp_real_force"
     assert dict_result["fz"]["magnitude"] == 3.0
     assert dict_result["fz"]["units"] == "lmp_real_force"
-    assert dict_result["class"] == "SetForceExtension"
+    assert dict_result["class_name"] == "SetForceExtension"
 
     load_back_obj = SetForceExtension()
     load_back_obj.from_dict(dict_result, version=0)
@@ -123,7 +123,7 @@ def test_LangevinExtension():
     assert dict_result["damp"]["magnitude"] == 3.0
     assert dict_result["damp"]["units"] == "ps"
     assert dict_result["seed"] == 122345
-    assert dict_result["class"] == "LangevinExtension"
+    assert dict_result["class_name"] == "LangevinExtension"
 
     load_back_obj = LangevinExtension()
     load_back_obj.from_dict(dict_result, version=0)
@@ -157,7 +157,7 @@ def test_InstructionExtension():
 
     dict_result = obj.to_dict()
     assert dict_result["instruction"] == instr.to_dict()
-    assert dict_result["class"] == "InstructionExtension"
+    assert dict_result["class_name"] == "InstructionExtension"
 
     load_back_obj = InstructionExtension()
     load_back_obj.from_dict(dict_result, version=0)
@@ -181,7 +181,7 @@ def test_ManualExtension():
     assert dict_result["id_name"] == "myManualExtension"
     assert dict_result["do_cmd"] == "my_do_cmd"
     assert dict_result["undo_cmd"] == "my_undo_cmd"
-    assert dict_result["class"] == "ManualExtension"
+    assert dict_result["class_name"] == "ManualExtension"
 
     load_back_obj = ManualExtension()
     load_back_obj.from_dict(dict_result, version=0)

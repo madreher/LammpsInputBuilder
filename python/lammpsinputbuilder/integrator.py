@@ -1,6 +1,6 @@
 """Module for the integrator class."""
 
-from enum import Enum
+from enum import IntEnum
 
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.types import GlobalInformation
@@ -18,7 +18,7 @@ class Integrator(BaseObject):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
@@ -38,13 +38,13 @@ class RunZeroIntegrator(Integrator):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
 
     def add_run_commands(self) -> str:
@@ -69,15 +69,15 @@ class NVEIntegrator(Integrator):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["group_name"] = self.group
         result["nb_steps"] = self.nb_steps
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.group = d["group_name"]
         self.nb_steps = d.get("nb_steps", 5000)
@@ -93,7 +93,7 @@ class NVEIntegrator(Integrator):
         return f"run {self.nb_steps}\n"
 
 
-class MinimizeStyle(Enum):
+class MinimizeStyle(IntEnum):
     CG = 0
     SD = 1
     SPIN_LBFGS = 2
@@ -139,7 +139,7 @@ class MinimizeIntegrator(Integrator):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["style"] = self.style.value
         result["etol"] = self.etol
         result["ftol"] = self.ftol
@@ -148,9 +148,9 @@ class MinimizeIntegrator(Integrator):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.style = MinimizeStyle(d["style"])
         self.etol = d["etol"]
@@ -181,13 +181,13 @@ class MultipassMinimizeIntegrator(Integrator):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
@@ -258,16 +258,16 @@ class ManualIntegrator(Integrator):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["cmd_do"] = self.cmd_do
         result["cmd_undo"] = self.cmd_undo
         result["cmd_run"] = self.cmd_run
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.cmd_do = d["cmd_do"]
         self.cmd_undo = d["cmd_undo"]

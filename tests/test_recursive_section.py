@@ -1,6 +1,6 @@
 import pytest
 
-from lammpsinputbuilder.section import IntegratorSection, RecusiveSection
+from lammpsinputbuilder.section import IntegratorSection, RecursiveSection
 from lammpsinputbuilder.integrator import NVEIntegrator
 from lammpsinputbuilder.group import AllGroup, IndicesGroup
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, DumpStyle
@@ -15,7 +15,7 @@ def test_recursive_section_accessors():
     section = IntegratorSection(integrator=integrator, section_name="mySection")
     assert section.get_integrator().to_dict() == integrator.to_dict()
 
-    recursive_section = RecusiveSection(section_name="recursive")
+    recursive_section = RecursiveSection(section_name="recursive")
     recursive_section.add_section(section)
 
     io = DumpTrajectoryFileIO(
@@ -51,7 +51,7 @@ def test_recursive_section_dict():
     section = IntegratorSection(integrator=integrator, section_name="mySection")
     assert section.get_integrator().to_dict() == integrator.to_dict()
 
-    recursive_section = RecusiveSection(section_name="recursive")
+    recursive_section = RecursiveSection(section_name="recursive")
     recursive_section.add_section(section)
 
     io = DumpTrajectoryFileIO(
@@ -80,14 +80,14 @@ def test_recursive_section_dict():
     recursive_section.add_extension(ext)
 
     assert recursive_section.to_dict() == {
-    "class": "RecusiveSection",
+    "class_name": "RecursiveSection",
     "id_name": "recursive",
     "sections": [
         {
-            "class": "IntegratorSection",
+            "class_name": "IntegratorSection",
             "id_name": "mySection",
             "integrator": {
-                "class": "NVEIntegrator",
+                "class_name": "NVEIntegrator",
                 "id_name": "myIntegrator",
                 "group_name": "all",
                 "nb_steps": 1000
@@ -100,7 +100,7 @@ def test_recursive_section_dict():
     ],
     "fileios": [
         {
-            "class": "DumpTrajectoryFileIO",
+            "class_name": "DumpTrajectoryFileIO",
             "id_name": "testFile",
             "user_fields": [
                 "a",
@@ -116,21 +116,21 @@ def test_recursive_section_dict():
     ],
     "extensions": [
         {
-            "class": "MoveExtension",
+            "class_name": "MoveExtension",
             "id_name": "myExtension",
             "group_name": "all",
             "vx": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0.0,
                 "units": "angstrom/ps"
             },
             "vy": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0.0,
                 "units": "angstrom/ps"
             },
             "vz": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0.0,
                 "units": "angstrom/ps"
             }
@@ -138,7 +138,7 @@ def test_recursive_section_dict():
     ],
     "groups": [
         {
-            "class": "IndicesGroup",
+            "class_name": "IndicesGroup",
             "id_name": "myIndicesGroup",
             "indices": [
                 1,
@@ -149,10 +149,10 @@ def test_recursive_section_dict():
     ],
     "instructions": [
         {
-            "class": "SetTimestepInstruction",
+            "class_name": "SetTimestepInstruction",
             "id_name": "myInstruction",
             "timestep": {
-                "class": "TimeQuantity",
+                "class_name": "TimeQuantity",
                 "magnitude": 20,
                 "units": "fs"
             }
@@ -160,7 +160,7 @@ def test_recursive_section_dict():
     ]
 }
 
-    section2 = RecusiveSection()
+    section2 = RecursiveSection()
     section2.from_dict(recursive_section.to_dict(), version=0)
 
     assert section2.to_dict() == recursive_section.to_dict()
@@ -171,7 +171,7 @@ def test_integrator_section_commands():
     section = IntegratorSection(integrator=integrator, section_name="mySection")
     assert section.get_integrator().to_dict() == integrator.to_dict()
 
-    recursive_section = RecusiveSection(section_name="recursive")
+    recursive_section = RecursiveSection(section_name="recursive")
     recursive_section.add_section(section)
 
     io = DumpTrajectoryFileIO(

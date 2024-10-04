@@ -24,7 +24,7 @@ class Section(BaseObject):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def add_all_commands(self, global_information: GlobalInformation) -> str:
@@ -41,7 +41,7 @@ class Section(BaseObject):
         return ""
 
 
-class RecusiveSection(Section):
+class RecursiveSection(Section):
     def __init__(self, section_name: str = "defaultSection") -> None:
         super().__init__(section_name=section_name)
         self.sections: List[Section] = []
@@ -82,7 +82,7 @@ class RecusiveSection(Section):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["sections"] = [s.to_dict() for s in self.sections]
         result["fileios"] = [s.to_dict() for s in self.ios]
         result["extensions"] = [s.to_dict() for s in self.extensions]
@@ -225,7 +225,7 @@ class IntegratorSection(Section):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["integrator"] = self.integrator.to_dict()
         result["fileios"] = [f.to_dict() for f in self.fileios]
         result["extensions"] = [e.to_dict() for e in self.extensions]
@@ -235,9 +235,9 @@ class IntegratorSection(Section):
 
     def from_dict(self, d: dict, version: int) -> None:
         super().from_dict(d, version=version)
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         if "integrator" not in d.keys():
             raise ValueError(f"Missing 'integrator' key in {d}.")
 
@@ -354,7 +354,7 @@ class InstructionsSection(Section):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["instructions"] = [c.to_dict() for c in self.instructions]
         return result
 

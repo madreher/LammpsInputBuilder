@@ -76,7 +76,7 @@ def test_load_no_class_fileio():
         associated_file_path="testfile")
 
     obj_dict = obj.to_dict()
-    del obj_dict["class"]
+    del obj_dict["class_name"]
 
     with pytest.raises(RuntimeError):
         loader = FileIOLoader()
@@ -92,7 +92,7 @@ def test_load_unknown_class_fileio():
         associated_file_path="testfile")
 
     obj_dict = obj.to_dict()
-    obj_dict["class"] = "unknown"
+    obj_dict["class_name"] = "unknown"
 
     with pytest.raises(RuntimeError):
         loader = FileIOLoader()

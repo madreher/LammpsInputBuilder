@@ -70,16 +70,16 @@ def test_integrator_section_dict():
     section.add_extension(ext)
 
     assert section.to_dict() == {
-        "class": "IntegratorSection",
+        "class_name": "IntegratorSection",
         "integrator": {
-            "class": "NVEIntegrator",
+            "class_name": "NVEIntegrator",
             "id_name": "myIntegrator",
             "group_name": "all",
             "nb_steps": 1000
         },
         "id_name": "mySection",
         "fileios": [{
-            "class": "DumpTrajectoryFileIO",
+            "class_name": "DumpTrajectoryFileIO",
             "id_name": "testFile",
             "user_fields": ["a", "b", "c", "element"],
             "add_default_fields": True,
@@ -88,35 +88,35 @@ def test_integrator_section_dict():
             "style": DumpStyle.CUSTOM.value
         }],
         "groups": [{
-            "class": "IndicesGroup",
+            "class_name": "IndicesGroup",
             "id_name": "myIndicesGroup",
             "indices": [1, 2, 3]
         }],
         "instructions": [{
-            "class": "SetTimestepInstruction",
+            "class_name": "SetTimestepInstruction",
             "id_name": "myInstruction",
             "timestep": {
-                "class": "TimeQuantity",
+                "class_name": "TimeQuantity",
                 "magnitude": 20,
                 "units": "fs"
             }
         }],
         "extensions": [{
-            "class": "MoveExtension",
+            "class_name": "MoveExtension",
             "id_name": "myExtension",
             "group_name": "all",
             "vx": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0,
                 "units": "angstrom/ps"
             },
             "vy": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0,
                 "units": "angstrom/ps"
             },
             "vz": {
-                "class": "VelocityQuantity",
+                "class_name": "VelocityQuantity",
                 "magnitude": 0,
                 "units": "angstrom/ps"
             }

@@ -101,7 +101,7 @@ def test_load_manual_extension():
 def test_no_class():
     obj = ManualExtension()
     obj_dict = obj.to_dict()
-    del obj_dict["class"]
+    del obj_dict["class_name"]
 
     with pytest.raises(RuntimeError):
         loader = ExtensionLoader()
@@ -111,7 +111,7 @@ def test_no_class():
 def test_unknown_class():
     obj = ManualExtension()
     obj_dict = obj.to_dict()
-    obj_dict["class"] = "unknown"
+    obj_dict["class_name"] = "unknown"
 
     with pytest.raises(RuntimeError):
         loader = ExtensionLoader()

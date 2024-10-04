@@ -25,11 +25,11 @@ def test_emptyReaxMolecule():
     assert not typed_molecule.is_model_loaded()
 
     assert typed_molecule.get_molecule_content() == ""
-    assert typed_molecule.get_molecule_format() is None 
-    assert typed_molecule.get_molecule_path() is None
+    assert typed_molecule.get_molecule_format() is None
+    assert typed_molecule.get_molecule_name() is None
 
     assert typed_molecule.get_forcefield_content() == ""
-    assert typed_molecule.get_forcefield_path() is None
+    assert typed_molecule.get_forcefield_name() is None
 
 
 
@@ -53,10 +53,10 @@ def test_reaxMoleculeFromFile():
 
     assert typed_molecule.get_molecule_content() != ""
     assert typed_molecule.get_molecule_format() == MoleculeFileFormat.XYZ
-    assert typed_molecule.get_molecule_path()  == molecule_path
+    assert typed_molecule.get_molecule_name()  == Path(molecule_path.name)
 
     assert typed_molecule.get_forcefield_content() != ""
-    assert typed_molecule.get_forcefield_path() == forcefield_path
+    assert typed_molecule.get_forcefield_name() == Path(forcefield_path.name)
 
 
 def test_reaxMoleculeFromStrings():
@@ -76,7 +76,7 @@ def test_reaxMoleculeFromStrings():
     with open(forcefield_path, 'r', encoding="utf-8") as f:
         potential_content = f.read()
 
-    typed_molecule.load_from_string(molecule_content, MoleculeFileFormat.XYZ, potential_content, forcefield_path, molecule_path)
+    typed_molecule.load_from_string(molecule_content, MoleculeFileFormat.XYZ, potential_content, Path(forcefield_path.name), Path(molecule_path.name))
 
     assert typed_molecule.get_forcefield_type() == Forcefield.REAX
     assert typed_molecule.get_boundingbox_style() == BoundingBoxStyle.PERIODIC
@@ -86,10 +86,10 @@ def test_reaxMoleculeFromStrings():
 
     assert typed_molecule.get_molecule_content() == molecule_content
     assert typed_molecule.get_molecule_format() == MoleculeFileFormat.XYZ
-    assert typed_molecule.get_molecule_path()  == molecule_path
+    assert typed_molecule.get_molecule_name()  == Path(molecule_path.name)
 
     assert typed_molecule.get_forcefield_content() == potential_content
-    assert typed_molecule.get_forcefield_path() == forcefield_path
+    assert typed_molecule.get_forcefield_name() == Path(forcefield_path.name)
 
 
 def test_moleculeToDict():
@@ -106,10 +106,10 @@ def test_moleculeToDict():
 
     result = typed_molecule.to_dict()
 
-    assert result["class"] == "ReaxTypedMolecularSystem"
+    assert result["class_name"] == "ReaxTypedMolecularSystem"
     assert result["electrostatic_method"] == ElectrostaticMethod.QEQ.value
-    assert result["forcefield_path"] == Path(str(forcefield_path))
-    assert result["molecule_path"] == Path(str(molecule_path))
+    assert result["forcefield_name"] == str(forcefield_path.name)
+    assert result["molecule_name"] == str(molecule_path.name)
     assert result["molecule_format"] == MoleculeFileFormat.XYZ.value
     assert result["forcefield_content"] == typed_molecule.get_forcefield_content()
     assert result["molecule_content"] == typed_molecule.get_molecule_content()

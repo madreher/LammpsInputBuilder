@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from typing import List
-from enum import Enum
+from enum import IntEnum
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.types import GlobalInformation
 from lammpsinputbuilder.base import BaseObject
@@ -19,7 +19,7 @@ class FileIO(BaseObject):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
@@ -32,7 +32,7 @@ class FileIO(BaseObject):
     def get_associated_file_path(self) -> Path:
         return Path()
 
-class DumpStyle(Enum):
+class DumpStyle(IntEnum):
     CUSTOM = 1
     XYZ = 2
 
@@ -75,7 +75,7 @@ class DumpTrajectoryFileIO(FileIO):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["user_fields"] = self.user_fields
         result["add_default_fields"] = self.add_default_fields
         result["interval"] = self.interval
@@ -84,9 +84,9 @@ class DumpTrajectoryFileIO(FileIO):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.user_fields = d.get("user_fields", [])
         self.add_default_fields = d.get("add_default_fields", True)
@@ -164,15 +164,15 @@ class ReaxBondFileIO(FileIO):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["group_name"] = self.group_name
         result["interval"] = self.interval
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.group_name = d.get("group_name", AllGroup().get_group_name())
         self.interval = d.get("interval", 100)
@@ -225,16 +225,16 @@ class ThermoFileIO(FileIO):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["user_fields"] = self.user_fields
         result["add_default_fields"] = self.add_default_fields
         result["interval"] = self.interval
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.user_fields = d.get("user_fields", [])
         self.add_default_fields = d.get("add_default_fields", True)
@@ -288,16 +288,16 @@ class ManualFileIO(FileIO):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["do_cmd"] = self.do_cmd
         result["undo_cmd"] = self.undo_cmd
         result["associated_file_path"] = self.associated_file_path
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.do_cmd = d.get("do_cmd", "")
         self.undo_cmd = d.get("undo_cmd", "")

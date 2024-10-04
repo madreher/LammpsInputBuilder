@@ -45,11 +45,10 @@ class TemplateSection(Section):
 
     def get_groups(self) -> List[Group]:
         return self.groups
-    
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["fileios"] = [s.to_dict() for s in self.ios]
         result["extensions"] = [s.to_dict() for s in self.extensions]
         result["groups"] = [s.to_dict() for s in self.groups]

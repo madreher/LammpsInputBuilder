@@ -10,7 +10,7 @@ def test_AllGroup():
 
     obj_dict = grp.to_dict()
     assert obj_dict["id_name"] == "all"
-    assert obj_dict["class"] == "AllGroup"
+    assert obj_dict["class_name"] == "AllGroup"
 
     grp2 = AllGroup()
     grp2.from_dict(obj_dict, version=0)
@@ -26,7 +26,7 @@ def test_EmptyGroup():
 
     obj_dict = grp.to_dict()
     assert obj_dict["id_name"] == "empty"
-    assert obj_dict["class"] == "EmptyGroup"
+    assert obj_dict["class_name"] == "EmptyGroup"
 
     grp2 = EmptyGroup()
     grp2.from_dict(obj_dict, version=0)
@@ -44,7 +44,7 @@ def test_IndicesGroup():
     obj_dict = grp.to_dict()
     assert obj_dict["id_name"] == "myIndicesGroup"
     assert obj_dict["indices"] == [1, 2, 3]
-    assert obj_dict["class"] == "IndicesGroup"
+    assert obj_dict["class_name"] == "IndicesGroup"
 
     grp2 = IndicesGroup()
     grp2.from_dict(obj_dict, version=0)
@@ -72,9 +72,9 @@ def test_OperationGroup():
     obj_dict = grp.to_dict()
     assert obj_dict["id_name"] == "myOperationGroup"
     assert obj_dict["op"] == OperationGroupEnum.UNION.value
-    assert obj_dict["other_groups"][0] == "myOtherGroup1"
-    assert obj_dict["other_groups"][1] == "myOtherGroup2"
-    assert obj_dict["class"] == "OperationGroup"
+    assert obj_dict["other_groups_name"][0] == "myOtherGroup1"
+    assert obj_dict["other_groups_name"][1] == "myOtherGroup2"
+    assert obj_dict["class_name"] == "OperationGroup"
 
     grp2 = OperationGroup()
     grp2.from_dict(obj_dict, version=0)
@@ -112,7 +112,7 @@ def test_ManualGroup():
     assert obj_dict["id_name"] == "myManualGroup"
     assert obj_dict["do_cmd"] == "my_do_cmd"
     assert obj_dict["undo_cmd"] == "my_undo_cmd"
-    assert obj_dict["class"] == "ManualGroup"
+    assert obj_dict["class_name"] == "ManualGroup"
 
     grp2 = ManualGroup()
     grp2.from_dict(obj_dict, version=0)

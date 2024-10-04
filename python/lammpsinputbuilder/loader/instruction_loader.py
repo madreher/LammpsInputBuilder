@@ -23,9 +23,9 @@ class InstructionLoader():
         instruction_table[ManualInstruction.__name__] = ManualInstruction()
         instruction_table[VariableInstruction.__name__] = VariableInstruction()
 
-        if "class" not in d:
-            raise RuntimeError(f"Missing 'class' key in {d}.")
-        class_name = d["class"]
+        if "class_name" not in d:
+            raise RuntimeError(f"Missing 'class_name' key in {d}.")
+        class_name = d["class_name"]
         if class_name not in instruction_table:
             raise RuntimeError(f"Unknown Instruction class {class_name}.")
         # Create a copy of the base object, and we will update the settings of

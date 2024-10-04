@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
 from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
 from lammpsinputbuilder.workflow_builder import WorkflowBuilder
-from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
+from lammpsinputbuilder.section import IntegratorSection, RecursiveSection, InstructionsSection
 from lammpsinputbuilder.integrator import MinimizeStyle, RunZeroIntegrator
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO, DumpStyle
 from lammpsinputbuilder.group import IndicesGroup, OperationGroup, OperationGroupEnum, AllGroup, ReferenceGroup
@@ -113,7 +113,7 @@ def runMinimizationSlab(lmpExecPath: Path, model: str) -> Path:
     groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection = RecursiveSection(section_name="GlobalSection")
     globalSection.add_group(groupTooltip)
     globalSection.add_group(groupAnchorSlab)
     globalSection.add_group(groupAnchorTooltip)
@@ -226,7 +226,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
     groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection = RecursiveSection(section_name="GlobalSection")
     globalSection.add_group(groupTooltip)
     globalSection.add_group(groupAnchorSlab)
     globalSection.add_group(groupAnchorTooltip)
@@ -241,7 +241,7 @@ def scanSurface(lmpExecPath: Path, xyzPath: Path, model: str, zplane:float, xyde
         # 4. Write the positions and bonds
         # 3. Move the head back to the initial position
 
-        stepSection = RecusiveSection(section_name=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
+        stepSection = RecursiveSection(section_name=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
         moveForwardSection = InstructionsSection(section_name="MoveForwardSection")
 
         # Unit note: ASE positions are in Angstroms

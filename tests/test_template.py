@@ -72,7 +72,7 @@ def test_template_dict():
     template.add_fileio(io)
 
     assert template.to_dict() == {
-        "class": "TemplateSection",
+        "class_name": "TemplateSection",
         "id_name": "test",
         "fileios": [io.to_dict()],
         "extensions": [ext.to_dict()],

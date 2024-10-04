@@ -92,7 +92,7 @@ def test_load_no_class_instruction():
     obj = ManualInstruction(instruction_name="defaultManual", cmd="manual")
 
     obj_dict = obj.to_dict()
-    del obj_dict["class"]
+    del obj_dict["class_name"]
 
     with pytest.raises(RuntimeError):
         loader = InstructionLoader()
@@ -103,7 +103,7 @@ def test_load_unknown_class_instruction():
     obj = ManualInstruction(instruction_name="defaultManual", cmd="manual")
 
     obj_dict = obj.to_dict()
-    obj_dict["class"] = "unknown"
+    obj_dict["class_name"] = "unknown"
 
     with pytest.raises(RuntimeError):
         loader = InstructionLoader()

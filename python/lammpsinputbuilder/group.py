@@ -1,7 +1,7 @@
 """Module implementing the Group class and its subclasses."""
 
 from typing import List
-from enum import Enum
+from enum import IntEnum
 from lammpsinputbuilder.base import BaseObject
 
 
@@ -14,7 +14,7 @@ class Group(BaseObject):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
 
         return result
 
@@ -55,15 +55,15 @@ class IndicesGroup(Group):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["indices"] = self.indices
         return result
 
     def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.indices = d.get("indices", [])
         self.validate_indices()
@@ -88,14 +88,14 @@ class AllGroup(Group):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
 
     def add_do_commands(self) -> str:
@@ -111,14 +111,14 @@ class EmptyGroup(Group):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         return result
 
     def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
 
     def add_do_commands(self) -> str:
@@ -128,7 +128,7 @@ class EmptyGroup(Group):
         return ""
 
 
-class OperationGroupEnum(Enum):
+class OperationGroupEnum(IntEnum):
     SUBTRACT = 0
     UNION = 1
     INTERSECT = 2
@@ -183,18 +183,18 @@ class OperationGroup(Group):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["op"] = self.op.value
-        result["other_groups"] = self.other_groups
+        result["other_groups_name"] = self.other_groups
         return result
 
     def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
-        self.other_groups = d.get("other_groups", [])
+        self.other_groups = d.get("other_groups_name", [])
 
         self.validate_configuration()
 
@@ -227,17 +227,17 @@ class ReferenceGroup(Group):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
-        result["reference"] = self.reference
+        result["class_name"] = self.__class__.__name__
+        result["reference_name"] = self.reference
         return result
 
     def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
-        self.reference = d.get("reference", "all")
+        self.reference = d.get("reference_name", "all")
 
     def add_do_commands(self) -> str:
         return ""
@@ -270,16 +270,16 @@ class ManualGroup(Group):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["do_cmd"] = self.do_cmd
         result["undo_cmd"] = self.undo_cmd
         return result
 
     def from_dict(self, d: dict, version: int):
         # Make sure that we are reading the right class
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.do_cmd = d.get("do_cmd", "")
         self.undo_cmd = d.get("undo_cmd", "")

@@ -51,7 +51,7 @@ class MinimizeTemplate(TemplateSection):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result["class"] = self.__class__.__name__
+        result["class_name"] = self.__class__.__name__
         result["style"] = self.style.value
         result["etol"] = self.etol
         result["ftol"] = self.ftol
@@ -62,9 +62,9 @@ class MinimizeTemplate(TemplateSection):
         return result
 
     def from_dict(self, d: dict, version: int):
-        if d["class"] != self.__class__.__name__:
+        if d["class_name"] != self.__class__.__name__:
             raise ValueError(
-                f"Expected class {self.__class__.__name__}, got {d['class']}.")
+                f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version=version)
         self.style = MinimizeStyle(d["style"])
         self.etol = d["etol"]

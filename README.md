@@ -17,7 +17,7 @@ With this organization, the main objectives of LammpsInputBuilder are:
 - Create a reusable library of common Sections types to easily chain common operations without having to copy Lammps code
 - Make is possible for external tools to generate Lammps inputs via a JSON representation of a workflow (under construction)
 
-Here is a simple example on how to load a molecular model, assign a reax potential to it, and minimize the model: 
+Here is a simple example (`examples/tldr.py`) on how to load a molecular model, assign a reax potential to it, and minimize the model: 
 ```
     from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
     from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
@@ -436,7 +436,7 @@ The molecular system XYZ coordinates need to be adjusted to lower the initial en
     groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection = RecursiveSection(section_name="GlobalSection")
     globalSection.add_group(groupTooltip)
     globalSection.add_group(groupAnchorSlab)
     globalSection.add_group(groupAnchorTooltip)
@@ -543,7 +543,7 @@ During the generation of the grid, we save the corresponding tooltip positions f
     groupFree = OperationGroup(group_name="free", op=OperationGroupEnum.SUBTRACT, other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection = RecursiveSection(section_name="GlobalSection")
     globalSection.add_group(groupTooltip)
     globalSection.add_group(groupAnchorSlab)
     globalSection.add_group(groupAnchorTooltip)
@@ -558,7 +558,7 @@ During the generation of the grid, we save the corresponding tooltip positions f
         # 4. Write the positions and bonds
         # 3. Move the head back to the initial position
 
-        stepSection = RecusiveSection(section_name=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
+        stepSection = RecursiveSection(section_name=f"Section_{headPixel[i][0]}_{headPixel[i][1]}")
         moveForwardSection = InstructionsSection(section_name="MoveForwardSection")
         moveForwardSection.add_instruction(instruction=DisplaceAtomsInstruction(instruction_name="moveforward", group=ReferenceGroup(group_name="tooltip", reference=groupTooltip), 
                                                                         dx=LengthQuantity(value=headTargetPosition[0] - headInitialPosition[0], units="lmp_real_length"),
