@@ -94,7 +94,7 @@ def test_variable_instruction_model():
     assert obj_model1.class_name == "VariableInstruction"
     assert obj_model1.id_name == "defaultVariable"
     assert obj_model1.variable_name == "defaultVariable"
-    assert obj_model1.style == VariableStyle.EQUAL.value
+    assert obj_model1.style == VariableStyle.EQUAL
     assert obj_model1.args == "{dt}"
 
     # Populate the model from the dictionnary
@@ -102,7 +102,7 @@ def test_variable_instruction_model():
     assert obj_model2.class_name == "VariableInstruction"
     assert obj_model2.id_name == "defaultVariable"
     assert obj_model2.variable_name == "defaultVariable"
-    assert obj_model2.style == VariableStyle.EQUAL.value
+    assert obj_model2.style == VariableStyle.EQUAL
     assert obj_model2.args == "{dt}"
 
 def test_displace_atoms_instruction_model():

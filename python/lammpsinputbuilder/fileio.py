@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from typing import List
-from enum import Enum
+from enum import IntEnum
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.types import GlobalInformation
 from lammpsinputbuilder.base import BaseObject
@@ -32,7 +32,7 @@ class FileIO(BaseObject):
     def get_associated_file_path(self) -> Path:
         return Path()
 
-class DumpStyle(Enum):
+class DumpStyle(IntEnum):
     CUSTOM = 1
     XYZ = 2
 

@@ -1,12 +1,12 @@
 """Module containing types for lammpsinputbuilder."""
 
-from enum import Enum
+from enum import IntEnum
 from typing import List
 from ase import Atoms
 from lammpsinputbuilder.quantities import LammpsUnitSystem
 
 
-class Forcefield(Enum):
+class Forcefield(IntEnum):
     REAX = 1
     AIREBO = 2
     REBO = 3
@@ -39,12 +39,12 @@ def get_extension_from_forcefield(forcefield: Forcefield) -> str:
     raise NotImplementedError(f"Forcefield {forcefield} not supported.")
 
 
-class BoundingBoxStyle(Enum):
+class BoundingBoxStyle(IntEnum):
     PERIODIC = 1
     SHRINK = 2
 
 
-class MoleculeFileFormat(Enum):
+class MoleculeFileFormat(IntEnum):
     XYZ = 1
     MOL2 = 2
     LAMMPS_DUMP_TEXT = 3
@@ -73,7 +73,7 @@ def get_extension_from_molecule_file_format(
     raise NotImplementedError(f"Molecule format {molecule_file_format} not supported.")
 
 
-class ElectrostaticMethod(Enum):
+class ElectrostaticMethod(IntEnum):
     ACKS2 = 1
     QEQ = 2
 

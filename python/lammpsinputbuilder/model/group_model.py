@@ -1,6 +1,7 @@
 from typing import List, Union, Annotated, Literal
 from pydantic import Field
 from lammpsinputbuilder.model.base_model import BaseObjectModel
+from lammpsinputbuilder.group import OperationGroupEnum
 
 class GroupModel(BaseObjectModel):
     pass
@@ -17,7 +18,7 @@ class EmptyGroupModel(GroupModel):
 
 class OperationGroupModel(GroupModel):
     class_name: Literal["OperationGroup"]
-    op: int
+    op: OperationGroupEnum
     other_groups_name: List[str]
 
 class ReferenceGroupModel(GroupModel):

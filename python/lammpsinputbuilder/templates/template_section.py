@@ -45,7 +45,6 @@ class TemplateSection(Section):
 
     def get_groups(self) -> List[Group]:
         return self.groups
-    
 
     def to_dict(self) -> dict:
         result = super().to_dict()

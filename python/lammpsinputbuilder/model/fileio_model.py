@@ -1,6 +1,8 @@
 from typing import List, Union, Annotated, Literal
 from pydantic import Field
+
 from lammpsinputbuilder.model.base_model import BaseObjectModel
+from lammpsinputbuilder.fileio import DumpStyle
 
 class FileIOModel(BaseObjectModel):
     pass
@@ -11,7 +13,7 @@ class DumpTrajectoryModel(FileIOModel):
     add_default_fields: bool
     interval: int
     group_name: str
-    style: int
+    style: DumpStyle
 
 class ReaxBondFileIOModel(FileIOModel):
     class_name: Literal["ReaxBondFileIO"]

@@ -1,6 +1,7 @@
 from typing import Union, Annotated, Literal
 from pydantic import Field
 from lammpsinputbuilder.model.base_model import BaseObjectModel
+from lammpsinputbuilder.integrator import MinimizeStyle
 
 class IntegratorModel(BaseObjectModel):
     pass
@@ -10,12 +11,12 @@ class RunZeroIntegratorModel(IntegratorModel):
 
 class NVEIntegratorModel(IntegratorModel):
     class_name: Literal["NVEIntegrator"]
-    group_name:str 
+    group_name:str
     nb_steps:int
 
 class MinimizeIntegratorModel(IntegratorModel):
     class_name: Literal["MinimizeIntegrator"]
-    style:int
+    style:MinimizeStyle
     etol:float
     ftol:float
     maxiter:int

@@ -1,6 +1,6 @@
 """Module for the integrator class."""
 
-from enum import Enum
+from enum import IntEnum
 
 from lammpsinputbuilder.group import Group, AllGroup
 from lammpsinputbuilder.types import GlobalInformation
@@ -93,7 +93,7 @@ class NVEIntegrator(Integrator):
         return f"run {self.nb_steps}\n"
 
 
-class MinimizeStyle(Enum):
+class MinimizeStyle(IntEnum):
     CG = 0
     SD = 1
     SPIN_LBFGS = 2

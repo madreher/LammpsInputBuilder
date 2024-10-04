@@ -57,9 +57,10 @@ def test_indices_group_model():
     assert obj_model2.indices == [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def test_operation_group_model():
-    otherGrp1 = IndicesGroup( group_name="myOtherGroup1", indices=[1, 2, 3])
-    otherGrp2 = IndicesGroup( group_name="myOtherGroup2", indices=[4, 5, 6])
-    grp = OperationGroup( group_name="myOperationGroup", op = OperationGroupEnum.UNION, other_groups=[otherGrp1, otherGrp2])
+    other_grp1 = IndicesGroup( group_name="myOtherGroup1", indices=[1, 2, 3])
+    other_grp2 = IndicesGroup( group_name="myOtherGroup2", indices=[4, 5, 6])
+    grp = OperationGroup( group_name="myOperationGroup", 
+                         op = OperationGroupEnum.UNION, other_groups=[other_grp1, other_grp2])
 
     obj_dict = grp.to_dict()
     obj_dict_str = json.dumps(obj_dict)
@@ -68,7 +69,7 @@ def test_operation_group_model():
     obj_model1 = OperationGroupModel.model_validate_json(obj_dict_str)
     assert obj_model1.class_name == "OperationGroup"
     assert obj_model1.id_name == "myOperationGroup"
-    assert obj_model1.op == OperationGroupEnum.UNION.value
+    assert obj_model1.op == OperationGroupEnum.UNION
     assert obj_model1.other_groups_name[0] == "myOtherGroup1"
     assert obj_model1.other_groups_name[1] == "myOtherGroup2"
 
@@ -76,7 +77,7 @@ def test_operation_group_model():
     obj_model2 = OperationGroupModel(**obj_dict)
     assert obj_model2.class_name == "OperationGroup"
     assert obj_model2.id_name == "myOperationGroup"
-    assert obj_model2.op == OperationGroupEnum.UNION.value
+    assert obj_model2.op == OperationGroupEnum.UNION
     assert obj_model2.other_groups_name[0] == "myOtherGroup1"
     assert obj_model2.other_groups_name[1] == "myOtherGroup2"
 

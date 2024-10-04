@@ -1,7 +1,7 @@
 """Module implementing the Group class and its subclasses."""
 
 from typing import List
-from enum import Enum
+from enum import IntEnum
 from lammpsinputbuilder.base import BaseObject
 
 
@@ -128,7 +128,7 @@ class EmptyGroup(Group):
         return ""
 
 
-class OperationGroupEnum(Enum):
+class OperationGroupEnum(IntEnum):
     SUBTRACT = 0
     UNION = 1
     INTERSECT = 2

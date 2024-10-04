@@ -53,7 +53,7 @@ def test_minimize_integrator_model():
     obj_model1 = MinimizeIntegratorModel.model_validate_json(obj_dict_str)
     assert obj_model1.class_name == "MinimizeIntegrator"
     assert obj_model1.id_name == "myIntegrator"
-    assert obj_model1.style == MinimizeStyle.CG.value
+    assert obj_model1.style == MinimizeStyle.CG
     assert obj_model1.etol == 0.02
     assert obj_model1.ftol == 0.03
     assert obj_model1.maxiter == 400
@@ -63,7 +63,7 @@ def test_minimize_integrator_model():
     obj_model2 = MinimizeIntegratorModel(**obj_dict)
     assert obj_model2.class_name == "MinimizeIntegrator"
     assert obj_model2.id_name == "myIntegrator"
-    assert obj_model2.style == MinimizeStyle.CG.value
+    assert obj_model2.style == MinimizeStyle.CG
     assert obj_model2.etol == 0.02
     assert obj_model2.ftol == 0.03
     assert obj_model2.maxiter == 400

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from importlib.resources import files
-from enum import Enum
+from enum import IntEnum
 
 import pint
 
@@ -38,7 +38,7 @@ ureg.define("lmp_metal_torque = eV")
 ureg.define("lmp_metal_temperature = kelvin")
 
 
-class LammpsUnitSystem(Enum):
+class LammpsUnitSystem(IntEnum):
     REAL = 0
     METAL = 1
 

@@ -3,6 +3,7 @@ from pydantic import Field
 from lammpsinputbuilder.model.base_model import BaseObjectModel
 from lammpsinputbuilder.model.quantity_model import TimeQuantityModel, TemperatureQuantityModel, \
     LengthQuantityModel
+from lammpsinputbuilder.instructions import VariableStyle
 
 
 class InstructionModel(BaseObjectModel):
@@ -25,7 +26,7 @@ class VelocityCreateInstructionModel(InstructionModel):
 class VariableInstructionModel(InstructionModel):
     class_name: Literal["VariableInstruction"]
     variable_name: str
-    style: int
+    style: VariableStyle
     args: str
 
 class DisplaceAtomsInstructionModel(InstructionModel):
