@@ -2,7 +2,7 @@
 
 import copy
 
-from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
+from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem, AireboTypedMolecularSystem
 
 
 class TypedMolecularSystemLoader():
@@ -12,6 +12,7 @@ class TypedMolecularSystemLoader():
     def dict_to_typed_molecular_system(self, d: dict, version: int = 0):
         molecule_table = {}
         molecule_table[ReaxTypedMolecularSystem.__name__] = ReaxTypedMolecularSystem()
+        molecule_table[AireboTypedMolecularSystem.__name__] = AireboTypedMolecularSystem()
 
         if "class_name" not in d:
             raise RuntimeError(f"Missing 'class_name' key in {d}.")
