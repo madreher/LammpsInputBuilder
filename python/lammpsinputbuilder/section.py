@@ -190,6 +190,7 @@ class IntegratorSection(Section):
         self.integrator = integrator
         self.fileios = []
         self.extensions = []
+        self.post_extensions = []
         self.groups = []
         self.instructions = []
 
@@ -210,6 +211,12 @@ class IntegratorSection(Section):
 
     def get_extensions(self) -> List[Extension]:
         return self.extensions
+    
+    def add_post_extension(self, extension: Extension) -> None:
+        self.post_extensions.append(extension)
+
+    def get_post_extensions(self) -> List[Extension]:
+        return self.post_extensions
 
     def add_group(self, group: Group) -> None:
         self.groups.append(group)
@@ -229,6 +236,7 @@ class IntegratorSection(Section):
         result["integrator"] = self.integrator.to_dict()
         result["fileios"] = [f.to_dict() for f in self.fileios]
         result["extensions"] = [e.to_dict() for e in self.extensions]
+        result["post_extensions"] = [e.to_dict() for e in self.post_extensions]
         result["groups"] = [g.to_dict() for g in self.groups]
         result["instructions"] = [i.to_dict() for i in self.instructions]
         return result
@@ -263,6 +271,15 @@ class IntegratorSection(Section):
 
             for ext in exts:
                 self.extensions.append(extension_loader.dict_to_extension(ext))
+
+        if "post_extensions" in d.keys() and len(d["post_extensions"]) > 0:
+            exts = d["post_extensions"]
+
+            import lammpsinputbuilder.loader.extension_loader as loader
+            extension_loader = loader.ExtensionLoader()
+
+            for ext in exts:
+                self.post_extensions.append(extension_loader.dict_to_extension(ext))
 
         if "groups" in d.keys() and len(d["groups"]) > 0:
             groups = d["groups"]
@@ -305,28 +322,40 @@ class IntegratorSection(Section):
             result += ext.add_do_commands(global_information=global_information)
         result += write_fixed_length_comment("END Extensions DECLARATION")
 
+        result += write_fixed_length_comment("START INTEGRATOR DECLARATION")
+        result += self.integrator.add_do_commands(
+            global_information=global_information)
+        result += write_fixed_length_comment("END INTEGRATOR DECLARATION")
+
+        result += write_fixed_length_comment("START Post Extensions DECLARATION")
+        for ext in self.post_extensions:
+            result += ext.add_do_commands(global_information=global_information)
+        result += write_fixed_length_comment("END Post Extensions DECLARATION")
+
         result += write_fixed_length_comment("START IOs DECLARATION")
         for io in self.fileios:
             result += io.add_do_commands(global_information=global_information)
         result += write_fixed_length_comment("END IOs DECLARATION")
 
-        result += write_fixed_length_comment("START INTEGRATOR DECLARATION")
-        result += self.integrator.add_do_commands(
-            global_information=global_information)
-        result += write_fixed_length_comment("END INTEGRATOR DECLARATION")
         return result
 
     def add_undo_commands(self) -> str:
         # Undo if the reverse order is needed
         result = ""
-        result += write_fixed_length_comment("START INTEGRATOR REMOVAL")
-        result += self.integrator.add_undo_commands()
-        result += write_fixed_length_comment("END INTEGRATOR REMOVAL")
 
         result += write_fixed_length_comment("START IO REMOVAL")
         for io in reversed(self.fileios):
             result += io.add_undo_commands()
         result += write_fixed_length_comment("END IOs DECLARATION")
+
+        result += write_fixed_length_comment("START Post Extensions REMOVAL")
+        for ext in reversed(self.post_extensions):
+            result += ext.add_undo_commands()
+        result += write_fixed_length_comment("END Post Extensions REMOVAL")
+
+        result += write_fixed_length_comment("START INTEGRATOR REMOVAL")
+        result += self.integrator.add_undo_commands()
+        result += write_fixed_length_comment("END INTEGRATOR REMOVAL")
 
         result += write_fixed_length_comment("START Extensions REMOVAL")
         for ext in reversed(self.extensions):

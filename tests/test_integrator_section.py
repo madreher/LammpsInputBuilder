@@ -41,6 +41,15 @@ def test_integrator_section_accessors():
     section.add_extension(ext)
     assert len(section.get_extensions()) == 1
 
+    post_ext = MoveExtension(
+        extension_name="myPostExtension",
+        group=AllGroup(),
+        vx=VelocityQuantity(0.0, "angstrom/ps"),
+        vy=VelocityQuantity(0.0, "angstrom/ps"),
+        vz=VelocityQuantity(0.0, "angstrom/ps"))
+    section.add_post_extension(post_ext)
+    assert len(section.get_post_extensions()) == 1
+
 def test_integrator_section_dict():
     integrator = NVEIntegrator(integrator_name="myIntegrator", group=AllGroup(), nb_steps=1000)
 
@@ -68,6 +77,14 @@ def test_integrator_section_dict():
         vy=VelocityQuantity(0.0, "angstrom/ps"),
         vz=VelocityQuantity(0.0, "angstrom/ps"))
     section.add_extension(ext)
+
+    post_ext = MoveExtension(
+        extension_name="myPostExtension",
+        group=AllGroup(),
+        vx=VelocityQuantity(0.0, "angstrom/ps"),
+        vy=VelocityQuantity(0.0, "angstrom/ps"),
+        vz=VelocityQuantity(0.0, "angstrom/ps"))
+    section.add_post_extension(post_ext)
 
     assert section.to_dict() == {
         "class_name": "IntegratorSection",
@@ -104,6 +121,26 @@ def test_integrator_section_dict():
         "extensions": [{
             "class_name": "MoveExtension",
             "id_name": "myExtension",
+            "group_name": "all",
+            "vx": {
+                "class_name": "VelocityQuantity",
+                "magnitude": 0,
+                "units": "angstrom/ps"
+            },
+            "vy": {
+                "class_name": "VelocityQuantity",
+                "magnitude": 0,
+                "units": "angstrom/ps"
+            },
+            "vz": {
+                "class_name": "VelocityQuantity",
+                "magnitude": 0,
+                "units": "angstrom/ps"
+            }
+        }],
+        "post_extensions": [{
+            "class_name": "MoveExtension",
+            "id_name": "myPostExtension",
             "group_name": "all",
             "vx": {
                 "class_name": "VelocityQuantity",
@@ -169,23 +206,27 @@ group myIndicesGroup id 1 2 3
 #### START Extensions DECLARATION ##############################################
 fix myExtension all move linear 0.0 0.0 0.0
 #### END Extensions DECLARATION ################################################
+#### START INTEGRATOR DECLARATION ##############################################
+fix myIntegrator all nve
+#### END INTEGRATOR DECLARATION ################################################
+#### START Post Extensions DECLARATION #########################################
+#### END Post Extensions DECLARATION ###########################################
 #### START IOs DECLARATION #####################################################
 dump testFile all custom 10 dump.testFile.lammpstrj id type x y z a b c element
 dump_modify testFile sort id
 dump_modify testFile element C
 #### END IOs DECLARATION #######################################################
-#### START INTEGRATOR DECLARATION ##############################################
-fix myIntegrator all nve
-#### END INTEGRATOR DECLARATION ################################################
 #### START RUN INTEGRATOR FOR SECTION mySection ################################
 run 1000
 #### END RUN INTEGRATOR FOR SECTION mySection ##################################
-#### START INTEGRATOR REMOVAL ##################################################
-unfix myIntegrator
-#### END INTEGRATOR REMOVAL ####################################################
 #### START IO REMOVAL ##########################################################
 undump testFile
 #### END IOs DECLARATION #######################################################
+#### START Post Extensions REMOVAL #############################################
+#### END Post Extensions REMOVAL ###############################################
+#### START INTEGRATOR REMOVAL ##################################################
+unfix myIntegrator
+#### END INTEGRATOR REMOVAL ####################################################
 #### START Extensions REMOVAL ##################################################
 unfix myExtension
 #### END Extensions DECLARATION ################################################

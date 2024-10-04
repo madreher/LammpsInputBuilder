@@ -39,6 +39,14 @@ def test_integrator_section_model():
         vz=VelocityQuantity(0.0, "angstrom/ps"))
     section.add_extension(ext)
 
+    post_ext = MoveExtension(
+        extension_name="myPostExtension",
+        group=AllGroup(),
+        vx=VelocityQuantity(0.0, "angstrom/ps"),
+        vy=VelocityQuantity(0.0, "angstrom/ps"),
+        vz=VelocityQuantity(0.0, "angstrom/ps"))
+    section.add_post_extension(post_ext)
+
     obj_dict = section.to_dict()
     obj_dict_str = json.dumps(obj_dict)
 
@@ -67,6 +75,14 @@ def test_integrator_section_model():
     assert obj_model1.extensions[0].vy.units == "angstrom/ps"
     assert obj_model1.extensions[0].vz.magnitude == 0.0
     assert obj_model1.extensions[0].vz.units == "angstrom/ps"
+    assert obj_model1.post_extensions[0].id_name == "myPostExtension"
+    assert obj_model1.post_extensions[0].group_name == "all"
+    assert obj_model1.post_extensions[0].vx.magnitude == 0.0
+    assert obj_model1.post_extensions[0].vx.units == "angstrom/ps"
+    assert obj_model1.post_extensions[0].vy.magnitude == 0.0
+    assert obj_model1.post_extensions[0].vy.units == "angstrom/ps"
+    assert obj_model1.post_extensions[0].vz.magnitude == 0.0
+    assert obj_model1.post_extensions[0].vz.units == "angstrom/ps"
 
     # Populate the model from the dictionnary
     obj_model2 = IntegratorSectionModel(**obj_dict)
@@ -92,3 +108,11 @@ def test_integrator_section_model():
     assert obj_model2.extensions[0].vy.units == "angstrom/ps"
     assert obj_model2.extensions[0].vz.magnitude == 0.0
     assert obj_model2.extensions[0].vz.units == "angstrom/ps"
+    assert obj_model2.post_extensions[0].id_name == "myPostExtension"
+    assert obj_model2.post_extensions[0].group_name == "all"
+    assert obj_model2.post_extensions[0].vx.magnitude == 0.0
+    assert obj_model2.post_extensions[0].vx.units == "angstrom/ps"
+    assert obj_model2.post_extensions[0].vy.magnitude == 0.0
+    assert obj_model2.post_extensions[0].vy.units == "angstrom/ps"
+    assert obj_model2.post_extensions[0].vz.magnitude == 0.0
+    assert obj_model2.post_extensions[0].vz.units == "angstrom/ps"

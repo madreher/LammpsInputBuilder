@@ -7,6 +7,7 @@ from lammpsinputbuilder.model.fileio_model import FileIOUnion
 from lammpsinputbuilder.model.group_model import GroupUnion
 from lammpsinputbuilder.model.extension_model import ExtensionUnion
 from lammpsinputbuilder.model.instruction_model import InstructionUnion
+from lammpsinputbuilder.integrator import MinimizeStyle
 
 class TemplateSectionModel(SectionModel):
     class_name: Literal["TemplateSection"]
@@ -17,7 +18,7 @@ class TemplateSectionModel(SectionModel):
 
 class MinimizeTemplateModel(TemplateSectionModel):
     class_name: Literal["MinimizeTemplate"]
-    style: int
+    style: MinimizeStyle
     etol: float
     ftol: float
     maxiter: int

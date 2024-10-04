@@ -92,6 +92,7 @@ def test_minimize_template_commands():
 
     result = template.add_all_commands(global_information=global_info)
 
+    #pylint: disable=line-too-long
     assert result == """#### START Section test ########################################################
 #### START Groups DECLARATION ##################################################
 #### END Groups DECLARATION ####################################################
@@ -105,18 +106,22 @@ def test_minimize_template_commands():
 #### START Extensions DECLARATION ##############################################
 fix zeroForceAnchor empty setforce 0.0 0.0 0.0
 #### END Extensions DECLARATION ################################################
-#### START IOs DECLARATION #####################################################
-#### END IOs DECLARATION #######################################################
 #### START INTEGRATOR DECLARATION ##############################################
 #### END INTEGRATOR DECLARATION ################################################
+#### START Post Extensions DECLARATION #########################################
+#### END Post Extensions DECLARATION ###########################################
+#### START IOs DECLARATION #####################################################
+#### END IOs DECLARATION #######################################################
 #### START RUN INTEGRATOR FOR SECTION minimizationTemplate #####################
 min_style cg
 minimize 0.02 0.03 400 50000
 #### END RUN INTEGRATOR FOR SECTION minimizationTemplate #######################
-#### START INTEGRATOR REMOVAL ##################################################
-#### END INTEGRATOR REMOVAL ####################################################
 #### START IO REMOVAL ##########################################################
 #### END IOs DECLARATION #######################################################
+#### START Post Extensions REMOVAL #############################################
+#### END Post Extensions REMOVAL ###############################################
+#### START INTEGRATOR REMOVAL ##################################################
+#### END INTEGRATOR REMOVAL ####################################################
 #### START Extensions REMOVAL ##################################################
 unfix zeroForceAnchor
 #### END Extensions DECLARATION ################################################

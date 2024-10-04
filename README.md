@@ -240,14 +240,18 @@ The `IntegratorSection` unrolls in the following order:
 * Do list of Instructions
 * Do list of Extensions
 * Do Integrator
+* Do list of post Extensions
 * Do list of FileIO
 * Run Integrator
 * Undo reverse list of FileIO
+* Undo reverse list of post Extensions
 * Undo Integrator
 * Undo reverse list of Extensions
 * Undo reverse list of Groups
 
 This order ensures that the commands are declared in the right order, and removed in the right order as well. The LIFO approach to *undo* guarantees that commands which may depend on each other are stopped cleanly. For example, if we declare the command A, followed by B and that B depends on A to function, we will have to remove B first before removing A.
+
+The `IntegratorSection` does include two spots to declare `Extensions`: before and after the `Integrator` with the methods `add_extension(Extension)` and `add_post_extension(Extension)` respectively. In the large majority of cases, the `Extension` objects should be declared as regular `Extension` with the `section.add_extension(ext)` method. However, some Lammps commands have to be declared after the declaration of the time integration method (ex: [bond/break](https://docs.lammps.org/fix_bond_break.html)). For these cases, users should use the method `section.add_post_extension(post_ext)`.
 
 Other `Section` objects follow a very similar pattern with the difference mainly being that the center piece of the `Section` may be a different object than an `Integrator`. For instance, the `RecursiveSection` has a list of `Section` objects to execute in the middle. Several examples are provided below to see how different `Section` types can be used in practice. 
 

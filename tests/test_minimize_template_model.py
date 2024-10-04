@@ -24,7 +24,7 @@ def test_minimize_template_model():
     obj_model1 = MinimizeTemplateModel.model_validate_json(obj_dict_str)
     assert obj_model1.class_name == "MinimizeTemplate"
     assert obj_model1.id_name == "test"
-    assert obj_model1.style == 0
+    assert obj_model1.style == MinimizeStyle.CG
     assert obj_model1.etol == 0.02
     assert obj_model1.ftol == 0.03
     assert obj_model1.maxiter == 400
@@ -37,7 +37,7 @@ def test_minimize_template_model():
     obj_model2 = MinimizeTemplateModel(**obj_dict)
     assert obj_model2.class_name == "MinimizeTemplate"
     assert obj_model2.id_name == "test"
-    assert obj_model2.style == 0
+    assert obj_model2.style == MinimizeStyle.CG
     assert obj_model2.etol == 0.02
     assert obj_model2.ftol == 0.03
     assert obj_model2.maxiter == 400
