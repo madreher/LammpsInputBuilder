@@ -315,3 +315,228 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             'v_ep',
             'v_efi',
             'v_eqeq']
+
+
+class AireboTypedMolecularSystem(TypedMolecularSystem):
+    """
+    Handler for a molecular system with a Reax forcefield assigned to it. 
+    This class is responsible for generating a LAMMPS data file for the 
+    system as well as the correspinding start of the input file.
+    """
+
+    def __init__(
+            self,
+            bbox_style: BoundingBoxStyle = BoundingBoxStyle.PERIODIC,
+            electrostatic_method: ElectrostaticMethod = ElectrostaticMethod.QEQ):
+        super().__init__(None, bbox_style)
+        self.electrostatic_method = electrostatic_method
+
+        self.model_loaded = False
+        self.molecule_content = ""
+        self.forcefield_content = ""
+        self.forcefield_name = None
+        self.molecule_name = None
+        self.molecule_format = None
+        self.atoms = None
+
+    def get_unit_system(self) -> LammpsUnitSystem:
+        return LammpsUnitSystem.METAL
+
+    def load_from_file(
+            self,
+            molecule_path: Path,
+            forcefield_path: Path,
+            format_hint: MoleculeFileFormat = None):
+        # Check for file exist
+        if not forcefield_path.is_file():
+            raise FileNotFoundError(f"File {forcefield_path} not found.")
+        if not molecule_path.is_file():
+            raise FileNotFoundError(f"File {molecule_path} not found.")
+
+        # Check for supported molecule format
+        self.molecule_format = get_molecule_file_format_from_extension(
+            molecule_path.suffix)
+
+        # Check for supported forcefield format
+        forcefield_format = get_forcefield_from_extension(forcefield_path.suffix)
+        if forcefield_format not in [Forcefield.AIREBO, Forcefield.AIREBOM, Forcefield.REBO]:
+            raise ValueError(
+                f"Forcefield file {forcefield_path} is not a rebo forcefield, \
+                expecting .airebo, .airebo-m, or .rebo extension, got {forcefield_path.suffix}")
+        self.ff_type = forcefield_format
+
+        # Set paths
+        self.molecule_name = Path(molecule_path.name)
+        self.forcefield_name = Path(forcefield_path.name)
+
+        # Read molecule
+        with open(molecule_path, "r", encoding="utf-8") as f:
+            self.molecule_content = f.read()
+            if format_hint is not None:
+                self.molecule_format = format_hint
+            elif self.molecule_name.suffix.lower() == ".xyz":
+                self.molecule_format = MoleculeFileFormat.XYZ
+            elif self.molecule_name.suffix.lower() == ".mol2":
+                self.molecule_format = MoleculeFileFormat.MOL2
+            elif self.molecule_name.suffix.lower() == ".lammpstrj":
+                self.molecule_format = MoleculeFileFormat.LAMMPS_DUMP_TEXT
+            else:  # Should never happen with after the format check above
+                raise NotImplementedError(
+                    f"Molecule format {self.molecule_name.suffix} not supported.")
+
+        # Read forcefield
+        with open(forcefield_path, "r", encoding="utf-8") as f:
+            self.forcefield_content = f.read()
+
+        # Load the ASE Atom object
+        if self.molecule_format == MoleculeFileFormat.LAMMPS_DUMP_TEXT:
+            with open(molecule_path, "r", encoding="utf-8") as f:
+                self.atoms = ase_read_lammps_dump_text(f)
+        else:
+            self.atoms = ase_read(molecule_path)
+
+        self.model_loaded = True
+
+    def load_from_string(
+            self,
+            molecule_content: str,
+            molecule_format: MoleculeFileFormat,
+            forcefield_content: str,
+            forcefield_file_name: Path,
+            molecule_file_name: Path):
+
+        if forcefield_file_name.suffix.lower() not in [".airebo", ".airebo-m", ".rebo"]:
+            raise ValueError(
+                f"Forcefield file {forcefield_file_name} is not a rebo forcefield, \
+                expecting .airebo, .airebo-m, or .rebo extension, got {forcefield_file_name.suffix.lower()}.")
+        self.ff_type = get_forcefield_from_extension(forcefield_file_name.suffix)
+
+        self.molecule_content = molecule_content
+        self.molecule_format = molecule_format
+        if molecule_file_name != "":
+            self.molecule_name = Path(molecule_file_name)
+        else:
+            self.molecule_name = Path(
+                "model." + get_extension_from_molecule_file_format(molecule_format))
+
+        self.forcefield_content = forcefield_content
+        self.forcefield_name = Path(forcefield_file_name)
+
+        # Create a temporary file to be read by ase
+        job_folder = Path(tempfile.mkdtemp())
+        model_path = job_folder / \
+            Path("model." + get_extension_from_molecule_file_format(molecule_format))
+
+        with open(model_path, "w", encoding="utf-8") as f:
+            f.write(molecule_content)
+
+        self.atoms = ase_read(model_path)
+
+        # Remove temporary folder
+        shutil.rmtree(job_folder)
+
+        self.model_loaded = True
+
+    def is_model_loaded(self) -> bool:
+        return self.model_loaded
+
+    def get_ase_model(self) -> Atoms:
+        return self.atoms
+
+    def get_molecule_content(self) -> str:
+        return self.molecule_content
+
+    def get_molecule_format(self) -> MoleculeFileFormat:
+        return self.molecule_format
+
+    def get_molecule_name(self) -> Path:
+        return self.molecule_name
+
+    def get_forcefield_content(self) -> str:
+        return self.forcefield_content
+
+    def get_forcefield_name(self) -> Path:
+        return self.forcefield_name
+
+    def get_electrostatic_method(self) -> ElectrostaticMethod:
+        return self.electrostatic_method
+
+    def set_electrostatic_method(self, electrostatic_method: ElectrostaticMethod):
+        self.electrostatic_method = electrostatic_method
+
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result["class_name"] = self.__class__.__name__
+        result["electrostatic_method"] = self.electrostatic_method.value
+        result["is_model_loaded"] = self.model_loaded
+        if self.model_loaded:
+            result["forcefield_name"] = str(self.forcefield_name)
+            result["molecule_name"] = str(self.molecule_name)
+            result["molecule_format"] = self.molecule_format.value
+            result["forcefield_content"] = self.forcefield_content
+            result["molecule_content"] = self.molecule_content
+        return result
+
+    def from_dict(self, d: dict, version: int):
+        # Make sure that we are reading the right class
+        molecule_type = d["class_name"]
+        if molecule_type != self.__class__.__name__:
+            raise ValueError(
+                f"Expected class {self.__class__.__name__}, got {molecule_type}.")
+        super().from_dict(d, version=version)
+        self.electrostatic_method = ElectrostaticMethod(
+            d["electrostatic_method"])
+        self.model_loaded = d.get("is_model_loaded", False)
+        if not self.model_loaded:
+            return
+        self.forcefield_name = Path(d["forcefield_name"])
+        self.molecule_name = Path(d["molecule_name"])
+        self.molecule_format = MoleculeFileFormat(d["molecule_format"])
+        self.forcefield_content = d["forcefield_content"]
+        self.molecule_content = d["molecule_content"]
+        self.load_from_string(
+            self.molecule_content,
+            self.molecule_format,
+            self.forcefield_content,
+            self.forcefield_name,
+            str(self.molecule_name)
+        )
+
+    def generate_lammps_data_file(self, job_folder: Path) -> GlobalInformation:
+        # TODO: Adjust code to handle the different bbox styles
+        global_info = molecule_to_lammps_data_pbc(
+            self.molecule_content,
+            self.molecule_format,
+            job_folder,
+            self.get_lammps_data_filename())
+
+        # Copy the forcefield to the job folder
+        forcefield_path = job_folder / self.forcefield_name
+        with open(forcefield_path, 'w', encoding="utf-8") as f:
+            f.write(self.forcefield_content)
+
+        return global_info
+
+    def generate_lammps_input_file(
+            self,
+            job_folder: Path,
+            global_information: GlobalInformation) -> Path:
+        return molecule_to_lammps_input(
+            "lammps.input",
+            job_folder /
+            self.get_lammps_data_filename(),
+            job_folder,
+            self.ff_type,
+            self.forcefield_name,
+            global_information,
+            electrostatic_method=self.electrostatic_method)
+
+    def get_lammps_data_filename(self) -> str:
+        return "model.data"
+
+    def get_default_thermo_variables(self) -> List[str]:
+        return [
+            'step',
+            'v_REBO',
+            'v_LJ',
+            'v_TORSION']

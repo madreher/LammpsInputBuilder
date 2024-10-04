@@ -3,9 +3,10 @@
 
 from pathlib import Path
 import logging
+import argparse
 
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
+from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem, AireboTypedMolecularSystem
 from lammpsinputbuilder.workflow_builder import WorkflowBuilder
 from lammpsinputbuilder.section import IntegratorSection
 from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeIntegrator, MinimizeStyle
@@ -14,25 +15,51 @@ from lammpsinputbuilder.extensions import LangevinExtension
 from lammpsinputbuilder.group import AllGroup
 from lammpsinputbuilder.quantities import TemperatureQuantity, TimeQuantity
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
 #logger.addHandler(logging.StreamHandler())
 
 
-def main(): 
-    modelData = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
-    forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
+def main():
 
-    typedMolecule = ReaxTypedMolecularSystem(
-        bbox_style=BoundingBoxStyle.PERIODIC,
-        electrostatic_method=ElectrostaticMethod.QEQ
-    )
-    typedMolecule.load_from_file(modelData, forcefield)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--reax', action='store_true', help="Use the default reax potential file.")
+    parser.add_argument('--airebo', action='store_true', help="Use the default airebo potential file.")
+    args = parser.parse_args()
+
+    if args.reax and args.airebo:
+        raise ValueError("Only one of --reax or --airebo can be specified.")
+    
+    use_reax = args.reax
+
+    if args.reax:
+        forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
+    elif args.airebo:
+        forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'CH.airebo'
+        use_reax = False
+    else:
+        forcefield = Path(__file__).parent.parent / 'data' / 'potentials' / 'ffield.reax.Fe_O_C_H.reax'
+    logger.info(f"Using forcefield: {forcefield}")
+    
+    model_data = Path(__file__).parent.parent / 'data' / 'models' / 'benzene.xyz'
+
+
+    if use_reax:
+        typed_molecule = ReaxTypedMolecularSystem(
+            bbox_style=BoundingBoxStyle.PERIODIC,
+            electrostatic_method=ElectrostaticMethod.QEQ
+        )
+    else:
+        typed_molecule = AireboTypedMolecularSystem(
+            bbox_style=BoundingBoxStyle.PERIODIC,
+            electrostatic_method=ElectrostaticMethod.QEQ
+        )
+    typed_molecule.load_from_file(model_data, forcefield)
 
     # Create the workflow. In this case, it's only the molecule
     workflow = WorkflowBuilder ()
-    workflow.set_typed_molecular_system(typedMolecule)
+    workflow.set_typed_molecular_system(typed_molecule)
 
     # Create a minimization Section 
     sectionMin = IntegratorSection(
@@ -78,11 +105,12 @@ def main():
         damp=TimeQuantity(1, "ps"),
         seed=12345
     )
-    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", add_default_fields=True, interval=10, group=AllGroup())
+    pos = DumpTrajectoryFileIO(fileio_name="fulltrajectory", add_default_fields=True, interval=100, group=AllGroup())
     sectionNVE.add_fileio(pos)
-    bonds = ReaxBondFileIO(fileio_name="bonds", interval=10, group=AllGroup())
-    sectionNVE.add_fileio(bonds)
-    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=10, user_fields=typedMolecule.get_default_thermo_variables())
+    if use_reax:
+        bonds = ReaxBondFileIO(fileio_name="bonds", interval=100, group=AllGroup())
+        sectionNVE.add_fileio(bonds)
+    thermo = ThermoFileIO(fileio_name="thermo", add_default_fields=True, interval=100, user_fields=typed_molecule.get_default_thermo_variables())
     sectionNVE.add_fileio(thermo)
 
     workflow.add_section(sectionNVE)

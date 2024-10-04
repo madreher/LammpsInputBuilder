@@ -252,22 +252,33 @@ def molecule_to_lammps_input(
         script_content += f"neighbor       {min([2.5, min_cell_dim/2])} bin\n"
         script_content += 'neigh_modify   every 1 delay 0 check yes\n'
 
-        script_content += 'compute reax   all pair reaxff\n'
-        script_content += 'variable eb    equal c_reax[1]\n'
-        script_content += 'variable ea    equal c_reax[2]\n'
-        script_content += 'variable elp   equal c_reax[3]\n'
-        script_content += 'variable emol  equal c_reax[4]\n'
-        script_content += 'variable ev    equal c_reax[5]\n'
-        script_content += 'variable epen  equal c_reax[6]\n'
-        script_content += 'variable ecoa  equal c_reax[7]\n'
-        script_content += 'variable ehb   equal c_reax[8]\n'
-        script_content += 'variable et    equal c_reax[9]\n'
-        script_content += 'variable eco   equal c_reax[10]\n'
-        script_content += 'variable ew    equal c_reax[11]\n'
-        script_content += 'variable ep    equal c_reax[12]\n'
-        script_content += 'variable efi   equal c_reax[13]\n'
-        script_content += 'variable eqeq  equal c_reax[14]\n'
-        script_content += '\n'
+        if ff_type == Forcefield.REAX:
+            script_content += 'compute reax   all pair reaxff\n'
+            script_content += 'variable eb    equal c_reax[1]\n'
+            script_content += 'variable ea    equal c_reax[2]\n'
+            script_content += 'variable elp   equal c_reax[3]\n'
+            script_content += 'variable emol  equal c_reax[4]\n'
+            script_content += 'variable ev    equal c_reax[5]\n'
+            script_content += 'variable epen  equal c_reax[6]\n'
+            script_content += 'variable ecoa  equal c_reax[7]\n'
+            script_content += 'variable ehb   equal c_reax[8]\n'
+            script_content += 'variable et    equal c_reax[9]\n'
+            script_content += 'variable eco   equal c_reax[10]\n'
+            script_content += 'variable ew    equal c_reax[11]\n'
+            script_content += 'variable ep    equal c_reax[12]\n'
+            script_content += 'variable efi   equal c_reax[13]\n'
+            script_content += 'variable eqeq  equal c_reax[14]\n'
+            script_content += '\n'
+        elif ff_type in [Forcefield.AIREBO, Forcefield.REBO, Forcefield.AIREBOM]:
+            if ff_type == Forcefield.AIREBOM:
+                script_content += 'compute reboPair all pair airebo/morse\n'
+            elif ff_type == Forcefield.AIREBO:
+                script_content += 'compute reboPair all pair airebo\n'
+            else:
+                script_content += 'compute reboPair all pair rebo\n'
+            script_content += 'variable REBO     equal c_reboPair[1]\n'
+            script_content += 'variable LJ       equal c_reboPair[2]\n'
+            script_content += 'variable TORSION  equal c_reboPair[3]\n'
 
         f.write(script_content)
 
