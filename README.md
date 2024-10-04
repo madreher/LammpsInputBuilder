@@ -17,7 +17,7 @@ With this organization, the main objectives of LammpsInputBuilder are:
 - Create a reusable library of common Sections types to easily chain common operations without having to copy Lammps code
 - Make is possible for external tools to generate Lammps inputs via a JSON representation of a workflow (under construction)
 
-Here is a simple example on how to load a molecular model, assign a reax potential to it, and minimize the model: 
+Here is a simple example (`examples/tldr.py`) on how to load a molecular model, assign a reax potential to it, and minimize the model: 
 ```
     from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
     from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
