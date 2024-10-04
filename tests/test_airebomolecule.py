@@ -9,6 +9,7 @@ import pytest
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod, \
     Forcefield, MoleculeFileFormat
 from lammpsinputbuilder.typedmolecule import AireboTypedMolecularSystem
+from lammpsinputbuilder.types import LammpsUnitSystem
 
 
 def test_empty_airebo_molecule():
@@ -21,7 +22,10 @@ def test_empty_airebo_molecule():
     assert typed_molecule.get_forcefield_type() is None
     assert typed_molecule.get_boundingbox_style() == BoundingBoxStyle.PERIODIC
     assert typed_molecule.get_electrostatic_method() == ElectrostaticMethod.QEQ
-    
+    assert typed_molecule.get_unit_system() == LammpsUnitSystem.METAL
+    assert typed_molecule.get_default_thermo_variables() == ['step', 'v_REBO', 'v_LJ', 'v_TORSION']
+    assert typed_molecule.get_lammps_data_filename() == "model.data"
+
     assert not typed_molecule.is_model_loaded()
 
     assert typed_molecule.get_molecule_content() == ""
