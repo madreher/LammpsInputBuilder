@@ -100,8 +100,8 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         self.model_loaded = False
         self.molecule_content = ""
         self.forcefield_content = ""
-        self.forcefield_path = None
-        self.molecule_path = None
+        self.forcefield_name = None
+        self.molecule_name = None
         self.molecule_format = None
         self.atoms = None
 
@@ -131,33 +131,34 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
                 expecting .reax extension.")
 
         # Set paths
-        self.molecule_path = molecule_path
-        self.forcefield_path = forcefield_path
+        self.molecule_name = Path(molecule_path.name)
+        self.forcefield_name = Path(forcefield_path.name)
 
         # Read molecule
-        with open(self.molecule_path, "r", encoding="utf-8") as f:
+        with open(molecule_path, "r", encoding="utf-8") as f:
             self.molecule_content = f.read()
             if format_hint is not None:
                 self.molecule_format = format_hint
-            elif self.molecule_path.suffix.lower() == ".xyz":
+            elif self.molecule_name.suffix.lower() == ".xyz":
                 self.molecule_format = MoleculeFileFormat.XYZ
-            elif self.molecule_path.suffix.lower() == ".mol2":
+            elif self.molecule_name.suffix.lower() == ".mol2":
                 self.molecule_format = MoleculeFileFormat.MOL2
-            elif self.molecule_path.suffix.lower() == ".lammpstrj":
+            elif self.molecule_name.suffix.lower() == ".lammpstrj":
                 self.molecule_format = MoleculeFileFormat.LAMMPS_DUMP_TEXT
             else:  # Should never happen with after the format check above
                 raise NotImplementedError(
-                    f"Molecule format {self.molecule_path.suffix} not supported.")
+                    f"Molecule format {self.molecule_name.suffix} not supported.")
 
         # Read forcefield
-        with open(self.forcefield_path, "r", encoding="utf-8") as f:
+        with open(forcefield_path, "r", encoding="utf-8") as f:
             self.forcefield_content = f.read()
 
+        # Load the ASE Atom object
         if self.molecule_format == MoleculeFileFormat.LAMMPS_DUMP_TEXT:
-            with open(self.molecule_path, "r", encoding="utf-8") as f:
+            with open(molecule_path, "r", encoding="utf-8") as f:
                 self.atoms = ase_read_lammps_dump_text(f)
         else:
-            self.atoms = ase_read(self.molecule_path)
+            self.atoms = ase_read(molecule_path)
 
         self.model_loaded = True
 
@@ -167,7 +168,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             molecule_format: MoleculeFileFormat,
             forcefield_content: str,
             forcefield_file_name: Path,
-            molecule_file_name: str = Path):
+            molecule_file_name: Path):
 
         if forcefield_file_name.suffix.lower() != ".reax":
             raise ValueError(
@@ -177,13 +178,13 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         self.molecule_content = molecule_content
         self.molecule_format = molecule_format
         if molecule_file_name != "":
-            self.molecule_path = Path(molecule_file_name)
+            self.molecule_name = Path(molecule_file_name)
         else:
-            self.molecule_path = Path(
+            self.molecule_name = Path(
                 "model." + get_extension_from_molecule_file_format(molecule_format))
 
         self.forcefield_content = forcefield_content
-        self.forcefield_path = Path(forcefield_file_name)
+        self.forcefield_name = Path(forcefield_file_name)
 
         # Create a temporary file to be read by ase
         job_folder = Path(tempfile.mkdtemp())
@@ -212,14 +213,14 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
     def get_molecule_format(self) -> MoleculeFileFormat:
         return self.molecule_format
 
-    def get_molecule_path(self) -> Path:
-        return self.molecule_path
+    def get_molecule_name(self) -> Path:
+        return self.molecule_name
 
     def get_forcefield_content(self) -> str:
         return self.forcefield_content
 
-    def get_forcefield_path(self) -> Path:
-        return self.forcefield_path
+    def get_forcefield_name(self) -> Path:
+        return self.forcefield_name
 
     def get_electrostatic_method(self) -> ElectrostaticMethod:
         return self.electrostatic_method
@@ -233,8 +234,8 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         result["electrostatic_method"] = self.electrostatic_method.value
         result["is_model_loaded"] = self.model_loaded
         if self.model_loaded:
-            result["forcefield_path"] = Path(str(self.forcefield_path))
-            result["molecule_path"] = Path(str(self.molecule_path))
+            result["forcefield_name"] = str(self.forcefield_name)
+            result["molecule_name"] = str(self.molecule_name)
             result["molecule_format"] = self.molecule_format.value
             result["forcefield_content"] = self.forcefield_content
             result["molecule_content"] = self.molecule_content
@@ -252,8 +253,8 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
         self.model_loaded = d.get("is_model_loaded", False)
         if not self.model_loaded:
             return
-        self.forcefield_path = Path(d["forcefield_path"])
-        self.molecule_path = Path(d["molecule_path"])
+        self.forcefield_name = Path(d["forcefield_name"])
+        self.molecule_name = Path(d["molecule_name"])
         self.molecule_format = MoleculeFileFormat(d["molecule_format"])
         self.forcefield_content = d["forcefield_content"]
         self.molecule_content = d["molecule_content"]
@@ -261,8 +262,8 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             self.molecule_content,
             self.molecule_format,
             self.forcefield_content,
-            self.forcefield_path,
-            str(self.molecule_path)
+            self.forcefield_name,
+            str(self.molecule_name)
         )
 
     def generate_lammps_data_file(self, job_folder: Path) -> GlobalInformation:
@@ -274,7 +275,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             self.get_lammps_data_filename())
 
         # Copy the forcefield to the job folder
-        forcefield_path = job_folder / self.forcefield_path.name
+        forcefield_path = job_folder / self.forcefield_name
         with open(forcefield_path, 'w', encoding="utf-8") as f:
             f.write(self.forcefield_content)
 
@@ -290,7 +291,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             self.get_lammps_data_filename(),
             job_folder,
             Forcefield.REAX,
-            self.forcefield_path.name,
+            self.forcefield_name,
             global_information,
             electrostatic_method=self.electrostatic_method)
 

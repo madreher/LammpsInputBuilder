@@ -4,7 +4,7 @@ import logging
 from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
 from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
 from lammpsinputbuilder.workflow_builder import WorkflowBuilder
-from lammpsinputbuilder.section import IntegratorSection, RecusiveSection, InstructionsSection
+from lammpsinputbuilder.section import IntegratorSection, RecursiveSection, InstructionsSection
 from lammpsinputbuilder.integrator import NVEIntegrator, MinimizeStyle, RunZeroIntegrator
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, ReaxBondFileIO, ThermoFileIO, DumpStyle
 from lammpsinputbuilder.group import IndicesGroup, OperationGroup, OperationGroupEnum, AllGroup, ReferenceGroup
@@ -61,7 +61,7 @@ def main():
         other_groups=[AllGroup(), groupAnchors])
 
     # Declare the global groups and IOs which are going to run for every operation
-    globalSection = RecusiveSection(section_name="GlobalSection")
+    globalSection = RecursiveSection(section_name="GlobalSection")
     globalSection.add_group(groupTooltip)
     globalSection.add_group(groupAnchorSlab)
     globalSection.add_group(groupAnchorTooltip)

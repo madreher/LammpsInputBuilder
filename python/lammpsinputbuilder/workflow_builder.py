@@ -79,8 +79,8 @@ class WorkflowBuilder:
         result = {}
         result["header"] = {
             "format": self.__class__.__name__,
-            "major_version": PackageVersion.get_major_lib_json_version(),
-            "minor_version": PackageVersion.get_minor_lib_json_version(),
+            "major_version": PackageVersion().get_major_lib_json_version(),
+            "minor_version": PackageVersion().get_minor_lib_json_version(),
             "generator": "lammpsinputbuilder"
         }
         if self.molecule is not None:
@@ -93,6 +93,7 @@ class WorkflowBuilder:
 
     def from_dict(self, d: dict, version: int):
         del version  # unused
+        
         if "header" not in d:
             raise ValueError("No header in JSON file, "
                              "unable to determine the format of the json file.")
@@ -112,10 +113,10 @@ class WorkflowBuilder:
             raise ValueError("No minor_version in JSON file, "
                              "unable to determine the format of the json file.")
 
-        if d["header"]["major_version"] != PackageVersion.get_major_lib_json_version():
+        if d["header"]["major_version"] != PackageVersion().get_major_lib_json_version():
             raise ValueError(f"Unsupported major version {d['header']['major_version']}")
 
-        if d["header"]["minor_version"] != PackageVersion.get_minor_lib_json_version():
+        if d["header"]["minor_version"] != PackageVersion().get_minor_lib_json_version():
             raise ValueError(f"Unsupported minor version {d['header']['minor_version']}")
 
         if "molecular_system" in d:

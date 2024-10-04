@@ -1,22 +1,22 @@
 from typing import List, Literal
 from lammpsinputbuilder.model.base_model import BaseObjectModel
-from lammpsinputbuilder.model.group_model import GroupModel
-from lammpsinputbuilder.model.instruction_model import InstructionModel
-from lammpsinputbuilder.model.extension_model import ExtensionModel
-from lammpsinputbuilder.model.fileio_model import FileIOModel
-from lammpsinputbuilder.model.integrator_model import IntegratorModel
+from lammpsinputbuilder.model.group_model import GroupUnion
+from lammpsinputbuilder.model.instruction_model import InstructionUnion
+from lammpsinputbuilder.model.extension_model import ExtensionUnion
+from lammpsinputbuilder.model.fileio_model import FileIOUnion
+from lammpsinputbuilder.model.integrator_model import IntegratorUnion
 
 class SectionModel(BaseObjectModel):
     pass
 
 class IntegratorSectionModel(SectionModel):
     class_name: Literal["IntegratorSection"]
-    groups: List[GroupModel] = []
-    instructions: List[InstructionModel] = []
-    fileios: List[FileIOModel] = []
-    extensions: List[ExtensionModel] = []
-    integrator: IntegratorModel
+    groups: List[GroupUnion] = []
+    instructions: List[InstructionUnion] = []
+    fileios: List[FileIOUnion] = []
+    extensions: List[ExtensionUnion] = []
+    integrator: IntegratorUnion
 
-class InstructionSectionModel(SectionModel):
-    class_name: Literal["InstructionSection"]
-    instructions: List[InstructionModel] = []
+class InstructionsSectionModel(SectionModel):
+    class_name: Literal["InstructionsSection"]
+    instructions: List[InstructionUnion] = []

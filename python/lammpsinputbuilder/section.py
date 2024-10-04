@@ -41,7 +41,7 @@ class Section(BaseObject):
         return ""
 
 
-class RecusiveSection(Section):
+class RecursiveSection(Section):
     def __init__(self, section_name: str = "defaultSection") -> None:
         super().__init__(section_name=section_name)
         self.sections: List[Section] = []

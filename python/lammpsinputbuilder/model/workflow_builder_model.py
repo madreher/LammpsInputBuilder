@@ -1,16 +1,15 @@
 from typing import List, Literal
+from pydantic import BaseModel
 
-from lammpsinputbuilder.model.base_model import BaseObjectModel
 from lammpsinputbuilder.model.template_model import TemplateUnion
 from lammpsinputbuilder.model.typedmolecule_model import TypedMolecularSystemUnion
 
-class HeaderModel(BaseObjectModel):
+class HeaderModel(BaseModel):
     major_version: int
     minor_version: int
-    format: str
+    format: Literal["WorkflowBuilder"]
 
-class WorkflowBuilderModel(BaseObjectModel):
-    class_name: Literal["WorkflowBuilder"]
+class WorkflowBuilderModel(BaseModel):
     header: HeaderModel
     sections: List[TemplateUnion] = []
     molecular_system: TypedMolecularSystemUnion

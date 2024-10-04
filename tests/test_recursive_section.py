@@ -1,6 +1,6 @@
 import pytest
 
-from lammpsinputbuilder.section import IntegratorSection, RecusiveSection
+from lammpsinputbuilder.section import IntegratorSection, RecursiveSection
 from lammpsinputbuilder.integrator import NVEIntegrator
 from lammpsinputbuilder.group import AllGroup, IndicesGroup
 from lammpsinputbuilder.fileio import DumpTrajectoryFileIO, DumpStyle
@@ -15,7 +15,7 @@ def test_recursive_section_accessors():
     section = IntegratorSection(integrator=integrator, section_name="mySection")
     assert section.get_integrator().to_dict() == integrator.to_dict()
 
-    recursive_section = RecusiveSection(section_name="recursive")
+    recursive_section = RecursiveSection(section_name="recursive")
     recursive_section.add_section(section)
 
     io = DumpTrajectoryFileIO(
@@ -51,7 +51,7 @@ def test_recursive_section_dict():
     section = IntegratorSection(integrator=integrator, section_name="mySection")
     assert section.get_integrator().to_dict() == integrator.to_dict()
 
-    recursive_section = RecusiveSection(section_name="recursive")
+    recursive_section = RecursiveSection(section_name="recursive")
     recursive_section.add_section(section)
 
     io = DumpTrajectoryFileIO(
@@ -80,7 +80,7 @@ def test_recursive_section_dict():
     recursive_section.add_extension(ext)
 
     assert recursive_section.to_dict() == {
-    "class_name": "RecusiveSection",
+    "class_name": "RecursiveSection",
     "id_name": "recursive",
     "sections": [
         {
@@ -160,7 +160,7 @@ def test_recursive_section_dict():
     ]
 }
 
-    section2 = RecusiveSection()
+    section2 = RecursiveSection()
     section2.from_dict(recursive_section.to_dict(), version=0)
 
     assert section2.to_dict() == recursive_section.to_dict()
@@ -171,7 +171,7 @@ def test_integrator_section_commands():
     section = IntegratorSection(integrator=integrator, section_name="mySection")
     assert section.get_integrator().to_dict() == integrator.to_dict()
 
-    recursive_section = RecusiveSection(section_name="recursive")
+    recursive_section = RecursiveSection(section_name="recursive")
     recursive_section.add_section(section)
 
     io = DumpTrajectoryFileIO(

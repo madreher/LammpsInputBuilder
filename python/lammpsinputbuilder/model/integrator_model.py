@@ -22,7 +22,7 @@ class MinimizeIntegratorModel(IntegratorModel):
     maxeval:int
 
 class MultiPassMinimizeIntegratorModel(IntegratorModel):
-    class_name: Literal["MultiPassMinimizeIntegrator"]
+    class_name: Literal["MultipassMinimizeIntegrator"]
 
 class ManualIntegratorModel(IntegratorModel):
     class_name: Literal["ManualIntegrator"]

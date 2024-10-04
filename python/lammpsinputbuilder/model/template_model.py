@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Union, Literal, Annotated
 from pydantic import Field
 from lammpsinputbuilder.model.section_model import SectionModel, \
-    IntegratorSectionModel, InstructionSectionModel
+    IntegratorSectionModel, InstructionsSectionModel
 from lammpsinputbuilder.model.fileio_model import FileIOUnion
 from lammpsinputbuilder.model.group_model import GroupUnion
 from lammpsinputbuilder.model.extension_model import ExtensionUnion
@@ -16,7 +16,7 @@ class TemplateSectionModel(SectionModel):
     instructions: List[InstructionUnion] = []
 
 class MinimizeTemplateModel(TemplateSectionModel):
-    class_name: Literal["MinimizeTemplateSection"]
+    class_name: Literal["MinimizeTemplate"]
     style: int
     etol: float
     ftol: float
@@ -37,5 +37,5 @@ TemplateUnion = Annotated[ Union[
     MinimizeTemplateModel,
     RecursiveSectionModel,
     IntegratorSectionModel,
-    InstructionSectionModel],
+    InstructionsSectionModel],
     Field(discriminator="class_name")]
