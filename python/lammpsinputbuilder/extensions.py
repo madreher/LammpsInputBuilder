@@ -48,6 +48,8 @@ class LangevinExtension(Extension):
         self.start_temp = start_temp
         self.end_temp = end_temp
         self.damp = damp
+        if seed < 0:
+            raise ValueError("Seed must be a positive integer.")
         self.seed = seed
 
     def to_dict(self) -> dict:
@@ -74,6 +76,8 @@ class LangevinExtension(Extension):
         self.damp = TimeQuantity()
         self.damp.from_dict(d["damp"], version)
         self.seed = d.get("seed", 122345)
+        if self.seed < 0:
+            raise ValueError("Seed must be a positive integer.")
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         return (f"fix {self.get_extension_name()} {self.group} langevin "
