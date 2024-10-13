@@ -1,4 +1,4 @@
-from typing import Union, Annotated, Literal
+from typing import Union, Annotated, Literal, Optional
 
 from pydantic import Field, PositiveInt
 from lammpsinputbuilder.model.base_model import BaseObjectModel
@@ -45,13 +45,13 @@ class SetForceExtensionModel(ExtensionModel):
                      "The given group must exist. "
                      "If not set, the extension is applied to the \"all\" group."),
         default="all")
-    fx: ForceQuantityModel = Field(
+    fx: Optional[ForceQuantityModel] = Field(
         description="The force to set the atoms to for the x component."
     )
-    fy: ForceQuantityModel = Field(
+    fy: Optional[ForceQuantityModel] = Field(
         description="The force to set the atoms to for the y component."
     )
-    fz: ForceQuantityModel = Field(
+    fz: Optional[ForceQuantityModel] = Field(
         description="The force to set the atoms to for the z component."
     )
 
@@ -69,13 +69,13 @@ class MoveExtensionModel(ExtensionModel):
                      "The given group must exist. "
                      "If not set, the extension is applied to the \"all\" group."),
         default="all")
-    vx: VelocityQuantityModel = Field(
+    vx: Optional[VelocityQuantityModel] = Field(
         description="The velocity to set the atoms to for the x component."
     )
-    vy: VelocityQuantityModel = Field(
+    vy: Optional[VelocityQuantityModel] = Field(
         description="The velocity to set the atoms to for the y component."
     )
-    vz: VelocityQuantityModel = Field(
+    vz: Optional[VelocityQuantityModel] = Field(
         description="The velocity to set the atoms to for the z component."
     )
 

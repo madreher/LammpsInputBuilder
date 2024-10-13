@@ -126,11 +126,14 @@ class SetForceExtension(Extension):
         super().from_dict(d, version)
         self.group = d.get("group_name", AllGroup().get_group_name())
         self.fx = ForceQuantity()
-        self.fx.from_dict(d["fx"], version)
+        if "fx" in d:
+            self.fx.from_dict(d["fx"], version)
         self.fy = ForceQuantity()
-        self.fy.from_dict(d["fy"], version)
+        if "fy" in d:
+            self.fy.from_dict(d["fy"], version)
         self.fz = ForceQuantity()
-        self.fz.from_dict(d["fz"], version)
+        if "fz" in d:
+            self.fz.from_dict(d["fz"], version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         return (f"fix {self.get_extension_name()} {self.group} setforce "
@@ -179,11 +182,14 @@ class MoveExtension(Extension):
         super().from_dict(d, version)
         self.group = d.get("group_name", AllGroup().get_group_name())
         self.vx = VelocityQuantity()
-        self.vx.from_dict(d["vx"], version)
+        if "vx" in d:
+            self.vx.from_dict(d["vx"], version)
         self.vy = VelocityQuantity()
-        self.vy.from_dict(d["vy"], version)
+        if "vy" in d:
+            self.vy.from_dict(d["vy"], version)
         self.vz = VelocityQuantity()
-        self.vz.from_dict(d["vz"], version)
+        if "vz" in d:
+            self.vz.from_dict(d["vz"], version)
 
     def add_do_commands(self, global_information: GlobalInformation) -> str:
         return (f"fix {self.get_extension_name()} {self.group} move linear "
