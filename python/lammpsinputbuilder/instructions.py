@@ -1,6 +1,6 @@
 """Module containing the definition of the Instruction class and its subclasses."""
 
-from enum import Enum
+from enum import IntEnum
 
 from lammpsinputbuilder.quantities import TimeQuantity, TemperatureQuantity
 from lammpsinputbuilder.group import Group, AllGroup
@@ -152,7 +152,7 @@ class VelocityCreateInstruction(Instruction):
                 f"{self.seed} dist gaussian\n")
 
 
-class VariableStyle(Enum):
+class VariableStyle(IntEnum):
     DELETE = 0
     ATOMFILE = 1
     FILE = 2
@@ -300,12 +300,18 @@ class DisplaceAtomsInstruction(Instruction):
                 f"Expected class {self.__class__.__name__}, got {d['class_name']}.")
         super().from_dict(d, version)
         self.group = d.get("group_name", AllGroup().get_group_name())
-        self.dx = LengthQuantity()
-        self.dx.from_dict(d.get("dx", {}), version=version)
-        self.dy = LengthQuantity()
-        self.dy.from_dict(d.get("dy", {}), version=version)
-        self.dz = LengthQuantity()
-        self.dz.from_dict(d.get("dz", {}), version=version)
+        self.dx = LengthQuantity(0.0,"lmp_real_length")
+        if "dx" in d:
+            self.dx.from_dict(d.get("dx", {}), version=version)
+
+        self.dy = LengthQuantity(0.0,"lmp_real_length")
+        if "dy" in d:
+            self.dy.from_dict(d.get("dy", {}), version=version)
+
+        self.dz = LengthQuantity(0.0,"lmp_real_length")
+        if "dz" in d:
+            self.dz.from_dict(d.get("dz", {}), version=version)
+
         self.validate()
 
     def write_instruction(self, global_information: GlobalInformation) -> str:
