@@ -20,9 +20,9 @@
 | python/lammpsinputbuilder/loader/section\_loader.py         |       22 |        2 |     91% |    23, 26 |
 | python/lammpsinputbuilder/loader/typedmolecule\_loader.py   |       17 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/base\_model.py              |        3 |        0 |    100% |           |
-| python/lammpsinputbuilder/model/extension\_model.py         |       37 |        0 |    100% |           |
-| python/lammpsinputbuilder/model/fileio\_model.py            |       28 |        0 |    100% |           |
-| python/lammpsinputbuilder/model/group\_model.py             |       25 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/extension\_model.py         |       49 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/fileio\_model.py            |       37 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/group\_model.py             |       43 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/instruction\_model.py       |       33 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/integrator\_model.py        |       27 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/quantity\_model.py          |       18 |        0 |    100% |           |
@@ -41,7 +41,7 @@
 | python/lammpsinputbuilder/utility/string\_utils.py          |        4 |        0 |    100% |           |
 | python/lammpsinputbuilder/version.py                        |       15 |        2 |     87% |    11, 14 |
 | python/lammpsinputbuilder/workflow\_builder.py              |       77 |       10 |     87% |25, 30, 41, 98, 102, 106, 109, 113, 117, 120 |
-|                                                   **TOTAL** | **2638** |  **190** | **93%** |           |
+|                                                   **TOTAL** | **2677** |  **190** | **93%** |           |
 
 
 ## Setup coverage badge
