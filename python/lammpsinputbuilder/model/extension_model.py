@@ -55,6 +55,13 @@ class SetForceExtensionModel(ExtensionModel):
         description="The force to set the atoms to for the z component."
     )
 
+    class Config:
+        title = "SetForceExtension"
+        json_schema_extra = {
+            "description": ("Fix the force vector of a group of atoms. "
+                            "Lammps documentation: https://docs.lammps.org/fix_setforce.html")
+        }
+
 class MoveExtensionModel(ExtensionModel):
     class_name: Literal["MoveExtension"]
     group_name: str = Field(
@@ -72,6 +79,15 @@ class MoveExtensionModel(ExtensionModel):
         description="The velocity to set the atoms to for the z component."
     )
 
+    class Config:
+        title = "MoveExtension"
+        json_schema_extra = {
+            "description": ("Apply a velocity vector to a group of atoms. "
+                            "The move command is currently forced to be linear. "
+                            "Use the ManualExtensionModel if another profile is needed. "
+                            "Lammps documentation: https://docs.lammps.org/fix_move.html")
+        }
+
 class InstructionExtensionModel(ExtensionModel):
     class_name: Literal["InstructionExtension"]
     instruction: InstructionUnion = Field(
@@ -80,6 +96,14 @@ class InstructionExtensionModel(ExtensionModel):
                      "method of the Extension is called.")
     )
 
+    class Config:
+        title = "InstructionExtension"
+        json_schema_extra = {
+            "description": ("Convert an Instruction object into an Extension object."
+                            " The Instruction command is written when the add_do_commands "
+                            "method of the Extension is called.")
+        }
+
 class ManualExtensionModel(ExtensionModel):
     class_name: Literal["ManualExtension"]
     do_cmd: str = Field(
@@ -87,9 +111,18 @@ class ManualExtensionModel(ExtensionModel):
                     "The field can contain multiple commands separated by newlines.")
     )
     undo_cmd: str = Field(
-        description=("The Lammps command(s) to execute when the add_undo_commands method is called. "
-                    "The field can contain multiple commands separated by newlines.")
+        description=("The Lammps command(s) to execute when the add_undo_commands method is called."
+                    " The field can contain multiple commands separated by newlines.")
     )
+
+    class Config:
+        title = "ManualExtension"
+        json_schema_extra = {
+            "description": ("Extension fully written by the user. The user is responsible for "
+                            "writing the commands in the do_cmd and undo_cmd sections. "
+                            "Note that no verifications can be done on the commands and are the"
+                            " sole responsibility of the user.")
+        }
 
 ExtensionUnion = Annotated[Union[
     LangevinExtensionModel,
