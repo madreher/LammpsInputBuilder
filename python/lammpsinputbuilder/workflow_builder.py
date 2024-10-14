@@ -15,27 +15,86 @@ logger = logging.getLogger(__name__)
 
 
 class WorkflowBuilder:
+    """
+    The WorkflowBuilder is the entry point to define a workflow and generate 
+    the corresponding Lammps input files. A workflow is define by a molecular 
+    system and a sequence of sections to execute. If no section is provided,
+    then Lammps inputs will only contains the declaration of the molecular system.
+    """
 
     def __init__(self):
+        """
+        Initialize a new WorkflowBuilder.
+        """
         self.molecule = None
         self.sections = []
 
     def set_typed_molecular_system(self, molecule: TypedMolecularSystem):
+        """
+        Set the molecular system to use.
+
+        Args:
+            molecule (TypedMolecularSystem): The molecular system to use.
+
+        Returns: 
+            None
+
+        Raise:
+            ValueError: If the molecule is not loaded.
+        """
         if not molecule.is_model_loaded():
             raise ValueError(
                 "The molecule must be loaded before it can be set.")
         self.molecule = molecule
 
     def get_typed_molecular_system(self) -> TypedMolecularSystem:
+        """
+        Get the molecular system currently set. If no molecular system is set,
+        then None is returned.
+
+        Returns:
+            TypedMolecularSystem: The molecular system to use.
+        """
         return self.molecule
 
     def add_section(self, section: Section):
+        """
+        Add a section to the workflow.
+
+        Args:
+            section (Section): The section to add.
+        Returns:
+            None
+        """
         self.sections.append(section)
 
     def get_sections(self) -> List[Section]:
+        """
+        Get the list of sections currently set.
+
+        Returns:
+            List[Section]: The list of sections.
+        """
         return self.sections
 
     def generate_inputs(self, job_folder_prefix: Path = None) -> Path:
+        """
+        Generate the input files for the workflow. This include a Lammps data file, 
+        a Lammps input file, and a copy of the molecule file and the potential file 
+        used to define the molecular system. 
+        If the job_folder_prefix is not None, then a new job folder will be created in that folder. 
+        Otherwise, tempfile.gettempdir() will be used as prefix.
+
+        Args: 
+            job_folder_prefix (Path): The prefix to use for the job folder.
+        
+        Returns:
+            Path: The path to the folder with the generated input files.
+
+        Raise:
+            ValueError: If the molecule is not set.
+        """
+
 
         if self.molecule is None:
             raise ValueError(
@@ -74,8 +133,14 @@ class WorkflowBuilder:
             f.write(section_content)
 
         return job_folder
-    
+
     def to_dict(self) -> dict:
+        """
+        Generate a dictionary representation of the workflow.
+
+        Returns:
+            dict: The dictionary representation of the workflow.
+        """
         result = {}
         result["header"] = {
             "format": self.__class__.__name__,
@@ -88,12 +153,33 @@ class WorkflowBuilder:
 
         if len(self.sections) > 0:
             result["sections"] = [s.to_dict() for s in self.sections]
-  
+
         return result
 
     def from_dict(self, d: dict, version: int):
+        """
+        Parse the dictionary representation of the workflow and load it into 
+        the current object.
+
+        Args:
+            d (dict): The dictionary representation of the workflow.
+            version (int): The version of the dictionary representation.
+
+        Returns:
+            None
+
+        Raise:
+            ValueError: If the version is not supported.
+            ValueError: If the header is not found
+            ValueError: If the format is not found or supported.
+            ValueError: If the major version is not found or supported.
+            ValueError: If the minor version is not found or supported.
+        """
+        if version != 0:
+            raise ValueError(f"Unsupported version {version}")
+
         del version  # unused
-        
+
         if "header" not in d:
             raise ValueError("No header in JSON file, "
                              "unable to determine the format of the json file.")
@@ -129,5 +215,4 @@ class WorkflowBuilder:
             from lammpsinputbuilder.loader.section_loader import SectionLoader
             loader = SectionLoader()
             for s in d["sections"]:
-                self.sections.append(loader.dict_to_section(s))    
-        
+                self.sections.append(loader.dict_to_section(s))
