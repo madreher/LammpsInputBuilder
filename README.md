@@ -24,11 +24,11 @@
 | python/lammpsinputbuilder/model/fileio\_model.py            |       37 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/group\_model.py             |       43 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/instruction\_model.py       |       51 |        0 |    100% |           |
-| python/lammpsinputbuilder/model/integrator\_model.py        |       27 |        0 |    100% |           |
-| python/lammpsinputbuilder/model/quantity\_model.py          |       18 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/integrator\_model.py        |       42 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/quantity\_model.py          |       42 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/section\_model.py           |       20 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/template\_model.py          |       32 |        0 |    100% |           |
-| python/lammpsinputbuilder/model/typedmolecule\_model.py     |       22 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/typedmolecule\_model.py     |       23 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/workflow\_builder\_model.py |       12 |        0 |    100% |           |
 | python/lammpsinputbuilder/quantities.py                     |      176 |       16 |     91% |82, 85, 105, 115, 132, 142, 162, 173, 190, 200, 220, 230, 246, 256, 273, 283 |
 | python/lammpsinputbuilder/section.py                        |      290 |       12 |     96% |23, 31-34, 37-38, 41, 57, 201, 247, 250 |
@@ -41,7 +41,7 @@
 | python/lammpsinputbuilder/utility/string\_utils.py          |        4 |        0 |    100% |           |
 | python/lammpsinputbuilder/version.py                        |       15 |        2 |     87% |    11, 14 |
 | python/lammpsinputbuilder/workflow\_builder.py              |       77 |       10 |     87% |25, 30, 41, 98, 102, 106, 109, 113, 117, 120 |
-|                                                   **TOTAL** | **2704** |  **190** | **93%** |           |
+|                                                   **TOTAL** | **2744** |  **190** | **93%** |           |
 
 
 ## Setup coverage badge
