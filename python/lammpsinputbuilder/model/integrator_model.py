@@ -55,8 +55,8 @@ class MinimizeIntegratorModel(IntegratorModel):
     class Config:
         title = "MinimizeIntegrator"
         json_schema_extra = {
-            "description": ("Perform an energy minimization of the system, by iteratively adjusting "
-                            "atom coordinates. Iterations are terminated when one of the stopping "
+            "description": ("Perform an energy minimization of the system, by iteratively adjusting"
+                            " atom coordinates. Iterations are terminated when one of the stopping "
                             "criteria is satisfied."
                             "Lammps documentation: https://docs.lammps.org/minimize.html")
         }
