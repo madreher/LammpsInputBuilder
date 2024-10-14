@@ -6,7 +6,7 @@
 |------------------------------------------------------------ | -------: | -------: | ------: | --------: |
 | python/lammpsinputbuilder/\_\_init\_\_.py                   |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/base.py                           |       20 |        3 |     85% | 60-61, 90 |
-| python/lammpsinputbuilder/extensions.py                     |      173 |       19 |     89% |24-25, 28, 52, 68, 80, 124, 180, 218, 228, 232, 255, 262-265, 268-270 |
+| python/lammpsinputbuilder/extensions.py                     |      173 |       19 |     89% |73-74, 87, 131, 167, 179, 278, 391, 477, 497, 509, 572, 591-594, 603-605 |
 | python/lammpsinputbuilder/fileio.py                         |      217 |       22 |     90% |26-27, 30, 33, 88, 112, 120, 128-132, 142-145, 174, 188, 209, 218, 236, 264, 299, 309, 315 |
 | python/lammpsinputbuilder/group.py                          |      186 |       19 |     90% |22, 25, 46, 54, 65, 97, 120, 176, 182, 194, 226, 237, 243, 246, 263, 269, 281, 289, 295 |
 | python/lammpsinputbuilder/instructions.py                   |      205 |       11 |     95% |24-25, 39, 52, 79, 90, 127, 140, 229, 299, 343 |
