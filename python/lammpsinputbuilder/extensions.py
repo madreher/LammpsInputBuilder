@@ -553,11 +553,11 @@ class ManualExtension(Extension):
 
     def from_dict(self, d: dict, version: int):
         """
-        Parse the dictionary representation of the workflow and load it into 
+        Parse the dictionary representation of the extension and load it into 
         the current object.
 
         Args:
-            d (dict): The dictionary representation of the workflow.
+            d (dict): The dictionary representation of the extension.
             version (int): The version of the dictionary representation.
 
         Returns:
