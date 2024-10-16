@@ -9,7 +9,7 @@
 | python/lammpsinputbuilder/extensions.py                     |      173 |       19 |     89% |73-74, 87, 131, 167, 179, 278, 391, 477, 497, 509, 572, 591-594, 603-605 |
 | python/lammpsinputbuilder/fileio.py                         |      218 |       22 |     90% |74-75, 88, 98, 222, 260, 268, 276-280, 303-306, 380, 414, 462, 491, 537, 584, 676, 695, 707 |
 | python/lammpsinputbuilder/group.py                          |      190 |       22 |     88% |69, 82, 131, 157-158, 188, 264, 330, 449-450, 474-475, 506, 587, 617, 630, 640, 688, 709, 740, 754, 766 |
-| python/lammpsinputbuilder/instructions.py                   |      205 |       11 |     95% |24-25, 39, 52, 79, 90, 127, 140, 229, 299, 343 |
+| python/lammpsinputbuilder/instructions.py                   |      205 |       11 |     95% |59-60, 102, 140, 209, 239, 332, 364, 514, 625, 715 |
 | python/lammpsinputbuilder/integrator.py                     |      196 |        9 |     95% |32, 46, 79, 152, 189, 269, 279, 284, 289 |
 | python/lammpsinputbuilder/loader/\_\_init\_\_.py            |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/loader/extension\_loader.py       |       20 |        0 |    100% |           |
