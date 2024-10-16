@@ -76,7 +76,7 @@ def test_minimize_template_commands():
     assert isinstance(section_list[0], IntegratorSection)
     assert section_list[0].get_section_name() == "minimizationTemplate"
     assert section_list[0].get_integrator().get_integrator_name() == "minimizer"
-    assert section_list[0].get_integrator().get_style() == MinimizeStyle.CG
+    assert section_list[0].get_integrator().get_minimize_style() == MinimizeStyle.CG
     assert section_list[0].get_integrator().get_etol() == 0.02
     assert section_list[0].get_integrator().get_ftol() == 0.03
     assert section_list[0].get_integrator().get_maxiter() == 400
