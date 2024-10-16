@@ -6,6 +6,8 @@ def test_LengthQuantityDeclarations():
     lengthQuantity = LengthQuantity(1.0, "angstrom")
     assert lengthQuantity.get_magnitude() == 1.0
     assert lengthQuantity.get_units() == "angstrom"
+    assert lengthQuantity.is_valid_unit("angstrom") is True
+    assert lengthQuantity.is_valid_unit("s") is False
 
     dict_result = lengthQuantity.to_dict()
     assert dict_result["magnitude"] == 1.0
@@ -41,6 +43,8 @@ def test_TimeQuantityDeclarations():
     timeQuantity = TimeQuantity(1.0, "ps")
     assert timeQuantity.get_magnitude() == 1.0
     assert timeQuantity.get_units() == "ps"
+    assert timeQuantity.is_valid_unit("s") is True
+    assert timeQuantity.is_valid_unit("bohr") is False
 
     dict_result = timeQuantity.to_dict()
     assert dict_result["magnitude"] == 1.0
@@ -74,6 +78,8 @@ def test_VelocityQuantityDeclarations():
     velocityQuantity = VelocityQuantity(1.0, "m/s")
     assert velocityQuantity.get_magnitude() == 1.0
     assert velocityQuantity.get_units() == "m/s"
+    assert velocityQuantity.is_valid_unit("angstrom/s") is True
+    assert velocityQuantity.is_valid_unit("bohr") is False
 
     dict_result = velocityQuantity.to_dict()
     assert dict_result["magnitude"] == 1.0
@@ -107,6 +113,8 @@ def test_EnergyQuantityDeclarations():
     energyQuantity = EnergyQuantity(1.0, "kcal/mol")
     assert energyQuantity.get_magnitude() == 1.0
     assert energyQuantity.get_units() == "kcal/mol"
+    assert energyQuantity.is_valid_unit("eV") is True
+    assert energyQuantity.is_valid_unit("bohr") is False
 
     dict_result = energyQuantity.to_dict()
     assert dict_result["magnitude"] == 1.0
@@ -141,6 +149,8 @@ def test_TemperatureQuantityDeclarations():
     temperatureQuantity = TemperatureQuantity(1.0, "K")
     assert temperatureQuantity.get_magnitude() == 1.0
     assert temperatureQuantity.get_units() == "K"
+    assert temperatureQuantity.is_valid_unit("K") is True
+    assert temperatureQuantity.is_valid_unit("bohr") is False
 
     dict_result = temperatureQuantity.to_dict()
     assert dict_result["magnitude"] == 1.0
@@ -174,6 +184,8 @@ def test_ForceQuantityDeclarations():
     forceQuantity = ForceQuantity(1.0, "kcal/mol/angstrom")
     assert forceQuantity.get_magnitude() == 1.0
     assert forceQuantity.get_units() == "kcal/mol/angstrom"
+    assert forceQuantity.is_valid_unit("kcal/mol/angstrom") is True
+    assert forceQuantity.is_valid_unit("bohr") is False
 
     dict_result = forceQuantity.to_dict()
     assert dict_result["magnitude"] == 1.0
@@ -207,6 +219,8 @@ def test_TorqueQuantityDeclarations():
     torqueQuantity = TorqueQuantity(1.0, "kcal/mol")
     assert torqueQuantity.get_magnitude() == 1.0
     assert torqueQuantity.get_units() == "kcal/mol"
+    assert torqueQuantity.is_valid_unit("kcal/mol") is True
+    assert torqueQuantity.is_valid_unit("bohr") is False
 
     dict_result = torqueQuantity.to_dict()
     assert dict_result["magnitude"] == 1.0
