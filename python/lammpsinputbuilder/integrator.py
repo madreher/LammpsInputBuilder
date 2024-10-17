@@ -458,6 +458,9 @@ class MultipassMinimizeIntegrator(Integrator):
 
         Returns:
             None
+        
+        Raise:
+            ValueError: If the class name is not found or the same as the current class
         """
         if d["class_name"] != self.__class__.__name__:
             raise ValueError(
