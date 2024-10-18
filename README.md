@@ -35,7 +35,7 @@
 | python/lammpsinputbuilder/templates/minimize\_template.py   |       60 |        1 |     98% |        66 |
 | python/lammpsinputbuilder/templates/template\_section.py    |       98 |        0 |    100% |           |
 | python/lammpsinputbuilder/typedmolecule.py                  |      280 |       43 |     85% |87-92, 129, 141, 158, 168, 214, 244, 246, 255, 267, 270-275, 284-285, 319, 328, 432, 470, 566, 650, 652, 661, 674, 677-682, 691-692, 719, 729, 766, 829, 861, 868 |
-| python/lammpsinputbuilder/types.py                          |       83 |        3 |     96% |93, 97, 110 |
+| python/lammpsinputbuilder/types.py                          |       83 |        3 |     96% |173, 185, 204 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py           |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/model\_to\_data.py        |      172 |       20 |     88% |34, 55, 58-61, 67-68, 130, 157, 182, 217, 231, 237, 240-241, 246-248, 274, 278 |
 | python/lammpsinputbuilder/utility/string\_utils.py          |        4 |        0 |    100% |           |
