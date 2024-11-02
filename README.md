@@ -6,7 +6,7 @@
 
 ## TLDR
 
-LammpsInputBuilder (or LIB) is a Python library designed to generate Lammps inputs from a molecular model, a forcefield, and a workflow high level definition.
+LammpsInputBuilder (or LIB) is a Python library designed to generate Lammps inputs from a molecular model, a forcefield, and a high level definition of a simulation workflow.
 
 The goal is to provide an API able to create a Lammps input and data scripts to load a molecular model, assign a forcefield to it, and execute a sequence of operations. The current implementation supports ReaxFF and Rebo potentials for the model defintion, with the possibility to extend to other types of forcefields later on. 
 
@@ -697,6 +697,40 @@ This will produce the following image:
 With this picture, we see that the scan generates a total of 10 different bond lists. For most of the scan (dark blue), no new bonds are performed. However, the scan does show some spots on the surface where the tooltip is likely close enough to the surface to interact with its hydrogen atoms. With this image, the user can quickly go back to individual frames to see what happens in these spots of interest.
 
 For a full working example of this workflow, please refer to the script `examples/scanSlab.py`.
+
+## Dev Section
+
+### Build and upload the package on the test repo
+
+Source: https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+Register an account for testpypi: https://test.pypi.org/account/register/
+Create the file ~/.pypirc and add the token api after generating it in the testpypi account.
+
+
+Then you can build and upload the package: 
+
+```
+python3 -m pip install --upgrade build
+python3 -m build
+python3 -m pip install --upgrade twine
+python3 -m twine upload --repository testpypi dist/*
+```
+
+The package is available at the address: https://test.pypi.org/project/lammpsinputbuilder/0.0.2/
+
+To install the package:
+```
+python3 -m venv test-lib
+source test-lib/bin/activate
+pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple lammpsinputbuilder==0.0.2
+``` 
+
+### Upload package by Github actions
+
+The Github workflow needs to be declared in the test Pypi repo. This can be done here: https://test.pypi.org/manage/project/lammpsinputbuilder/settings/publishing/
+
+
 
 
 

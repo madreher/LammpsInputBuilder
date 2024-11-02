@@ -35,3 +35,24 @@ disable = [
     "too-many-ancestors",
     "unexpected-special-method-signature",
 ]
+
+# https://packaging.python.org/en/latest/specifications/pyproject-toml/
+[project]
+name = "lammpsinputbuilder"
+version = "0.0.2"
+authors = [
+  { name="Matthieu Dreher", email="dreher.matthieu@gmail.com" },
+]
+description = "LammpsInputBuilder (or LIB) is a Python library designed to generate Lammps inputs from a molecular model, a forcefield, and a high level definition of a simulation workflow."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies", "maintainers", "license"]
+
+[project.urls]
+Homepage = "https://github.com/madreher/LammpsInputBuilder"
+Issues = "https://github.com/madreher/LammpsInputBuilder/issues"
