@@ -743,7 +743,14 @@ pip3 install -i https://pypi.org/simple/ lammpsinputbuilder==0.0.3
 
 ### Upload package by Github actions
 
-The Github workflow needs to be declared in the test Pypi repo. This can be done here: https://test.pypi.org/manage/project/lammpsinputbuilder/settings/publishing/
+The Github workflow needs to be declared in the test Pypi repo. This can be done here:
+- https://test.pypi.org/manage/project/lammpsinputbuilder/settings/publishing/
+- https://pypi.org/manage/project/lammpsinputbuilder/settings/publishing/ 
+
+Note: The project should already exists and a version should have been pushed manually once before hand otherwise it seems to cause some token issues.
+The version used for the manual upload should also be different than the automated one to avoid trying to upload a file which already exists.
+
+After that, the workflow are implemented following the documentation available here: https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 
 
