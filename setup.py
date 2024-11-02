@@ -8,7 +8,7 @@ setup(
     package_data={"lammpsinputbuilder": ["lib_units.txt"]},
     install_requires=['ase', 'pint', 'lammps-logfile', 'matplotlib','pylint','pydantic'],
     license='MIT License',
-    python_requires='>=3.10',
+    python_requires='>=3.9',
     author='Matthieu Dreher',
     author_email='dreher.matthieu@gmail.com',
     maintainer='Matthieu Dreher',
