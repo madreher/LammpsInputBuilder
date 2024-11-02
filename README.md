@@ -726,6 +726,12 @@ source test-lib/bin/activate
 pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple lammpsinputbuilder==0.0.2
 ``` 
 
+### Upload package by Github actions
+
+The Github workflow needs to be declared in the test Pypi repo. This can be done here: https://test.pypi.org/manage/project/lammpsinputbuilder/settings/publishing/
+
+
+
 
 
 
