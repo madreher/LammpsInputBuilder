@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lammpsinputbuilder",
-    version='0.0.2',
+    version='0.0.3',
     packages=find_packages(where='python'),
     package_dir={'': 'python'},
     package_data={"lammpsinputbuilder": ["lib_units.txt"]},
