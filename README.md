@@ -705,7 +705,19 @@ For a full working example of this workflow, please refer to the script `example
 Source: https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 Register an account for testpypi: https://test.pypi.org/account/register/
-Create the file ~/.pypirc and add the token api after generating it in the testpypi account.
+Register an account for pypi: https://pypi.org/account/register/
+Create the file ~/.pypirc and add the token api after generating it in the testpypi and/or pypi account.
+
+The file should look like this:
+```
+[testpypi]
+  username = __token__
+  password = <pwd>
+
+[pypi]
+  username = __token__
+  password = <pwd>
+```
 
 
 Then you can build and upload the package: 
@@ -715,15 +727,18 @@ python3 -m pip install --upgrade build
 python3 -m build
 python3 -m pip install --upgrade twine
 python3 -m twine upload --repository testpypi dist/*
+python3 -m twine upload --repository pypi dist/*
 ```
 
-The package is available at the address: https://test.pypi.org/project/lammpsinputbuilder/0.0.2/
+The package is available at the address: https://test.pypi.org/project/lammpsinputbuilder/0.0.3/ and https://pypi.org/project/lammpsinputbuilder/0.0.3/
 
 To install the package:
 ```
 python3 -m venv test-lib
 source test-lib/bin/activate
-pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple lammpsinputbuilder==0.0.2
+pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple lammpsinputbuilder==0.0.3
+# OR
+pip3 install -i https://pypi.org/simple/ lammpsinputbuilder==0.0.3
 ``` 
 
 ### Upload package by Github actions

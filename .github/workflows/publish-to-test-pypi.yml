@@ -38,7 +38,7 @@ jobs:
       name: testpypi
       url: https://test.pypi.org/p/lammpsinputbuilder/ 
     permissions:
-      contents: read
+      #contents: read
       id-token: write  # IMPORTANT: mandatory for trusted publishing
     steps:
     - name: Download all the dists
