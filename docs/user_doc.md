@@ -1,90 +1,3 @@
-# LammpsInputBuilder
-
-[![LIB CI/CD](https://github.com/madreher/lammpsinputbuilder/actions/workflows/ci.yml/badge.svg)](https://github.com/madreher/lammpsinputbuilder/actions/workflows/ci.yml)
-[![Coverage badge](https://raw.githubusercontent.com/madreher/lammpsinputbuilder/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/madreher/lammpsinputbuilder/blob/python-coverage-comment-action-data/htmlcov/index.html)
-![PyLint](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/madreher/bc29e267d35fad12ca2de2bd7138ecfc/raw/test.json)
-[![pypi version](https://img.shields.io/pypi/v/lammpsinputbuilder)](https://pypi.org/project/lammpsinputbuilder/)
-
-## TLDR
-
-LammpsInputBuilder (or LIB) is a Python library designed to generate Lammps inputs from a molecular model, a forcefield, and a high level definition of a simulation workflow.
-
-The goal is to provide an API able to create a Lammps input and data scripts to load a molecular model, assign a forcefield to it, and execute a sequence of operations. The current implementation supports ReaxFF and Rebo potentials for the model defintion, with the possibility to extend to other types of forcefields later on. 
-
-Operations are organized in Sections, where each section is organized around typically but not necessary a time integration operations (minimize, nve, run 0, etc). Each Section can be extended to added addition computations (fix, compute, etc) running at the same time of the main time integration operation. 
-
-With this organization, the main objectives of LammpsInputBuilder are:
-- Provide an easy way to generate base Lammps input scripts via a simple Python API
-- Create a reusable library of common Sections types to easily chain common operations without having to copy Lammps code
-- Make is possible for external tools to generate Lammps inputs via a JSON representation of a workflow (under construction)
-
-Here is a simple example (`examples/tldr.py`) on how to load a molecular model, assign a reax potential to it, and minimize the model: 
-```
-    from lammpsinputbuilder.types import BoundingBoxStyle, ElectrostaticMethod
-    from lammpsinputbuilder.typedmolecule import ReaxTypedMolecularSystem
-    from lammpsinputbuilder.workflow_builder import WorkflowBuilder
-    from lammpsinputbuilder.section import IntegratorSection
-    from lammpsinputbuilder.integrator import MinimizeIntegrator, MinimizeStyle
-
-    modelData = Path('benzene.xyz')
-    forcefield = Path('ffield.reax.Fe_O_C_H.reax') 
-
-    typedMolecule = ReaxTypedMolecularSystem(
-        bbox_style=BoundingBoxStyle.PERIODIC,
-        electrostatic_method=ElectrostaticMethod.QEQ
-    )
-    typedMolecule.load_from_file(modelData, forcefield)
-
-    # Create the workflow. In this case, it's only the molecule
-    workflow = WorkflowBuilder()
-    workflow.set_typed_molecular_system(typedMolecule)
-
-    # Create a minimization Section 
-    sectionMin = IntegratorSection(
-        integrator=MinimizeIntegrator(
-            integrator_name="Minimize",
-            style=MinimizeStyle.CG, 
-            etol=0.01,
-            ftol=0.01, 
-            maxiter=100, 
-            maxeval=10000))
-    workflow.add_section(sectionMin)
-
-    # Generate the inputs
-    job_folder = workflow.generate_inputs()
-```
-
-## Installation
-
-The easiest way to get the latest release is via Pypi. You can install LammpsInputBuilder as follows:
-
-```
-# Create a virtual environment
-python3 -m venv lammpsinputbuilder
-source lammpsinputbuilder/bin/activate
-
-# Install LammpsInputBuilder
-pip3 install lammpsinputbuilder
-```
-
-Alternatively, if you would like the latest dev build (unstable), you may install LammpsInputBuilder from source as well:
-```
-# Create a virtual environment
-python3 -m venv lammpsinputbuilder
-source lammpsinputbuilder/bin/activate
-
-git clone git@github.com:madreher/LammpsInputBuilder.git 
-cd LammpsInputBuilder
-pip3 install -e .
-```
-
-## Documentation 
-
-The user documentation can be found [here](docs/user_doc.md). It will provide detailed explanation of the different concepts introduced by LammpsInputBuilder and how to build 
-reusable simulation workflow.
-
-A few notes for maintainers are also available [here](docs/dev_doc.md).
-
 ## How does a Workflow work?
 
 ### Main Objects
@@ -92,7 +5,7 @@ A few notes for maintainers are also available [here](docs/dev_doc.md).
 A LammpsInputBuilder starts by declaring a `WorkflowBuilder` object. This object is responsible for hosting the workflow definition and converting it into a Lammps script.
 The `WorkflowBuilder` is composed of two main parts: a `TypedMolecularSystem`, and a list of `Section`.
 
-<img src="data/images/WorkflowBuilder.svg" alt="WorkflowBuilder chart" height="400" />
+<img src="../data/images/WorkflowBuilder.svg" alt="WorkflowBuilder chart" height="400" />
 
 A `TypedMolecularSystem` represents a molecular model with a forcefield assigned to it. Currently, LIB supports ReaxFF and Airebo potentials but other could be added in the future. With a `TypedMolecularSystem`, the `WorkflowBuilder` can generate a Lammps data file as well as the beginning of the input script.
 
@@ -104,7 +17,7 @@ A non recursive `Section` is usually built around an `Integrator` object. The `I
 
 Finally, the last category of objects is the `TemplateSection`. A `TemplateSection` is the base class to definie high level tasks which may be composed one or several `Section` objects. The example, the class `MinimizeTemplate` provide a high level object to define a minimization and specify a group of anchors without the need for the user to know how to setup anchors during a minimization. To create a new task, the developer need to extend the class `TemplateSection` and implement the methods `generate_sections()` if the task can be decomposed in sections, and override the function `add_all_commands()` if the `TemplateSection` does not follow organization of the `TemplateSection`. 
 
-![Section Organization](data/images/Sections.svg)
+![Section Organization](../data/images/Sections.svg)
 
 ### Unrolling the workflow into a Lammps script and data file
 
@@ -422,7 +335,7 @@ This code will produce all the necessary inputs in a job folder ready to be exec
 
 In this example, we are going to use a passivated slab and a molecular tooltip where the head of the tooltip has an open valence. The goal of this exemple is to move the tooltip above the slab, perform a single point energy calculation at each step, and for each step analyse the potential energy of the system as well as the list of bonds in the system. We are going to model our system using ReaxFF. As we move the tip above the surface, we will export the bonds that will form and break dynamically.
 
-![Passivated slab and tooltip with open head](data/images/slabHeadDepassivated.png)
+![Passivated slab and tooltip with open head](../data/images/slabHeadDepassivated.png)
 
 **IMPORTANT**: The code snippets provided are extracted from `examples/scanSlab.py` and may not be complete for the sake of space. Please refer to the complete example for a working example out of the box. To run the example, you can do as follow from the source folder:
 ```
@@ -438,7 +351,7 @@ The first step in this process is to determine the atom indices of the groups we
 - The anchor of the tooltip (top layer of the tooltip)
 - The head, i.e the last atom at the bottom of the tooltip
 
-![Group decomposition of the model](data/images/SlabGroups.svg)
+![Group decomposition of the model](../data/images/SlabGroups.svg)
 
 With this being done, we can start to load the molecular model with LammpsInputGenerator. This is done as follows:
 
@@ -635,7 +548,7 @@ Another important note is that at no point we perform a time integration step. I
 Once this is done, we can run the workflow. This workflow will produce two files per frame. In the script `examples/scanSlab.py`, we added a postprocessing step to concatenate all the files into a single trajectory file for simplicity and moved all the individual frame files into a subfolder.
 
 This workflow produced the following trajectory:
-![Trajectory of the scan, 1/10 frame](data/video/scan_traj_openhead.gif)
+![Trajectory of the scan, 1/10 frame](../data/video/scan_traj_openhead.gif)
 
 #### Phase 3: Analysis
 
@@ -669,7 +582,7 @@ The image can be generated as follows:
     plt.clf()
 ```
 This will generate the following image:
-![Potential Energy](data/images/potentialEnergyMap_headopen_xy0-5_z1-5.png)
+![Potential Energy](../data/images/potentialEnergyMap_headopen_xy0-5_z1-5.png)
 
 This picture shows the total potential energy of the system as a function of the XY coordinates of the tooltip above the slab.
 
@@ -724,71 +637,8 @@ To evaluate this, we are going to draw another image where the color is going to
 For each frame, we read the list of bonds produced by ReaxFF to determinate the available bond pairs. We filter out the bond pairs which have a bond order deemed too low to be meaningful. Once we have the full list of bond pairs, we sort the list of bonds and generate a unique ID identifying this specific list. Sorting the list of bonds is mandatory to ensure that two arrays with the same list of bonds but in a different order would become the same list and therfor end up with the same unique ID. When a new frame is read and an ID is gennerated, we check if we have already encountered this ID. If no, we assign a new color to the ID and store it. If yes, we assign the color associated to this ID to the current pixel. 
 
 This will produce the following image:
-![Map of bond individual configurations](data/images/bondConfigurationMap_headopen_xy0-5_z1-5.png)
+![Map of bond individual configurations](../data/images/bondConfigurationMap_headopen_xy0-5_z1-5.png)
 
 With this picture, we see that the scan generates a total of 10 different bond lists. For most of the scan (dark blue), no new bonds are performed. However, the scan does show some spots on the surface where the tooltip is likely close enough to the surface to interact with its hydrogen atoms. With this image, the user can quickly go back to individual frames to see what happens in these spots of interest.
 
 For a full working example of this workflow, please refer to the script `examples/scanSlab.py`.
-
-## Dev Section
-
-### Manual build and upload the package on the test repo
-
-Source: https://packaging.python.org/en/latest/tutorials/packaging-projects/
-
-Register an account for testpypi: https://test.pypi.org/account/register/
-Register an account for pypi: https://pypi.org/account/register/
-Create the file ~/.pypirc and add the token api after generating it in the testpypi and/or pypi account.
-
-The file should look like this:
-```
-[testpypi]
-  username = __token__
-  password = <pwd>
-
-[pypi]
-  username = __token__
-  password = <pwd>
-```
-
-
-Then you can build and upload the package: 
-
-```
-python3 -m pip install --upgrade build
-python3 -m build
-python3 -m pip install --upgrade twine
-python3 -m twine upload --repository testpypi dist/*
-python3 -m twine upload --repository pypi dist/*
-```
-
-The package is available at the address: https://test.pypi.org/project/lammpsinputbuilder/0.0.3/ and https://pypi.org/project/lammpsinputbuilder/0.0.3/
-
-To install the package:
-```
-python3 -m venv test-lib
-source test-lib/bin/activate
-pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple lammpsinputbuilder==0.0.3
-# OR
-pip3 install -i https://pypi.org/simple/ lammpsinputbuilder==0.0.3
-``` 
-
-### Automated Build and Upload package by Github actions
-
-The Github workflow needs to be declared in the test Pypi repo. This can be done here:
-- https://test.pypi.org/manage/project/lammpsinputbuilder/settings/publishing/
-- https://pypi.org/manage/project/lammpsinputbuilder/settings/publishing/ 
-
-Note: The project should already exists and a version should have been pushed manually once before hand otherwise it seems to cause some token issues.
-The version used for the manual upload should also be different than the automated one to avoid trying to upload a file which already exists.
-
-After that, the workflow are implemented following the documentation available here: https://packaging.python.org/en/latest/tutorials/packaging-projects/
-
-To trigger the github workflows, the following conditions must be met:
-- The branch name must follow the pattern `test-**` for `test.pypi` and `release-**` for `pypi`. Additionnally, in the case of a release, a tag should also be set with the right version for the package.
-
-
-
-
-
-
