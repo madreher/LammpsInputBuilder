@@ -19,6 +19,7 @@
 | python/lammpsinputbuilder/loader/integrator\_loader.py      |       20 |        0 |    100% |           |
 | python/lammpsinputbuilder/loader/section\_loader.py         |       22 |        2 |     91% |    23, 26 |
 | python/lammpsinputbuilder/loader/typedmolecule\_loader.py   |       17 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/\_\_init\_\_.py             |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/base\_model.py              |        3 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/extension\_model.py         |       49 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/fileio\_model.py            |       37 |        0 |    100% |           |
@@ -32,6 +33,7 @@
 | python/lammpsinputbuilder/model/workflow\_builder\_model.py |       18 |        0 |    100% |           |
 | python/lammpsinputbuilder/quantities.py                     |      176 |       15 |     91% |155, 196, 215, 251, 270, 310, 330, 367, 386, 427, 446, 483, 502, 539, 558 |
 | python/lammpsinputbuilder/section.py                        |      291 |       13 |     96% |64-65, 85-88, 98-99, 107, 161, 418, 546, 549 |
+| python/lammpsinputbuilder/templates/\_\_init\_\_.py         |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/templates/minimize\_template.py   |       60 |        1 |     98% |        66 |
 | python/lammpsinputbuilder/templates/template\_section.py    |       98 |        0 |    100% |           |
 | python/lammpsinputbuilder/typedmolecule.py                  |      280 |       43 |     85% |87-92, 129, 141, 158, 168, 214, 244, 246, 255, 267, 270-275, 284-285, 319, 328, 432, 470, 566, 650, 652, 661, 674, 677-682, 691-692, 719, 729, 766, 829, 861, 868 |
