@@ -2,10 +2,10 @@ from setuptools import find_packages, setup
 
 setup(
     name="lammpsinputbuilder",
-    version='0.0.5',
+    version='0.0.6',
     packages=find_packages(where='python'),
     package_dir={'': 'python'},
-    package_data={"lammpsinputbuilder": ["lib_units.txt"]},
+    package_data={"lammpsinputbuilder": ["units.txt"]},
     install_requires=['ase', 'pint', 'lammps-logfile', 'matplotlib','pylint','pydantic'],
     license='MIT License',
     python_requires='>=3.9',

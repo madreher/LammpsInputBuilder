@@ -37,9 +37,9 @@ disable = [
 ]
 
 # https://packaging.python.org/en/latest/specifications/pyproject-toml/
+# version = "0.0.6"
 [project]
 name = "lammpsinputbuilder"
-version = "0.0.5"
 authors = [
   { name="Matthieu Dreher", email="dreher.matthieu@gmail.com" },
 ]
@@ -51,7 +51,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dynamic = ["dependencies", "maintainers", "license"]
+dynamic = ["dependencies", "maintainers", "license", "version"]
 
 [project.urls]
 Homepage = "https://github.com/madreher/LammpsInputBuilder"
