@@ -54,3 +54,4 @@ After that, the workflow are implemented following the documentation available h
 
 To trigger the github workflows, the following conditions must be met:
 - The branch name must follow the pattern `test-**` for `test.pypi` and `release-**` for `pypi`. Additionnally, in the case of a release, a tag should also be set with the right version for the package.
+- To push the tag: `git push origin tag v0.0.6`

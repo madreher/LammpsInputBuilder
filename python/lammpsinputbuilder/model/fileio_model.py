@@ -92,7 +92,7 @@ class ManualFileIOModel(FileIOModel):
                     " The field can contain multiple commands separated by newlines.")
     )
     associated_file_path: str = Field(
-        description=("The file path of the file being produced by the fileio. ",
+        description=("The file path of the file being produced by the fileio. "
                      "Typically would return the filename of the trajectory file "
                      "produced in the job folder.")
     )

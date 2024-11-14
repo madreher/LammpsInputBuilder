@@ -18,7 +18,7 @@ class RunZeroIntegratorModel(IntegratorModel):
 class NVEIntegratorModel(IntegratorModel):
     class_name: Literal["NVEIntegrator"]
     group_name:str = Field(
-        description=("Name of a group to apply the integrator to.",
+        description=("Name of a group to apply the integrator to."
                      "The given group must exist. "
                      "If not set, the integrator is applied to the \"all\" group."),
         default="all"
