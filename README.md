@@ -29,21 +29,21 @@
 | python/lammpsinputbuilder/model/quantity\_model.py          |       42 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/section\_model.py           |       27 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/template\_model.py          |       41 |        0 |    100% |           |
-| python/lammpsinputbuilder/model/typedmolecule\_model.py     |       23 |        0 |    100% |           |
+| python/lammpsinputbuilder/model/typedmolecule\_model.py     |       25 |        0 |    100% |           |
 | python/lammpsinputbuilder/model/workflow\_builder\_model.py |       18 |        0 |    100% |           |
 | python/lammpsinputbuilder/quantities.py                     |      176 |       15 |     91% |155, 196, 215, 251, 270, 310, 330, 367, 386, 427, 446, 483, 502, 539, 558 |
 | python/lammpsinputbuilder/section.py                        |      291 |       13 |     96% |64-65, 85-88, 98-99, 107, 161, 418, 546, 549 |
 | python/lammpsinputbuilder/templates/\_\_init\_\_.py         |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/templates/minimize\_template.py   |       60 |        1 |     98% |        66 |
 | python/lammpsinputbuilder/templates/template\_section.py    |       98 |        0 |    100% |           |
-| python/lammpsinputbuilder/typedmolecule.py                  |      280 |       43 |     85% |87-92, 129, 141, 158, 168, 214, 244, 246, 255, 267, 270-275, 284-285, 319, 328, 432, 470, 566, 650, 652, 661, 674, 677-682, 691-692, 719, 729, 766, 829, 861, 868 |
+| python/lammpsinputbuilder/typedmolecule.py                  |      281 |       43 |     85% |87-92, 129, 141, 158, 168, 214, 244, 246, 255, 267, 270-275, 284-285, 319, 328, 432, 470, 567, 651, 653, 662, 675, 678-683, 692-693, 720, 730, 767, 830, 862, 869 |
 | python/lammpsinputbuilder/types.py                          |       83 |        3 |     96% |173, 185, 204 |
 | python/lammpsinputbuilder/utility/\_\_init\_\_.py           |        0 |        0 |    100% |           |
 | python/lammpsinputbuilder/utility/model\_to\_data.py        |      172 |       20 |     88% |34, 55, 58-61, 67-68, 130, 157, 182, 217, 231, 237, 240-241, 246-248, 274, 278 |
 | python/lammpsinputbuilder/utility/string\_utils.py          |        4 |        0 |    100% |           |
 | python/lammpsinputbuilder/version.py                        |       15 |        2 |     87% |    11, 14 |
 | python/lammpsinputbuilder/workflow\_builder.py              |       79 |       11 |     86% |46, 58, 100, 179, 184, 188, 192, 195, 199, 203, 206 |
-|                                                   **TOTAL** | **2776** |  **197** | **93%** |           |
+|                                                   **TOTAL** | **2779** |  **197** | **93%** |           |
 
 
 ## Setup coverage badge
