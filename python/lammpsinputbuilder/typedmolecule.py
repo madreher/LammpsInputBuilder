@@ -474,6 +474,7 @@ class ReaxTypedMolecularSystem(TypedMolecularSystem):
             d["electrostatic_method"])
         self.model_loaded = d.get("is_model_loaded", False)
         if not self.model_loaded:
+            print("Model not loaded when loading from json.")
             return
         self.forcefield_name = Path(d["forcefield_name"])
         self.molecule_name = Path(d["molecule_name"])

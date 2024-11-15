@@ -1,4 +1,4 @@
-from typing import Union, Literal, Annotated
+from typing import Union, Literal, Annotated, Final
 from pydantic import BaseModel, Field
 from lammpsinputbuilder.types import Forcefield, BoundingBoxStyle, ElectrostaticMethod, MoleculeFileFormat
 
@@ -32,6 +32,7 @@ class ReaxTypedMolecularSystemModel(TypedMolecularSystemModel):
     molecule_content: str = Field(
         description="Content of the molecule file, i.e the atom positions in text format."
     )
+    is_model_loaded: Literal[True]
 
 class AireboTypedMolecularSystemModel(TypedMolecularSystemModel):
     class_name: Literal["AireboTypedMolecularSystem"]
@@ -54,6 +55,7 @@ class AireboTypedMolecularSystemModel(TypedMolecularSystemModel):
     molecule_content: str = Field(
         description="Content of the molecule file, i.e the atom positions in text format."
     )
+    is_model_loaded: Literal[True]
 
 # Not doing a Annoted for now, it requires at least two objects
 TypedMolecularSystemUnion = Annotated[
